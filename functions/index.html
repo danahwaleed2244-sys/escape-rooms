@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>غرفة الهروب: العلاقات والدوال الخطية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* عالم واحد: قبو ليلي بلون الحبر، ونحاس دافئ للأقفال والمفاتيح */
+  --ink:#0f1a24;
+  --panel:#172634;
+  --panel-2:#1e3142;
+  --line:#2e4659;
+  --text:#eef2f5;
+  --muted:#9fb3c3;
+  --brass:#e3a94b;
+  --brass-dk:#b9822c;
+  --ok:#4fc08d;
+  --bad:#e86a5c;
+  --display:"Lalezar","Tajawal",system-ui,sans-serif;
+  --body:"Tajawal","Segoe UI",Tahoma,system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--text);font-family:var(--body);font-size:18px;line-height:1.7}
+body{min-height:100%}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--display);font-weight:400;letter-spacing:0;margin:0;text-wrap:balance;line-height:1.35}
+h1{font-size:2rem;color:var(--brass)}
+h2{font-size:1.45rem}
+p{margin:0}
+.muted{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+button{font-family:var(--body);font-size:1rem;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.btn{background:var(--brass);color:#1b1206;border:0;border-radius:10px;padding:12px 20px;font-weight:800}
+.btn:hover{background:#f0b95c}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
+label{font-weight:700;display:block;margin-bottom:4px}
+input[type=text],select{width:100%;font:inherit;background:var(--ink);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.field{display:flex;flex-direction:column}
+.form{display:grid;gap:14px}
+
+/* خريطة الغرف */
+.map{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.door{background:var(--panel-2);border:1px solid var(--line);border-radius:10px 10px 4px 4px;padding:10px 4px 8px;text-align:center;font-size:.8rem;line-height:1.35;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;min-height:96px}
+.door svg{width:26px;height:26px}
+.door.open{border-color:var(--ok);color:var(--text)}
+.door.now{border-color:var(--brass);color:var(--text);box-shadow:0 0 0 2px rgba(227,169,75,.25)}
+
+/* رأس الغرفة */
+.roomhead{display:flex;flex-direction:column;gap:6px}
+.tag{display:inline-block;align-self:flex-start;background:var(--panel-2);border:1px solid var(--line);color:var(--brass);border-radius:999px;padding:2px 12px;font-size:.85rem;font-weight:700}
+.slots{display:flex;gap:8px;justify-content:center}
+.slot{width:48px;height:56px;border-radius:8px;border:2px dashed var(--line);display:grid;place-items:center;font-size:1.6rem;font-weight:800;color:var(--brass);background:var(--ink)}
+.slot.got{border-style:solid;border-color:var(--brass)}
+
+/* السؤال */
+.qnum{font-size:.9rem;color:var(--muted);font-weight:700}
+.qtext{font-size:1.12rem;font-weight:500}
+.opts{display:grid;gap:10px;margin-top:14px}
+.opt{display:flex;align-items:center;gap:12px;text-align:right;background:var(--panel-2);color:var(--text);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:1.08rem;line-height:1.6}
+.opt:hover:not(:disabled){border-color:var(--brass)}
+.opt .k{flex:0 0 32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--ink);color:var(--brass);font-weight:800}
+.opt.wrong{border-color:var(--bad);opacity:.55;text-decoration:line-through;text-decoration-color:var(--bad)}
+.opt.right{border-color:var(--ok);background:rgba(79,192,141,.12)}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;border-radius:12px;padding:14px;line-height:1.85}
+.fb.hint{background:rgba(232,106,92,.1);border:1px solid rgba(232,106,92,.45)}
+.fb.sol{background:rgba(79,192,141,.08);border:1px solid rgba(79,192,141,.45)}
+.fb b{display:block;margin-bottom:4px}
+.digit{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:700;color:var(--brass)}
+.digit span.big{font-size:1.8rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* الرمز */
+.codebox{display:flex;gap:8px;justify-content:center}
+.codebox input{width:52px;height:60px;text-align:center;font-size:1.6rem;font-weight:800;background:var(--ink);color:var(--brass);border:2px solid var(--line);border-radius:8px;font-family:var(--body)}
+.err{color:var(--bad);font-weight:700;text-align:center}
+
+/* الشهادة */
+.cert{border:2px solid var(--brass);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.cert .name{font-family:var(--display);font-size:1.8rem;color:var(--brass)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.stat{background:var(--panel-2);border-radius:10px;padding:10px 4px}
+.stat .v{font-size:1.4rem;font-weight:800}
+.stat .l{font-size:.8rem;color:var(--muted)}
+.praise{display:flex;flex-direction:column;gap:10px;background:var(--panel-2);border-radius:12px;padding:16px;width:100%;line-height:1.9}
+.praise .pt{font-family:var(--display);font-size:1.35rem;color:var(--ok)}
+.praise .thanks{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+
+/* الرياضيات: كل تعبير معزول باتجاه من اليمين لليسار مثل الكتاب */
+.m{unicode-bidi:isolate;direction:rtl;white-space:nowrap;font-weight:700}
+.m bdi{unicode-bidi:isolate}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;font-size:.85em;margin:0 2px}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.fr>span{padding:0 3px}
+sup{font-size:.7em;line-height:0}
+.steps{display:block}
+.pl{width:100%;display:block;margin:10px auto 0}
+.tbl{overflow-x:auto;margin-top:10px}.tbl table{border-collapse:collapse;margin:0 auto;font-weight:700}.tbl th,.tbl td{border:1px solid var(--line);padding:6px 12px;text-align:center}.tbl th{color:var(--brass);font-weight:700}
+.opt .pl{margin:0}
+.nl{width:100%;max-width:420px;display:block;margin:10px auto 0}
+.shape{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.shape svg{max-width:220px;width:46%}
+
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .5s ease-out}
+@keyframes pop{from{transform:scale(.6)}to{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.shake,.pop{animation:none}}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media (max-width:400px){html,body{font-size:17px}.slot{width:42px;height:50px}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app" aria-live="polite"></main>
+
+<script>
+/* ===== أدوات كتابة الرياضيات ===== */
+const M = s => `<span class="m">${s}</span>`;
+const F = (a,b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const P = (base,exp) => `<bdi>${base}</bdi><bdi><sup>${exp}</sup></bdi>`;
+
+function numberLine(points, lo=-5, hi=6){
+  // خط أعداد، والسالب يسار مثل الكتاب
+  const ar = n => String(Math.abs(n)).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+  const step = 330/(hi-lo);
+  const x = n => 30 + (n-lo)*step;
+  let s = `<svg class="nl" viewBox="0 0 390 62" direction="ltr" role="img" aria-label="خط أعداد">`;
+  s += `<line x1="8" y1="22" x2="382" y2="22" stroke="#9fb3c3" stroke-width="2"/>`;
+  s += `<path d="M8 22 l10 -6 v12z M382 22 l-10 -6 v12z" fill="#9fb3c3"/>`;
+  for(let n=lo;n<=hi;n++){
+    s += `<line x1="${x(n)}" y1="15" x2="${x(n)}" y2="29" stroke="#9fb3c3" stroke-width="2"/>`;
+    s += `<text x="${x(n)}" y="50" fill="#eef2f5" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl">${n<0?'−':''}${ar(n)}</text>`;
+  }
+  points.forEach(p=> s += `<circle cx="${x(p)}" cy="22" r="7" fill="#e3a94b"/>`);
+  return s + `</svg>`;
+}
+
+const areaQ = `<div class="shape">
+<svg viewBox="0 0 220 140" role="img" aria-label="المستطيل الأول">
+ <rect x="45" y="15" width="150" height="80" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="122" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٣</text>
+ <text x="25" y="60" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٨</text>
+</svg>
+<svg viewBox="0 0 220 140" role="img" aria-label="المستطيل الثاني">
+ <rect x="45" y="30" width="150" height="60" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="117" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٧</text>
+ <text x="25" y="66" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٦</text>
+</svg></div>`;
+
+const shapesQ = `<div class="shape">
+<svg viewBox="0 0 220 130" role="img" aria-label="مستطيل">
+ <rect x="40" y="20" width="160" height="70" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="115" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ١٣</text>
+ <text x="22" y="60" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س</text>
+</svg>
+<svg viewBox="0 0 220 130" role="img" aria-label="مثلث">
+ <polygon points="45,15 45,95 205,95" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="125" y="120" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س + ٥</text>
+ <text x="22" y="62" fill="#eef2f5" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl" transform="rotate(-90 22 58)">٣س + ٤</text>
+ <text x="140" y="45" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٥س + ١</text>
+</svg></div>`;
+
+/* ===== رسومات: مستوى إحداثي، مخطط سهمي، تمثيل وصفي ===== */
+const ARD = n => String(Math.abs(n)).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const C='#e3a94b', G='#9fb3c3', GL='#2e4659', TX='#eef2f5';
+
+// مستوى إحداثي من -r إلى r مع نقاط و/أو مستقيمات
+function PL(o){
+  const r=o.r||5, sz=o.size||220, pad=14, u=(sz-2*pad)/(2*r);
+  const X=x=>pad+(x+r)*u, Y=y=>pad+(r-y)*u;
+  let s=`<svg class="pl" viewBox="0 0 ${sz} ${sz}" style="max-width:${sz}px" direction="ltr" role="img" aria-label="مستوى إحداثي">`;
+  for(let i=-r;i<=r;i++){ s+=`<line x1="${X(i)}" y1="${Y(-r)}" x2="${X(i)}" y2="${Y(r)}" stroke="${GL}" stroke-width="1"/><line x1="${X(-r)}" y1="${Y(i)}" x2="${X(r)}" y2="${Y(i)}" stroke="${GL}" stroke-width="1"/>`; }
+  s+=`<line x1="${X(-r)}" y1="${Y(0)}" x2="${X(r)}" y2="${Y(0)}" stroke="${G}" stroke-width="2"/><line x1="${X(0)}" y1="${Y(-r)}" x2="${X(0)}" y2="${Y(r)}" stroke="${G}" stroke-width="2"/>`;
+  s+=`<text x="${X(r)-4}" y="${Y(0)-5}" fill="${TX}" font-size="12" font-family="Tajawal" text-anchor="end">س</text><text x="${X(0)+5}" y="${Y(r)+11}" fill="${TX}" font-size="12" font-family="Tajawal">ص</text>`;
+  (o.ticks||[]).forEach(([v,axis])=>{
+    const lbl=(v<0?'−':'')+ARD(v);
+    if(axis==='x') s+=`<text x="${X(v)}" y="${Y(0)+13}" fill="${TX}" font-size="11" font-family="Tajawal" text-anchor="middle" direction="rtl">${lbl}</text>`;
+    else s+=`<rect x="${X(0)-30}" y="${Y(v)-19}" width="24" height="15" rx="3" fill="#0f1a24"/><text x="${X(0)-9}" y="${Y(v)-7}" fill="${TX}" font-size="11" font-family="Tajawal" text-anchor="end" direction="rtl">${lbl}</text>`;
+  });
+  (o.lines||[]).forEach(([x1,y1,x2,y2])=> s+=`<line x1="${X(x1)}" y1="${Y(y1)}" x2="${X(x2)}" y2="${Y(y2)}" stroke="${C}" stroke-width="3"/>`);
+  (o.paths||[]).forEach(d=> s+=`<path d="${d.map((p,i)=>(i?'L':'M')+X(p[0])+' '+Y(p[1])).join(' ')}" fill="none" stroke="${C}" stroke-width="3"/>`);
+  (o.points||[]).forEach(([x,y])=> s+=`<circle cx="${X(x)}" cy="${Y(y)}" r="4.5" fill="${C}"/>`);
+  return s+`</svg>`;
+}
+
+// مخطط سهمي: المجال يمين والمدى يسار كما في الكتاب
+function MAP(dom, rng, pairs){
+  const h=Math.max(dom.length,rng.length)*34+40;
+  const yD=i=>30+i*34+(Math.max(dom.length,rng.length)-dom.length)*17;
+  const yR=i=>30+i*34+(Math.max(dom.length,rng.length)-rng.length)*17;
+  const lab=v=>(v<0?'−':'')+ARD(v);
+  let s=`<svg class="pl" viewBox="0 0 240 ${h}" style="max-width:240px" direction="ltr" role="img" aria-label="مخطط سهمي">`;
+  s+=`<text x="190" y="14" fill="${G}" font-size="12" font-family="Tajawal" text-anchor="middle">المجال</text><text x="50" y="14" fill="${G}" font-size="12" font-family="Tajawal" text-anchor="middle">المدى</text>`;
+  s+=`<rect x="165" y="20" width="50" height="${h-28}" rx="22" fill="none" stroke="${G}" stroke-width="1.5"/><rect x="25" y="20" width="50" height="${h-28}" rx="22" fill="none" stroke="${G}" stroke-width="1.5"/>`;
+  s+=`<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="${C}"/></marker></defs>`;
+  pairs.forEach(([a,b])=> s+=`<line x1="175" y1="${yD(dom.indexOf(a))}" x2="68" y2="${yR(rng.indexOf(b))}" stroke="${C}" stroke-width="2" marker-end="url(#ah)"/>`);
+  dom.forEach((v,i)=> s+=`<text x="195" y="${yD(i)+5}" fill="${TX}" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl">${lab(v)}</text>`);
+  rng.forEach((v,i)=> s+=`<text x="48" y="${yR(i)+5}" fill="${TX}" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl">${lab(v)}</text>`);
+  return s+`</svg>`;
+}
+
+// تمثيل وصفي (بلا تدريج): محور الزمن ومحور الكمية
+function STORY(pts, yl, xl){
+  let s=`<svg class="pl" viewBox="0 0 240 170" style="max-width:240px" direction="ltr" role="img" aria-label="تمثيل بياني">`;
+  s+=`<line x1="30" y1="140" x2="230" y2="140" stroke="${G}" stroke-width="2"/><line x1="30" y1="140" x2="30" y2="10" stroke="${G}" stroke-width="2"/>`;
+  s+=`<text x="130" y="162" fill="${TX}" font-size="12" font-family="Tajawal" text-anchor="middle">${xl}</text><text x="16" y="75" fill="${TX}" font-size="12" font-family="Tajawal" text-anchor="middle" transform="rotate(-90 16 75)">${yl}</text>`;
+  s+=`<polyline points="${pts.map(([x,y])=>`${30+x*2} ${140-y*1.3}`).join(' ')}" fill="none" stroke="${C}" stroke-width="3"/>`;
+  return s+`</svg>`;
+}
+
+/* ===== الغرف والأسئلة ===== */
+const ROOMS = [
+ { name:"غرفة الخرائط", lesson:"العلاقات والدوال", code:"71946",
+   intro:"الباب مقفل برمز من خمسة أرقام. تذكري: الدالة تربط كل عنصر في المجال بعنصر واحد فقط في المدى.",
+   qs:[
+   { q:`يوضح التمثيل البياني الآتي المسافة التي قطعتها سارة على دراجتها. أي وصف يناسب التمثيل؟${STORY([[0,0],[35,55],[60,55],[100,100]],'المسافة','الزمن')}`,
+     o:[ 'زادت المسافة بمعدل ثابت طوال الوقت', 'زادت المسافة، ثم توقفت سارة فترة، ثم تابعت السير', 'تناقصت المسافة ثم زادت', 'توقفت سارة في البداية، ثم تحركت' ], a:1,
+     hint:`ماذا يعني الجزء الأفقي من التمثيل؟ هل تتغير المسافة فيه مع مرور الزمن؟`,
+     sol:`الجزء الأول صاعد: المسافة تزيد مع الزمن.<br>الجزء الأفقي: الزمن يمر والمسافة ثابتة، أي أن سارة توقفت.<br>الجزء الأخير صاعد: تابعت السير.` },
+   { q:`أي العلاقات الممثلة بيانيًا الآتية <b>ليست</b> دالة؟`,
+     o:[ PL({r:4,size:130,lines:[[-4,-3,4,3]]}), PL({r:4,size:130,paths:[[[-2.4,4],[-2,2],[-1,-1.2],[0,-2],[1,-1.2],[2,2],[2.4,4]]]}), PL({r:4,size:130,paths:[[[4,3.2],[2,2.2],[0,1.3],[-2,0],[0,-1.3],[2,-2.2],[4,-3.2]]]}), PL({r:4,size:130,lines:[[-4,2,4,2]]}) ], a:2, wide:true,
+     hint:`استعملي اختبار الخط الرأسي: هل يوجد خط رأسي يقطع التمثيل في أكثر من نقطة؟`,
+     sol:`في التمثيل (ج) يقطع خط رأسي، مثل ${M('س = ٢')}، المنحنى في نقطتين.<br>إذن لعنصر واحد من المجال أكثر من عنصر في المدى، فالعلاقة ليست دالة.<br>المستقيم الأفقي دالة، لأن كل خط رأسي يقطعه في نقطة واحدة.` },
+   { q:`ما مدى العلاقة الممثلة بالمخطط السهمي الآتي؟ وهل هي دالة؟${MAP([-2,1,3],[4,5],[[-2,4],[1,5],[3,4]])}`,
+     o:[ `المدى ${M('{−٢ ، ١ ، ٣}')}، وهي دالة`, `المدى ${M('{٤ ، ٥}')}، وليست دالة لأن ٤ ارتبط بعنصرين`, `المدى ${M('{٤ ، ٥}')}، وهي دالة`, `المدى ${M('{٤ ، ٥ ، ٤}')}، وليست دالة` ], a:2,
+     hint:`المدى هو قيم ص. وفي الدالة: هل المشكلة أن يخرج من عنصر في المجال سهمان، أم أن يصل لعنصر في المدى سهمان؟`,
+     sol:`المدى هو العناصر التي تصلها الأسهم: ${M('{٤ ، ٥}')}، ولا نكرر العنصر.<br>كل عنصر في المجال خرج منه سهم واحد فقط، إذن العلاقة دالة.<br>وصول سهمين إلى العدد ٤ لا يمنع أن تكون دالة.` },
+   { q:`إذا كانت ${M(`هـ(س) = ٢${P('س','٢')} − ٣س + ٤`)}، فما قيمة ${M('هـ(−٢) + هـ(١)')}؟`,
+     o:[ M('٥'), M('٩'), M('١٧'), M('٢١') ], a:3,
+     hint:`عوّضي كل قيمة على حدة، وانتبهي: ${M(`${P('(−٢)','٢')} = ٤`)} وليست ${M('−٤')}.`,
+     sol:`${M(`هـ(−٢) = ٢${P('(−٢)','٢')} − ٣(−٢) + ٤ = ٨ + ٦ + ٤ = ١٨`)}<br>${M('هـ(١) = ٢ − ٣ + ٤ = ٣')}<br>${M('هـ(−٢) + هـ(١) = ١٨ + ٣ = ٢١')}` },
+   { q:`إذا كانت ${M('د(س + ٢) = ٣س + ٤')}، فما قاعدة ${M('د(س)')}؟`,
+     o:[ M('د(س) = ٣س + ٢'), M('د(س) = ٣س − ٢'), M('د(س) = ٣س + ١٠'), M('د(س) = س + ٢') ], a:1,
+     hint:`افترضي أن ${M('ع = س + ٢')}، إذن ${M('س = ع − ٢')}. عوّضي في الطرف الأيمن.`,
+     sol:`نضع ${M('ع = س + ٢')}، فيكون ${M('س = ع − ٢')}.<br>${M('د(ع) = ٣(ع − ٢) + ٤ = ٣ع − ٢')}<br>إذن ${M('د(س) = ٣س − ٢')}. تحقق: ${M('د(٥) = ١٣')}، و ${M('٣(٣) + ٤ = ١٣')}.` }
+ ]},
+ { name:"غرفة المقاطع", lesson:"تمثيل المعادلات الخطية وحلها بيانيًا", code:"28503",
+   intro:"المقطع السيني هو حيث ص = ٠، وهو نفسه جذر المعادلة وصفر الدالة. والمقطع الصادي هو حيث س = ٠.",
+   qs:[
+   { q:`الصورة القياسية للمعادلة ${M(`${F('٢','٣')}س − ${F('١','٢')}ص = ٢`)} هي:`,
+     o:[ M('٢س − ص = ٢'), M('٤س + ٣ص = ١٢'), M('−٤س + ٣ص = −١٢'), M('٤س − ٣ص = ١٢') ], a:3,
+     hint:`في الصورة القياسية تكون المعاملات أعدادًا صحيحة، و ${M('أ ≥ ٠')}. اضربي في المضاعف المشترك الأصغر للمقامين.`,
+     sol:`نضرب الطرفين في ٦: ${M('٤س − ٣ص = ١٢')}.<br>الخيار ${M('−٤س + ٣ص = −١٢')} مكافئ لها، لكنه ليس صورة قياسية لأن ${M('أ')} سالبة.` },
+   { q:`يمثل المستقيم في الشكل كمية الماء (باللتر) في خزان أثناء تفريغه بعد س ساعة. يقطع المستقيم محور الصادات عند ٦٠٠ ومحور السينات عند ١٢. ماذا يعني المقطع السيني؟${STORY([[0,100],[100,0]],'الماء (لتر)','الزمن (ساعة)')}`,
+     o:[ 'كان في الخزان ١٢ لترًا في البداية', 'يُفرَّغ الخزان بمعدل ١٢ لترًا كل ساعة', 'يفرغ الخزان تمامًا بعد ١٢ ساعة', 'يتسع الخزان ٦٠٠ ساعة' ], a:2,
+     hint:`عند المقطع السيني تكون ص = ٠. وماذا تمثل ص هنا؟`,
+     sol:`عند المقطع السيني كمية الماء ص = ٠، والزمن س = ١٢.<br>إذن يفرغ الخزان تمامًا بعد ١٢ ساعة.<br>والمقطع الصادي ٦٠٠ يعني أن في الخزان ٦٠٠ لتر عند بداية التفريغ.` },
+   { q:`ما المقطعان السيني والصادي للمستقيم الممثل في الشكل؟${PL({r:4,size:200,lines:[[-4,-2,4,-2]],ticks:[[-2,'y'],[2,'x'],[-2,'x']]})}`,
+     o:[ 'المقطع السيني −٢، ولا يوجد مقطع صادي', 'المقطع الصادي −٢، ولا يوجد مقطع سيني', 'المقطع السيني والمقطع الصادي كلاهما −٢', 'المقطع السيني صفر، والمقطع الصادي −٢' ], a:1,
+     hint:`المستقيم أفقي. هل يلتقي بمحور السينات أبدًا؟`,
+     sol:`المستقيم هو ${M('ص = −٢')}، وهو يقطع محور الصادات عند −٢.<br>لأنه أفقي وموازٍ لمحور السينات، لا يقطعه أبدًا، فلا يوجد مقطع سيني.` },
+   { q:`عند حل المعادلة ${M('٢س + ٥ = ٢س − ١')} بيانيًا، نحصل على الدالة المرتبطة ${M('د(س) = ٦')}. ماذا نستنتج؟`,
+     o:[ `الحل ${M('س = ٦')}`, 'لا يوجد حل، لأن المستقيم لا يقطع محور السينات', `الحل ${M('س = ٠')}`, 'للمعادلة عدد لا نهائي من الحلول' ], a:1,
+     hint:`حل المعادلة هو المقطع السيني للدالة المرتبطة. أين يقع المستقيم ${M('ص = ٦')}؟`,
+     sol:`نجعل الطرف الأيمن صفرًا: ${M('٢س + ٥ − ٢س + ١ = ٠')} ← ${M('٦ = ٠')}.<br>الدالة المرتبطة ${M('د(س) = ٦')} مستقيم أفقي فوق محور السينات ولا يقطعه.<br>إذن لا يوجد للمعادلة حل.` },
+   { q:`اشترى مقصف المدرسة علبة حلوى بمبلغ ٦٠ ريالًا، ويبيع القطعة الواحدة بريالين. تمثل الدالة ${M('ص = ٢س − ٦٠')} الربح عند بيع س قطعة. ما صفر الدالة، وماذا يعني؟`,
+     o:[ `${M('س = −٦٠')}، وهي خسارة المقصف في البداية`, `${M('س = ٣٠')}، وهو ربح المقصف بالريال`, `${M('س = ٣٠')}، أي أن المقصف يسترد ما دفعه عند بيع ٣٠ قطعة`, `${M('س = ١٢٠')}، وهو عدد القطع في العلبة` ], a:2,
+     hint:`صفر الدالة هو قيمة س التي تجعل ص = ٠. ماذا يعني أن يكون الربح صفرًا؟`,
+     sol:`${M('٠ = ٢س − ٦٠')} ← ${M('س = ٣٠')}<br>عند بيع ٣٠ قطعة يكون الربح صفرًا: يسترد المقصف الستين ريالًا، وبعدها يبدأ الربح.` }
+ ]},
+ { name:"غرفة المنحدرات", lesson:"معدل التغير والميل", code:"63187",
+   intro:"الميل = التغير الرأسي ÷ التغير الأفقي. والدالة خطية فقط إذا كان معدل تغيرها ثابتًا.",
+   qs:[
+   { q:`يبين الجدول عدد زوار أحد المتاحف (بالآلاف). في أي فترة كان معدل التغير أكبر، وكم كان؟<div class="tbl"><table><tr><th>العام</th><td>١٤٤٢</td><td>١٤٤٤</td><td>١٤٤٦</td></tr><tr><th>الزوار (ألف)</th><td>٢٠٠</td><td>٢٦٠</td><td>٢٧٠</td></tr></table></div>`,
+     o:[ 'من ١٤٤٢ إلى ١٤٤٤، بمعدل ٣٠ ألف زائر في السنة', 'من ١٤٤٤ إلى ١٤٤٦، بمعدل ٥ آلاف زائر في السنة', 'من ١٤٤٢ إلى ١٤٤٤، بمعدل ٦٠ ألف زائر في السنة', 'المعدل ثابت في الفترتين' ], a:0,
+     hint:`معدل التغير = التغير في عدد الزوار ÷ التغير في عدد السنوات. ولا تنسي أن كل فترة سنتان.`,
+     sol:`${M(`${F('٢٦٠ − ٢٠٠','١٤٤٤ − ١٤٤٢')} = ${F('٦٠','٢')} = ٣٠`)} ألف زائر في السنة<br>${M(`${F('٢٧٠ − ٢٦٠','١٤٤٦ − ١٤٤٤')} = ${F('١٠','٢')} = ٥`)} آلاف زائر في السنة<br>المعدل في الفترة الأولى أكبر. والخيار ٦٠ ألفًا نسي القسمة على عدد السنوات.` },
+   { q:`أي مجموعة من الأزواج المرتبة الآتية تمثل دالة خطية؟`,
+     o:[ M('(١، ١)، (٢، ٤)، (٣، ٩)، (٤، ١٦)'), M('(١، ٥)، (٢، ٨)، (٣، ١١)، (٤، ١٤)'), M('(١، ٢)، (٢، ٤)، (٣، ٧)، (٤، ١١)'), M('(١، ١٠)، (٢، ٨)، (٣، ٥)، (٤، ١)') ], a:1,
+     hint:`احسبي التغير في ص كلما زادت س بمقدار ١. في الدالة الخطية يكون هذا التغير ثابتًا.`,
+     sol:`في المجموعة الثانية تزيد ص بمقدار ٣ كلما زادت س بمقدار ١: ${M('٥ ، ٨ ، ١١ ، ١٤')}.<br>معدل التغير ثابت، إذن الدالة خطية.<br>في المجموعات الأخرى يتغير الفرق، مثل ${M('٣ ، ٥ ، ٧')} في الأولى.` },
+   { q:`ما قيمة ر التي تجعل ميل المستقيم المار بالنقطتين ${M('(٢، ر)')} و ${M('(٥، ٧)')} يساوي ${M(F('٢','٣'))}؟`,
+     o:[ M('٩'), M('٣'), M('−٥'), M('٥') ], a:3,
+     hint:`اكتبي صيغة الميل: ${M(`${F('٧ − ر','٥ − ٢')} = ${F('٢','٣')}`)}، ثم حلّي المعادلة.`,
+     sol:`${M(`${F('٧ − ر','٣')} = ${F('٢','٣')}`)}<br>${M('٧ − ر = ٢')} ← ${M('ر = ٥')}<br>تحقق: ${M(`${F('٧ − ٥','٥ − ٢')} = ${F('٢','٣')}`)}` },
+   { q:`اشترت روان حاسوبًا بمبلغ ٤٠٠٠ ريال، وبعد ٣ سنوات صار سعره ١٧٥٠ ريالًا، وكان الانخفاض بمعدل ثابت. ما معدل التغير في سعر الحاسوب؟`,
+     o:[ M('٧٥٠ ريالًا في السنة'), M('−٧٥٠ ريالًا في السنة'), M('−٢٢٥٠ ريالًا في السنة'), M('−٥٨٣ ريالًا في السنة') ], a:1,
+     hint:`معدل التغير = (السعر الجديد − السعر الأصلي) ÷ عدد السنوات. هل السعر يزيد أم ينقص؟`,
+     sol:`${M(`${F('١٧٥٠ − ٤٠٠٠','٣')} = ${F('−٢٢٥٠','٣')} = −٧٥٠`)}<br>الإشارة السالبة تعني أن السعر ينخفض ٧٥٠ ريالًا كل سنة.` },
+   { q:`ما قيمة د التي تجعل ميل المستقيم المار بالنقطتين ${M('(أ، ب)')} و ${M('(جـ، د)')} يساوي ${M(F('١','٢'))}؟`,
+     o:[ M(`د = ب + ${F('جـ − أ','٢')}`), M(`د = ب − ${F('جـ − أ','٢')}`), M('د = ٢(جـ − أ) + ب'), M(`د = ${F('جـ − أ','٢')}`) ], a:0,
+     hint:`اكتبي: ${M(`${F('د − ب','جـ − أ')} = ${F('١','٢')}`)}، ثم اجعلي د وحدها في طرف.`,
+     sol:`${M(`${F('د − ب','جـ − أ')} = ${F('١','٢')}`)}<br>نضرب في ${M('(جـ − أ)')}: ${M(`د − ب = ${F('جـ − أ','٢')}`)}<br>نضيف ب: ${M(`د = ب + ${F('جـ − أ','٢')}`)}` }
+ ]},
+ { name:"غرفة الأنماط", lesson:"المتتابعات الحسابية كدوال خطية", code:"45629",
+   intro:"الحد النوني للمتتابعة الحسابية: أن = أ١ + (ن − ١)د، حيث د هو الأساس.",
+   qs:[
+   { q:`ما رتبة الحد الذي قيمته ٤٨ في المتتابعة الحسابية ${M('٣ ، ٨ ، ١٣ ، ١٨ ، ...')}؟`,
+     o:[ 'الحد التاسع', 'الحد العاشر', 'الحد الحادي عشر', 'الحد الثامن والأربعون' ], a:1,
+     hint:`اكتبي معادلة الحد النوني أولًا، ثم ضعي ${M('أن = ٤٨')} وحلّي لإيجاد ن.`,
+     sol:`${M('د = ٥')}، إذن ${M('أن = ٣ + (ن − ١)٥ = ٥ن − ٢')}<br>${M('٥ن − ٢ = ٤٨')} ← ${M('٥ن = ٥٠')} ← ${M('ن = ١٠')}<br>إذن ٤٨ هو الحد العاشر.` },
+   { q:`كان في حساب يوسف ٥٢٥ ريالًا في الشهر الأول، ويضيف إليه ٥٥ ريالًا كل شهر. أي دالة تعبر عن رصيده في الشهر ن؟`,
+     o:[ M('ق(ن) = ٥٥ن + ٥٢٥'), M('ق(ن) = ٥٢٥ن + ٥٥'), M('ق(ن) = ٥٥ن + ٤٧٠'), M('ق(ن) = ٥٥ن − ٤٧٠') ], a:2,
+     hint:`الحد الأول ٥٢٥ والأساس ٥٥. عوّضي في ${M('أن = أ١ + (ن − ١)د')} ثم بسّطي.`,
+     sol:`${M('ق(ن) = ٥٢٥ + (ن − ١)٥٥ = ٥٢٥ + ٥٥ن − ٥٥ = ٥٥ن + ٤٧٠')}<br>تحقق: ${M('ق(١) = ٥٢٥')}، ${M('ق(٢) = ٥٨٠')}.<br>الخيار ${M('٥٥ن + ٥٢٥')} يعطي ٥٨٠ في الشهر الأول، وهذا خطأ.` },
+   { q:`متتابعة حسابية حدها الرابع ٨ وأساسها ٣. ما حدها الأول؟`,
+     o:[ M('١٧'), M('٥'), M('−١'), M('٢') ], a:2,
+     hint:`${M('أ٤ = أ١ + ٣د')}. عوّضي ثم حلّي.`,
+     sol:`${M('٨ = أ١ + (٤ − ١)(٣) = أ١ + ٩')} ← ${M('أ١ = −١')}<br>المتتابعة: ${M('−١ ، ٢ ، ٥ ، ٨ ، ...')}` },
+   { q:`ما قيمة س التي تجعل الحدود ${M('س + ٨ ، ٤س + ٦ ، ٣س')} حدودًا متتالية في متتابعة حسابية؟`,
+     o:[ M('١'), M('−١'), M('−٢'), M('٢') ], a:1,
+     hint:`في المتتابعة الحسابية الفرق ثابت: (الحد الثاني − الحد الأول) = (الحد الثالث − الحد الثاني).`,
+     sol:`${M('(٤س + ٦) − (س + ٨) = ٣س − (٤س + ٦)')}<br>${M('٣س − ٢ = −س − ٦')} ← ${M('٤س = −٤')} ← ${M('س = −١')}<br>الحدود: ${M('٧ ، ٢ ، −٣')}، والأساس ${M('−٥')}.` },
+   { q:`عند تمثيل حدود متتابعة حسابية بيانيًا على صورة أزواج مرتبة ${M('(ن، أن)')}، فإن التمثيل يكون:`,
+     o:[ 'مستقيمًا متصلًا، ومجاله جميع الأعداد الحقيقية', 'نقاطًا منفصلة تقع على مستقيم، ومجاله الأعداد الصحيحة الموجبة', 'نقاطًا منفصلة تقع على منحنى، ومجاله الأعداد الحقيقية', 'مستقيمًا أفقيًا دائمًا' ], a:1,
+     hint:`ن هو رتبة الحد. هل يوجد حد رتبته ${M('٢٫٥')}؟ ولماذا تقع النقاط على خط مستقيم؟`,
+     sol:`ن رتبة الحد، فيأخذ القيم ${M('١ ، ٢ ، ٣ ، ...')} فقط، والنقاط منفصلة ولا نصل بينها.<br>والأساس ثابت، أي أن معدل التغير ثابت، لذا تقع النقاط على مستقيم واحد.` }
+ ]}
+];
+
+const EXIT = {
+  q:`باب الخروج الأخير: الحدود الأولى في متتابعة فيبوناتشي هي ${M('١ ، ١ ، ٢ ، ٣ ، ٥ ، ٨ ، ...')}، وكل حد فيها يساوي مجموع الحدين السابقين له. هل هي متتابعة حسابية؟`,
+  o:[ 'نعم، أساسها ١', 'نعم، لأن كل حد يُحسب من الحدود التي قبله', 'لا، لأن الفرق بين كل حدين متتاليين ليس ثابتًا', 'نعم، أساسها ٢' ], a:2,
+  hint:`احسبي الفرق بين كل حد والحد الذي قبله: ${M('١ − ١ ، ٢ − ١ ، ٣ − ٢ ، ...')}`,
+  sol:`الفروق: ${M('٠ ، ١ ، ١ ، ٢ ، ٣ ، ...')}، وهي غير ثابتة.<br>إذن المتتابعة ليست حسابية. وجود قاعدة للمتتابعة لا يكفي، فالحسابية قاعدتها إضافة عدد ثابت.`
+};
+
+/* ===== الحالة ===== */
+const KEY = "escape-relations-functions-v1";
+const LETTERS = ['أ','ب','ج','د'];
+const AR = s => String(s).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const EN = s => String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+let S = load() || fresh();
+function fresh(){ return {name:"",cls:"",room:-1,q:0,stage:"start",got:[],tried:[],mistakes:0,start:0,end:0}; }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const lockSvg = open => open
+ ? `<svg viewBox="0 0 24 24" fill="none" stroke="#4fc08d" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>`
+ : `<svg viewBox="0 0 24 24" fill="none" stroke="#e3a94b" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+
+function mapHtml(){
+  const names = ROOMS.map(r=>r.name.replace('غرفة ','')).concat(['باب الخروج']);
+  return `<div class="map">${names.map((n,i)=>{
+    const done = i < S.room || S.stage==='done';
+    const now = i === S.room && S.stage!=='done';
+    return `<div class="door ${done?'open':''} ${now?'now':''}">${lockSvg(done)}<span>${n}</span></div>`;
+  }).join('')}</div>`;
+}
+
+function render(){
+  if(S.stage==='start') return renderStart();
+  if(S.stage==='done') return renderDone();
+  if(S.stage==='code') return renderCode();
+  if(S.room === ROOMS.length) return renderQ(EXIT, true);
+  return renderQ(ROOMS[S.room].qs[S.q], false);
+}
+
+function renderStart(){
+  app.innerHTML = `
+  <header class="roomhead">
+    <span class="tag">الصف الثالث المتوسط · الفصل الثاني · أ.&nbsp;لطفيه الطلحي</span>
+    <h1>غرفة الهروب: العلاقات والدوال الخطية</h1>
+    <p class="muted">أنتِ محبوسة في قبو فيه أربع غرف مقفلة وباب خروج. كل إجابة صحيحة تعطيك رقمًا من رمز القفل. اجمعي أرقام الرمز، اكتبيه، وانتقلي للغرفة التالية.</p>
+  </header>
+  ${mapHtml()}
+  <form class="card form" id="f">
+    <div class="field"><label for="nm">اسمك الثلاثي</label><input type="text" id="nm" required autocomplete="name" value="${esc(S.name)}"></div>
+    <div class="field"><label for="cl">الفصل</label><select id="cl" required><option value="" disabled ${S.cls?'':'selected'}>اختاري فصلك</option>${['ثالثة ١','ثالثة ٢'].map(c=>`<option ${S.cls===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    <button class="btn" type="submit">ادخلي الغرفة الأولى</button>
+  </form>
+  <div class="card"><p><b>القواعد</b></p><p class="muted">إذا أخطأتِ يظهر لك تلميح، وتقدرين تجربين مرة ثانية. إذا أصبتِ يظهر لك الحل بالخطوات. حلّي في دفترك قبل ما تختارين. في النهاية تظهر لك شهادة الهروب: صوّريها وأرسليها لمعلمتك أ.&nbsp;لطفيه الطلحي في تيمز.</p></div>`;
+  document.getElementById('f').onsubmit = e => {
+    e.preventDefault();
+    const n = document.getElementById('nm').value.trim(), c = document.getElementById('cl').value.trim();
+    if(!n || !c) return;
+    Object.assign(S,{name:n,cls:c,room:0,q:0,stage:'q',got:[],tried:[],mistakes:0,start:Date.now()});
+    save(); render(); window.scrollTo(0,0);
+  };
+}
+
+function slotsHtml(){
+  const r = ROOMS[S.room];
+  return `<div class="slots" aria-label="أرقام الرمز">${[...r.code].map((_,i)=>{
+    const g = S.got[i] != null;
+    return `<div class="slot ${g?'got':''}">${g?AR(r.code[i]):''}</div>`;
+  }).join('')}</div>`;
+}
+
+function renderQ(item, isExit){
+  const r = isExit ? null : ROOMS[S.room];
+  const answered = isExit ? S.stage==='exitSolved' : S.got[S.q] != null;
+  app.innerHTML = `
+  ${mapHtml()}
+  <header class="roomhead">
+    <span class="tag">${isExit ? 'الباب الأخير' : `الغرفة ${AR(S.room+1)} · ${r.lesson}`}</span>
+    <h2>${isExit ? 'باب الخروج' : r.name}</h2>
+    ${!isExit && S.q===0 && !answered ? `<p class="muted">${r.intro}</p>` : ''}
+  </header>
+  ${isExit ? '' : slotsHtml()}
+  <section class="card" id="qc">
+    <div class="qnum">${isExit ? 'السؤال الأخير' : `السؤال ${AR(S.q+1)} من ${AR(ROOMS[S.room].qs.length)}`}</div>
+    <div class="qtext">${item.q}</div>
+    <div class="opts">${item.o.map((o,i)=>{
+      const wrong = S.tried.includes(i);
+      const right = answered && i===item.a;
+      return `<button class="opt ${wrong?'wrong':''} ${right?'right':''}" data-i="${i}" ${answered||wrong?'disabled':''}><span class="k">${LETTERS[i]}</span><span>${o}</span></button>`;
+    }).join('')}</div>
+    <div id="fb">${fbHtml(item, answered, isExit)}</div>
+  </section>
+  <div class="foot"><span class="muted">${esc(S.name)} · ${esc(S.cls)}</span><span class="muted">الأخطاء: ${AR(S.mistakes)}</span></div>`;
+  app.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(+b.dataset.i, item, isExit));
+  const nx = document.getElementById('nx');
+  if(nx) nx.onclick = () => next(isExit);
+}
+
+function fbHtml(item, answered, isExit){
+  if(answered){
+    const digit = isExit ? '' : `<div class="digit pop">حصلتِ على رقم من الرمز: <span class="big">${AR(ROOMS[S.room].code[S.q])}</span></div>`;
+    const last = !isExit && S.q===ROOMS[S.room].qs.length-1;
+    return `<div class="fb sol"><b>إجابة صحيحة. طريقة الحل:</b><span class="steps">${item.sol}</span></div>${digit}
+      <div class="row" style="margin-top:14px"><button class="btn" id="nx">${isExit ? 'اخرجي من القبو' : last ? 'اذهبي إلى القفل' : 'السؤال التالي'}</button></div>`;
+  }
+  if(S.tried.length) return `<div class="fb hint"><b>ليست الإجابة الصحيحة. تلميح:</b>${item.hint}</div>`;
+  return '';
+}
+
+function choose(i, item, isExit){
+  if(i === item.a){
+    if(isExit) S.stage='exitSolved'; else S.got[S.q] = true;
+  } else {
+    S.tried.push(i); S.mistakes++;
+  }
+  save(); render();
+  if(i !== item.a){ const c=document.getElementById('qc'); c.classList.add('shake'); }
+  document.getElementById('fb').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function next(isExit){
+  S.tried = [];
+  if(isExit){ S.stage='done'; S.end=Date.now(); }
+  else if(S.q < ROOMS[S.room].qs.length-1){ S.q++; }
+  else { S.stage='code'; }
+  save(); render(); window.scrollTo(0,0);
+}
+
+function renderCode(){
+  const r = ROOMS[S.room];
+  app.innerHTML = `
+  ${mapHtml()}
+  <header class="roomhead"><span class="tag">الغرفة ${AR(S.room+1)} · القفل</span><h2>افتحي قفل ${r.name}</h2>
+  <p class="muted">اكتبي أرقام الرمز بالترتيب نفسه الذي حصلتِ عليه.</p></header>
+  ${slotsHtml()}
+  <form class="card form" id="cf">
+    <div class="codebox">${[...r.code].map((_,i)=>`<input id="c${i}" inputmode="numeric" maxlength="1" aria-label="الرقم ${i+1}">`).join('')}</div>
+    <p class="err" id="ce" hidden>الرمز غير صحيح. راجعي الأرقام في الخانات بالأعلى.</p>
+    <button class="btn" type="submit">افتحي الباب</button>
+  </form>`;
+  const ins = [...r.code].map((_,i)=>document.getElementById('c'+i));
+  ins.forEach((inp,i)=>{
+    inp.oninput = () => { inp.value = AR(EN(inp.value).replace(/\D/g,'').slice(-1)); if(inp.value && ins[i+1]) ins[i+1].focus(); };
+    inp.onkeydown = e => { if(e.key==='Backspace' && !inp.value && ins[i-1]) ins[i-1].focus(); };
+  });
+  ins[0].focus();
+  document.getElementById('cf').onsubmit = e => {
+    e.preventDefault();
+    const v = ins.map(x=>EN(x.value)).join('');
+    if(v === r.code){
+      S.room++; S.q=0; S.got=[]; S.tried=[]; S.stage='q'; save(); render(); window.scrollTo(0,0);
+    } else {
+      document.getElementById('ce').hidden = false; document.getElementById('cf').classList.remove('shake'); void document.getElementById('cf').offsetWidth; document.getElementById('cf').classList.add('shake');
+    }
+  };
+}
+
+function renderDone(){
+  const mins = Math.max(1, Math.round((S.end - S.start)/60000));
+  const d = new Date(S.end);
+  const date = d.toLocaleDateString('ar-SA-u-ca-gregory-nu-arab',{day:'numeric',month:'long',year:'numeric'});
+  const time = d.toLocaleTimeString('ar-SA-u-nu-arab',{hour:'numeric',minute:'2-digit'});
+  const praise = S.mistakes === 0
+    ? {title:'أداء كامل بدون أي خطأ!', body:'فهمك للمتباينات الخطية واضح وقوي. حافظي على هذا المستوى، وراجعي بنفس الهمة، والدرجة الكاملة في الاختبار بإذن الله قريبة منك.'}
+    : S.mistakes <= 4
+    ? {title:'إنجاز رائع!', body:'أخطاؤك قليلة، وكل خطأ صححتيه صار خطوة تعلمتِها. ارجعي للأسئلة اللي توقفتِ عندها مرة ثانية، وبتدخلين الاختبار بثقة بإذن الله.'}
+    : {title:'ما استسلمتِ ووصلتِ!', body:'كل محاولة خاطئة كانت درسًا، والمهم إنك كملتِ حتى فتحتِ كل الأبواب. أعيدي الغرفة مرة ثانية وبتلاحظين بنفسك كم تحسنتِ. الاستمرار هو سر النجاح.'};
+  app.innerHTML = `
+  ${mapHtml()}
+  <section class="card cert pop">
+    <span class="tag">شهادة الهروب · الفصل الثاني: العلاقات والدوال الخطية</span>
+    <h1>هربتِ من القبو</h1>
+    <div class="name">${esc(S.name)}</div>
+    <p class="muted">الفصل ${esc(S.cls)} · ${date} · ${time}</p>
+    <div class="stats">
+      <div class="stat"><div class="v">${AR(ROOMS.reduce((n,r)=>n+r.qs.length,0)+1)}</div><div class="l">سؤالًا محلولًا</div></div>
+      <div class="stat"><div class="v">${AR(S.mistakes)}</div><div class="l">محاولة خاطئة</div></div>
+      <div class="stat"><div class="v">${AR(mins)}</div><div class="l">دقيقة</div></div>
+    </div>
+    <div class="praise">
+      <p class="pt">${praise.title}</p>
+      <p>${praise.body}</p>
+      <p class="thanks">شكرًا لكِ يا ${esc(S.name.split(/\s+/)[0])} على جهدك وصبرك حتى آخر باب. فخورة بكِ، وأنتظر أن أراكِ في الغرفة القادمة.<br><span class="muted">معلمتك: أ.&nbsp;لطفيه الطلحي</span></p>
+    </div>
+    <p class="muted">صوّري هذه الشهادة وأرسليها لمعلمتك أ.&nbsp;لطفيه الطلحي في تيمز.</p>
+  </section>
+  <div class="row"><button class="btn ghost" id="again">ابدئي من جديد</button></div>`;
+  document.getElementById('again').onclick = () => { const n=S.name, c=S.cls; S=fresh(); S.name=n; S.cls=c; save(); render(); window.scrollTo(0,0); };
+}
+
+render();
+</script>
+</body>
+</html>

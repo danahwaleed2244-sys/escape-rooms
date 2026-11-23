@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>غرفة الهروب: المعادلات الخطية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* عالم واحد: قبو ليلي بلون الحبر، ونحاس دافئ للأقفال والمفاتيح */
+  --ink:#0f1a24;
+  --panel:#172634;
+  --panel-2:#1e3142;
+  --line:#2e4659;
+  --text:#eef2f5;
+  --muted:#9fb3c3;
+  --brass:#e3a94b;
+  --brass-dk:#b9822c;
+  --ok:#4fc08d;
+  --bad:#e86a5c;
+  --display:"Lalezar","Tajawal",system-ui,sans-serif;
+  --body:"Tajawal","Segoe UI",Tahoma,system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--text);font-family:var(--body);font-size:18px;line-height:1.7}
+body{min-height:100%}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--display);font-weight:400;letter-spacing:0;margin:0;text-wrap:balance;line-height:1.35}
+h1{font-size:2rem;color:var(--brass)}
+h2{font-size:1.45rem}
+p{margin:0}
+.muted{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+button{font-family:var(--body);font-size:1rem;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.btn{background:var(--brass);color:#1b1206;border:0;border-radius:10px;padding:12px 20px;font-weight:800}
+.btn:hover{background:#f0b95c}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
+label{font-weight:700;display:block;margin-bottom:4px}
+input[type=text],select{width:100%;font:inherit;background:var(--ink);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.field{display:flex;flex-direction:column}
+.form{display:grid;gap:14px}
+
+/* خريطة الغرف */
+.map{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.door{background:var(--panel-2);border:1px solid var(--line);border-radius:10px 10px 4px 4px;padding:10px 4px 8px;text-align:center;font-size:.8rem;line-height:1.35;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;min-height:96px}
+.door svg{width:26px;height:26px}
+.door.open{border-color:var(--ok);color:var(--text)}
+.door.now{border-color:var(--brass);color:var(--text);box-shadow:0 0 0 2px rgba(227,169,75,.25)}
+
+/* رأس الغرفة */
+.roomhead{display:flex;flex-direction:column;gap:6px}
+.tag{display:inline-block;align-self:flex-start;background:var(--panel-2);border:1px solid var(--line);color:var(--brass);border-radius:999px;padding:2px 12px;font-size:.85rem;font-weight:700}
+.slots{display:flex;gap:8px;justify-content:center}
+.slot{width:48px;height:56px;border-radius:8px;border:2px dashed var(--line);display:grid;place-items:center;font-size:1.6rem;font-weight:800;color:var(--brass);background:var(--ink)}
+.slot.got{border-style:solid;border-color:var(--brass)}
+
+/* السؤال */
+.qnum{font-size:.9rem;color:var(--muted);font-weight:700}
+.qtext{font-size:1.12rem;font-weight:500}
+.opts{display:grid;gap:10px;margin-top:14px}
+.opt{display:flex;align-items:center;gap:12px;text-align:right;background:var(--panel-2);color:var(--text);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:1.08rem;line-height:1.6}
+.opt:hover:not(:disabled){border-color:var(--brass)}
+.opt .k{flex:0 0 32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--ink);color:var(--brass);font-weight:800}
+.opt.wrong{border-color:var(--bad);opacity:.55;text-decoration:line-through;text-decoration-color:var(--bad)}
+.opt.right{border-color:var(--ok);background:rgba(79,192,141,.12)}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;border-radius:12px;padding:14px;line-height:1.85}
+.fb.hint{background:rgba(232,106,92,.1);border:1px solid rgba(232,106,92,.45)}
+.fb.sol{background:rgba(79,192,141,.08);border:1px solid rgba(79,192,141,.45)}
+.fb b{display:block;margin-bottom:4px}
+.digit{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:700;color:var(--brass)}
+.digit span.big{font-size:1.8rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* الرمز */
+.codebox{display:flex;gap:8px;justify-content:center}
+.codebox input{width:52px;height:60px;text-align:center;font-size:1.6rem;font-weight:800;background:var(--ink);color:var(--brass);border:2px solid var(--line);border-radius:8px;font-family:var(--body)}
+.err{color:var(--bad);font-weight:700;text-align:center}
+
+/* الشهادة */
+.cert{border:2px solid var(--brass);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.cert .name{font-family:var(--display);font-size:1.8rem;color:var(--brass)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.stat{background:var(--panel-2);border-radius:10px;padding:10px 4px}
+.stat .v{font-size:1.4rem;font-weight:800}
+.stat .l{font-size:.8rem;color:var(--muted)}
+.praise{display:flex;flex-direction:column;gap:10px;background:var(--panel-2);border-radius:12px;padding:16px;width:100%;line-height:1.9}
+.praise .pt{font-family:var(--display);font-size:1.35rem;color:var(--ok)}
+.praise .thanks{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+
+/* الرياضيات: كل تعبير معزول باتجاه من اليمين لليسار مثل الكتاب */
+.m{unicode-bidi:isolate;direction:rtl;white-space:nowrap;font-weight:700}
+.m bdi{unicode-bidi:isolate}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;font-size:.85em;margin:0 2px}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.fr>span{padding:0 3px}
+sup{font-size:.7em;line-height:0}
+.steps{display:block}
+.nl{width:100%;max-width:420px;display:block;margin:10px auto 0}
+.shape{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.shape svg{max-width:220px;width:46%}
+
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .5s ease-out}
+@keyframes pop{from{transform:scale(.6)}to{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.shake,.pop{animation:none}}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media (max-width:400px){html,body{font-size:17px}.slot{width:42px;height:50px}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app" aria-live="polite"></main>
+
+<script>
+/* ===== أدوات كتابة الرياضيات ===== */
+const M = s => `<span class="m">${s}</span>`;
+const F = (a,b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const P = (base,exp) => `<bdi>${base}</bdi><bdi><sup>${exp}</sup></bdi>`;
+
+function numberLine(points, lo=-5, hi=6){
+  // خط أعداد، والسالب يسار مثل الكتاب
+  const ar = n => String(Math.abs(n)).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+  const step = 330/(hi-lo);
+  const x = n => 30 + (n-lo)*step;
+  let s = `<svg class="nl" viewBox="0 0 390 62" direction="ltr" role="img" aria-label="خط أعداد">`;
+  s += `<line x1="8" y1="22" x2="382" y2="22" stroke="#9fb3c3" stroke-width="2"/>`;
+  s += `<path d="M8 22 l10 -6 v12z M382 22 l-10 -6 v12z" fill="#9fb3c3"/>`;
+  for(let n=lo;n<=hi;n++){
+    s += `<line x1="${x(n)}" y1="15" x2="${x(n)}" y2="29" stroke="#9fb3c3" stroke-width="2"/>`;
+    s += `<text x="${x(n)}" y="50" fill="#eef2f5" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl">${n<0?'−':''}${ar(n)}</text>`;
+  }
+  points.forEach(p=> s += `<circle cx="${x(p)}" cy="22" r="7" fill="#e3a94b"/>`);
+  return s + `</svg>`;
+}
+
+const areaQ = `<div class="shape">
+<svg viewBox="0 0 220 140" role="img" aria-label="المستطيل الأول">
+ <rect x="45" y="15" width="150" height="80" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="122" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٣</text>
+ <text x="25" y="60" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٨</text>
+</svg>
+<svg viewBox="0 0 220 140" role="img" aria-label="المستطيل الثاني">
+ <rect x="45" y="30" width="150" height="60" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="117" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٧</text>
+ <text x="25" y="66" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٦</text>
+</svg></div>`;
+
+const shapesQ = `<div class="shape">
+<svg viewBox="0 0 220 130" role="img" aria-label="مستطيل">
+ <rect x="40" y="20" width="160" height="70" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="115" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ١٣</text>
+ <text x="22" y="60" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س</text>
+</svg>
+<svg viewBox="0 0 220 130" role="img" aria-label="مثلث">
+ <polygon points="45,15 45,95 205,95" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="125" y="120" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س + ٥</text>
+ <text x="22" y="62" fill="#eef2f5" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl" transform="rotate(-90 22 58)">٣س + ٤</text>
+ <text x="140" y="45" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٥س + ١</text>
+</svg></div>`;
+
+/* ===== الغرف والأسئلة ===== */
+const ROOMS = [
+ { name:"غرفة الترجمة", lesson:"كتابة المعادلات", code:"37152",
+   intro:"الباب مقفل برمز من أربعة أرقام. حوّلي الكلام إلى معادلات صحيحة، وكل إجابة صحيحة تعطيك رقمًا من الرمز.",
+   qs:[
+   { q:`المعادلة التي تمثل الجملة: «ربع عدد ناقص ٦ يساوي ٢ مضروبًا في حاصل جمع العدد و ٩» هي:`,
+     o:[ M(`${F('١','٤')}ن − ٦ = ٢(ن + ٩)`), M(`${F('١','٤')}(ن − ٦) = ٢ن + ٩`), M(`${F('١','٤')}ن − ٦ = ٢ن + ٩`), M(`٤ن − ٦ = ٢(ن + ٩)`) ], a:0,
+     hint:`انتبهي لكلمة «حاصل جمع»: الضرب يكون في المجموع كاملًا. هل وضعتِ الأقواس في المكان الصحيح؟`,
+     sol:`«ربع عدد» ← ${M(`${F('١','٤')}ن`)}، و«ناقص ٦» بعدها مباشرة ← ${M(`${F('١','٤')}ن − ٦`)}.<br>«٢ مضروبًا في حاصل جمع العدد و ٩» ← ${M(`٢(ن + ٩)`)}، فالأقواس ضرورية.` },
+   { q:`المعادلة التي تمثل ثلاثة أعداد صحيحة فردية متتالية مجموعها ٧٥ هي:`,
+     o:[ M(`٣س + ٣ = ٧٥`), M(`٣س + ٦ = ٧٥`), M(`٦س + ٣ = ٧٥`), M(`٣س + ٤ = ٧٥`) ], a:1,
+     hint:`كم الفرق بين عددين فرديين متتاليين مثل ٥ و ٧؟`,
+     sol:`الفرق بين كل عددين فرديين متتاليين هو ٢، فالأعداد: ${M('س ، س + ٢ ، س + ٤')}.<br>مجموعها ${M('س + (س + ٢) + (س + ٤) = ٣س + ٦')}، إذن ${M('٣س + ٦ = ٧٥')}.` },
+   { q:`طُرح من عدد ٦، ثم قُسم الناتج على ٤، وأضيف إلى الناتج الجديد ١٠ فأصبح الناتج النهائي ٣٠. ما العدد؟`,
+     o:[ M('١٦'), M('٨٠'), M('٨٦'), M('٤') ], a:2,
+     hint:`اكتبي المعادلة بالترتيب، ثم حلّيها بالعمليات العكسية بدءًا من آخر عملية.`,
+     sol:`${M(`${F('ن − ٦','٤')} + ١٠ = ٣٠`)}<br>نطرح ١٠: ${M(`${F('ن − ٦','٤')} = ٢٠`)}<br>نضرب في ٤: ${M('ن − ٦ = ٨٠')}<br>نجمع ٦: ${M('ن = ٨٦')}` },
+   { q:`اشترت سارة حقيبة مدرسية بثلاثة أرباع سعرها الأصلي، ثم استعملت قسيمة خصم مقدارها ٢٠ ريالًا فدفعت ٧٠ ريالًا. ما السعر الأصلي للحقيبة؟`,
+     o:[ M('٦٧٫٥ ريالًا'), M('٩٠ ريالًا'), M('١٠٠ ريال'), M('١٢٠ ريالًا') ], a:3,
+     hint:`اكتبي المعادلة: ثلاثة أرباع السعر ناقص ٢٠ يساوي ٧٠. لا تتوقفي بعد أول خطوة.`,
+     sol:`${M(`${F('٣','٤')}س − ٢٠ = ٧٠`)}<br>نضيف ٢٠: ${M(`${F('٣','٤')}س = ٩٠`)}<br>نضرب في ${M(F('٤','٣'))}: ${M('س = ١٢٠')} ريالًا.<br>الخيار ٩٠ هو ثلاثة أرباع السعر فقط، وليس السعر كاملًا.` },
+   { q:`أعمار ثلاثة إخوة أعداد صحيحة زوجية متتالية، ومجموعها ١٠٢. كم عمر الأخ الأكبر؟`,
+     o:[ M('٣٦'), M('٣٢'), M('٣٤'), M('٣٥') ], a:0,
+     hint:`الأعداد الزوجية المتتالية مثل ٤ ، ٦ ، ٨: الفرق بين كل عددين ٢. والسؤال عن الأكبر.`,
+     sol:`الأعمار: ${M('ن ، ن + ٢ ، ن + ٤')}<br>${M('ن + (ن + ٢) + (ن + ٤) = ١٠٢')} ← ${M('٣ن + ٦ = ١٠٢')} ← ${M('ن = ٣٢')}<br>الأعمار ٣٢ و٣٤ و٣٦، والأكبر ${M('٣٦')}.` }
+ ]},
+ { name:"غرفة الخطوات", lesson:"حل المعادلات المتعددة الخطوات", code:"82640",
+   intro:"في هذه الغرفة كل خطوة لها ترتيب. خطوة خاطئة واحدة تغيّر الحل كله.",
+   qs:[
+   { q:`قيمة س التي تجعل محيطي الشكلين الآتيين متساويين هي:${shapesQ}`,
+     o:[ M('٤'), M('٥'), M('٦'), M('٧') ], a:0,
+     hint:`محيط المستطيل = ٢ × (الطول + العرض)، ومحيط المثلث = مجموع أضلاعه الثلاثة. ساوي بينهما.`,
+     sol:`محيط المستطيل: ${M('٢(٢س + س + ١٣) = ٦س + ٢٦')}<br>محيط المثلث: ${M('(٣س + ٤) + (٥س + ١) + (٢س + ٥) = ١٠س + ١٠')}<br>${M('٦س + ٢٦ = ١٠س + ١٠')} ← ${M('١٦ = ٤س')} ← ${M('س = ٤')}` },
+   { q:`حل المعادلة ${M(`ص = ٧ + (${P('٩','٢')} − ٩) ÷ ٢`)} هو ص =`,
+     o:[ M('٨'), M('١١٫٥'), M('٣٩٫٥'), M('٤٣') ], a:3,
+     hint:`ترتيب العمليات: الأقواس، ثم الأسس، ثم الضرب والقسمة، ثم الجمع والطرح. هل جمعتِ ٧ قبل القسمة؟`,
+     sol:`داخل القوس أولًا: ${M(`${P('٩','٢')} − ٩ = ٨١ − ٩ = ٧٢`)}<br>ثم القسمة: ${M('٧٢ ÷ ٢ = ٣٦')}<br>ثم الجمع: ${M('ص = ٧ + ٣٦ = ٤٣')}<br>الخيار ٣٩٫٥ يأتي من جمع ٧ قبل القسمة، وهذا خطأ شائع.` },
+   { q:`حلّت ريم المعادلة ${M('٤(س + ١) = ٦س − ٢')} كالتالي:<br>${M('٤س + ١ = ٦س − ٢')} ← ${M('٣ = ٢س')} ← ${M(`س = ${F('٣','٢')}`)}<br>أين خطأ ريم؟`,
+     o:[ `لم توزّع ${M('٤')} على العدد ${M('١')}، والصحيح ${M('٤س + ٤')} والحل ${M('س = ٣')}`, `أخطأت في نقل ${M('٤س')}، والحل الصحيح ${M('س = −٣')}`, `أخطأت في القسمة، والحل الصحيح ${M('س = ٦')}`, `حل ريم صحيح` ], a:0,
+     hint:`راجعي الخطوة الأولى: عند فك القوس، هل ضُرب ٤ في كل ما داخل القوس؟`,
+     sol:`خاصية التوزيع: ${M('٤(س + ١) = ٤س + ٤')}<br>${M('٤س + ٤ = ٦س − ٢')} ← ${M('٦ = ٢س')} ← ${M('س = ٣')}<br>للتحقق: ${M('٤(٣ + ١) = ١٦')} و ${M('٦(٣) − ٢ = ١٦')}.` },
+   { q:`حل المعادلة ${M(`−${F('٢','٥')}ك = ٦`)} هو ك =`,
+     o:[ M('١٥'), M('−١٥'), M(`−${F('١٢','٥')}`), M('−٣') ], a:1,
+     hint:`اضربي الطرفين في مقلوب المعامل، ولا تنسي الإشارة السالبة.`,
+     sol:`نضرب الطرفين في ${M(`−${F('٥','٢')}`)}:<br>${M(`ك = ٦ × (−${F('٥','٢')}) = −١٥`)}<br>تحقق: ${M(`−${F('٢','٥')} × (−١٥) = ٦`)}` }
+,
+   { q:`حلّت هند ومها المعادلة ${M('س = ٥(٤ − ٢) + ٦ ÷ ٣')}:<br>هند: ${M('س = ١٠ + ٦ ÷ ٣ = ١٦ ÷ ٣ = ')}${M(F('١٦','٣'))}<br>مها: ${M('س = ١٠ + ٦ ÷ ٣ = ١٠ + ٢ = ١٢')}<br>أيهما على صواب؟`,
+     o:[ 'هند، لأنها جمعت ثم قسمت بالترتيب من اليمين', 'مها، لأن القسمة تسبق الجمع في ترتيب العمليات', 'كلتاهما على صواب', `ولا واحدة منهما، والحل الصحيح ${M('س = ٦')}` ], a:1,
+     hint:`تذكري ترتيب العمليات: الأقواس، ثم الأسس، ثم الضرب والقسمة، ثم الجمع والطرح.`,
+     sol:`${M('٥(٤ − ٢) = ٥(٢) = ١٠')}<br>بعدها القسمة قبل الجمع: ${M('٦ ÷ ٣ = ٢')}<br>${M('س = ١٠ + ٢ = ١٢')}، إذن مها على صواب.<br>خطأ هند أنها جمعت ${M('١٠ + ٦')} قبل القسمة.` } ]},
+ { name:"غرفة الطرفين", lesson:"المعادلات التي تحتوي متغيرًا في طرفيها", code:"50938",
+   intro:"المتغير موجود في الطرفين. أحيانًا يكون للمعادلة حل واحد، وأحيانًا لا يوجد حل، وأحيانًا كل الأعداد حلول.",
+   qs:[
+   { q:`أي مما يأتي يمثل متطابقة؟`,
+     o:[ M('٥س + ٤ = ١٤'), M('٨(س + ٤) = ٨س + ٤'), M('٣(س − ١) = ٣س − ٣'), M('٢س + ٧ = ٤س + ١٣') ], a:2,
+     hint:`المتطابقة يكون طرفاها متساويين دائمًا مهما كانت قيمة س. جرّبي فك الأقواس.`,
+     sol:`${M('٣(س − ١) = ٣س − ٣')}، وهو نفس الطرف الأيمن تمامًا، فالمعادلة صحيحة لكل قيم س.<br>أما ${M('٨(س + ٤)')} فتساوي ${M('٨س + ٣٢')}، وليست ${M('٨س + ٤')}.` },
+   { q:`حل المعادلة ${M('(٣ × ٥)ن + (٢١ − ١٢) = ١٥ن + ٢٣')} هو:`,
+     o:[ 'مجموعة الأعداد الحقيقية', 'لا يوجد حل', M('ن = ٢'), M('ن = ٥') ], a:1,
+     hint:`بسّطي ما داخل الأقواس أولًا، ثم قارني الطرفين.`,
+     sol:`${M('١٥ن + ٩ = ١٥ن + ٢٣')}<br>نطرح ${M('١٥ن')} من الطرفين: ${M('٩ = ٢٣')}، وهذه جملة خاطئة.<br>إذن لا يوجد حل، ومجموعة الحل ${M('∅')}.` },
+   { q:`حل المعادلة ${M(`٤(٢ن − ١) = ${F('١','٢')}(١٢ن + ٨)`)} هو:`,
+     o:[ M('ن = ٤'), M('ن = ٠'), M('ن = ٢'), 'لا يوجد حل' ], a:0,
+     hint:`وزّعي في الطرفين أولًا: ${M('٤')} على القوس الأول، و${M(F('١','٢'))} على القوس الثاني.`,
+     sol:`خاصية التوزيع: ${M('٨ن − ٤ = ٦ن + ٤')}<br>نطرح ${M('٦ن')}: ${M('٢ن − ٤ = ٤')}<br>نضيف ٤: ${M('٢ن = ٨')} ← ${M('ن = ٤')}` },
+   { q:`قالت سارة: «المعادلة ${M('٣س + ٥ = ٣س + ٥')} ليس لها حل، لأن المتغير اختفى عند الحل». ما رأيك في قولها؟`,
+     o:[ 'قولها صحيح', `قولها خطأ، فالمعادلة حلها ${M('س = ٠')} فقط`, 'قولها خطأ، فالمعادلة متطابقة وحلها جميع الأعداد الحقيقية', `قولها خطأ، فالمعادلة حلها ${M('س = ٥')}` ], a:2,
+     hint:`عندما يختفي المتغير، انظري للجملة الباقية: هل هي صحيحة دائمًا أم خاطئة دائمًا؟`,
+     sol:`بطرح ${M('٣س')} من الطرفين يبقى ${M('٥ = ٥')}، وهي جملة صحيحة دائمًا.<br>إذن المعادلة متطابقة، وكل عدد حقيقي حل لها.<br>اختفاء المتغير لا يعني «لا حل»؛ المهم صحة الجملة الباقية.` }
+,
+   { q:`قيمة س التي تجعل مساحتي المستطيلين الآتيين متساويتين هي:${areaQ}`,
+     o:[ M('٩'), M('٣'), M('٦'), M('١٨') ], a:0,
+     hint:`مساحة المستطيل = الطول × العرض. اكتبي مساحة كل مستطيل وساوي بينهما.`,
+     sol:`المساحة الأولى: ${M('٨(س + ٣) = ٨س + ٢٤')}<br>المساحة الثانية: ${M('٦(س + ٧) = ٦س + ٤٢')}<br>${M('٨س + ٢٤ = ٦س + ٤٢')} ← ${M('٢س = ١٨')} ← ${M('س = ٩')}<br>تحقق: ${M('٨ × ١٢ = ٩٦')} و ${M('٦ × ١٦ = ٩٦')}` } ]},
+ { name:"غرفة القيمة المطلقة", lesson:"حل معادلات القيمة المطلقة", code:"64281",
+   intro:"القيمة المطلقة مسافة، والمسافة لا تكون سالبة. هذه الفكرة هي مفتاح الغرفة.",
+   qs:[
+   { q:`مجموعة حل المعادلة ${M('|ص + ٢| = ٤')} هي:`,
+     o:[ M('{−٦ ، ٢}'), M('{٦ ، −٢}'), M('{−٦ ، −٢}'), M('{٦ ، ٢}') ], a:0,
+     hint:`حلّي حالتين: ما داخل القيمة المطلقة يساوي ٤، أو يساوي −٤.`,
+     sol:`${M('ص + ٢ = ٤')} ← ${M('ص = ٢')}<br>${M('ص + ٢ = −٤')} ← ${M('ص = −٦')}<br>مجموعة الحل ${M('{−٦ ، ٢}')}` },
+   { q:`أي المعادلات الآتية ليس لها حل؟`,
+     o:[ M('|ن − ٧| = ٠'), M('−|س| = −٣'), M('|٤ن − ١| = −٦'), M('|س + ٣| = ٧') ], a:2,
+     hint:`القيمة المطلقة لا يمكن أن تساوي عددًا سالبًا. لكن انتبهي: ${M('−|س| = −٣')} تعني ${M('|س| = ٣')}.`,
+     sol:`${M('|٤ن − ١| = −٦')}: القيمة المطلقة لا تكون سالبة، إذن مجموعة الحل ${M('∅')}.<br>بينما ${M('−|س| = −٣')} تصبح ${M('|س| = ٣')} ولها حلان، و ${M('|ن − ٧| = ٠')} لها حل واحد ${M('ن = ٧')}.` },
+   { q:`المعادلة التي تتضمن القيمة المطلقة للتمثيل الآتي هي:${numberLine([14,22],12,24)}`,
+     o:[ M('|س − ٤| = ١٨'), M('|س + ١٨| = ٤'), M('|س − ١٨| = ٤'), M('|س − ١٤| = ٨') ], a:2,
+     hint:`أوجدي نقطة المنتصف: اجمعي العددين واقسمي على ٢، ثم احسبي المسافة من المنتصف إلى كل نقطة.`,
+     sol:`المنتصف: ${M(`${F('١٤ + ٢٢','٢')} = ١٨`)}<br>المسافة من ١٨ إلى كل نقطة = ٤<br>إذن ${M('|س − ١٨| = ٤')}، وللتحقق: ${M('|١٤ − ١٨| = ٤')} و ${M('|٢٢ − ١٨| = ٤')}.` },
+   { q:`ما قيمة س في المعادلة ${M('|٣ص − ٣| + ٢س = ٠')} عندما ${M('ص = −٣')}؟`,
+     o:[ M('−٦'), M('٦'), M('−٣'), M('٠') ], a:0,
+     hint:`عوّضي ص أولًا واحسبي القيمة المطلقة، ثم حلّي المعادلة الناتجة.`,
+     sol:`${M('|٣(−٣) − ٣| = |−١٢| = ١٢')}<br>${M('١٢ + ٢س = ٠')} ← ${M('٢س = −١٢')} ← ${M('س = −٦')}` }
+,
+   { q:`اتفقت طالبات الصف على قراءة فصل من كتاب ينتهي عند الصفحة ١٨٥، بزيادة أو نقصان ٧ صفحات. ما أصغر وأكبر رقم صفحة يمكن أن تتوقف عنده الطالبة؟`,
+     o:[ M('١٧٨ و ١٨٥'), M('١٧٨ و ١٩٢'), M('١٨٥ و ١٩٢'), M('١٧١ و ١٩٩') ], a:1,
+     hint:`الصفحة ١٨٥ هي المركز، و٧ هي المسافة عنه في الاتجاهين. اكتبي معادلة قيمة مطلقة.`,
+     sol:`${M('|ص − ١٨٥| = ٧')}<br>${M('ص − ١٨٥ = ٧')} ← ${M('ص = ١٩٢')}<br>${M('ص − ١٨٥ = −٧')} ← ${M('ص = ١٧٨')}<br>أصغر صفحة ١٧٨ وأكبر صفحة ١٩٢.` } ]}
+];
+
+const EXIT = {
+  q:`باب الخروج الأخير: حلّ علي وعبدالرحمن المعادلة ${M('|س + ٤| = −٦')}:<br>علي: ${M('س + ٤ = ٦')} أو ${M('س + ٤ = −٦')}، إذن ${M('س = ٢')} أو ${M('س = −١٠')}<br>عبدالرحمن: ليس لها حل، ومجموعة الحل ${M('∅')}<br>أيهما على صواب؟`,
+  o:[ 'علي، لأنه أخذ الحالتين', 'عبدالرحمن، لأن القيمة المطلقة لا يمكن أن تكون سالبة', 'كلاهما على صواب', `علي، لكن الحل ${M('س = −١٠')} فقط` ], a:1,
+  hint:`القيمة المطلقة مسافة. هل يمكن أن تكون المسافة عددًا سالبًا مثل −٦؟`,
+  sol:`القيمة المطلقة لأي عدد موجبة أو صفر، ولا تساوي ${M('−٦')} أبدًا.<br>إذن مجموعة الحل ${M('∅')}، وعبدالرحمن على صواب.<br>للتحقق من خطأ علي: ${M('|٢ + ٤| = ٦')} وليست ${M('−٦')}.`
+};
+
+/* ===== الحالة ===== */
+const KEY = "escape-linear-eq-v2";
+const LETTERS = ['أ','ب','ج','د'];
+const AR = s => String(s).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const EN = s => String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+let S = load() || fresh();
+function fresh(){ return {name:"",cls:"",room:-1,q:0,stage:"start",got:[],tried:[],mistakes:0,start:0,end:0}; }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const lockSvg = open => open
+ ? `<svg viewBox="0 0 24 24" fill="none" stroke="#4fc08d" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>`
+ : `<svg viewBox="0 0 24 24" fill="none" stroke="#e3a94b" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+
+function mapHtml(){
+  const names = ROOMS.map(r=>r.name.replace('غرفة ','')).concat(['باب الخروج']);
+  return `<div class="map">${names.map((n,i)=>{
+    const done = i < S.room || S.stage==='done';
+    const now = i === S.room && S.stage!=='done';
+    return `<div class="door ${done?'open':''} ${now?'now':''}">${lockSvg(done)}<span>${n}</span></div>`;
+  }).join('')}</div>`;
+}
+
+function render(){
+  if(S.stage==='start') return renderStart();
+  if(S.stage==='done') return renderDone();
+  if(S.stage==='code') return renderCode();
+  if(S.room === ROOMS.length) return renderQ(EXIT, true);
+  return renderQ(ROOMS[S.room].qs[S.q], false);
+}
+
+function renderStart(){
+  app.innerHTML = `
+  <header class="roomhead">
+    <span class="tag">الصف الثالث المتوسط · الفصل الأول · أ.&nbsp;لطفيه الطلحي</span>
+    <h1>غرفة الهروب: المعادلات الخطية</h1>
+    <p class="muted">أنتِ محبوسة في قبو فيه أربع غرف مقفلة وباب خروج. كل إجابة صحيحة تعطيك رقمًا من رمز القفل. اجمعي أرقام الرمز، اكتبيه، وانتقلي للغرفة التالية.</p>
+  </header>
+  ${mapHtml()}
+  <form class="card form" id="f">
+    <div class="field"><label for="nm">اسمك الثلاثي</label><input type="text" id="nm" required autocomplete="name" value="${esc(S.name)}"></div>
+    <div class="field"><label for="cl">الفصل</label><select id="cl" required><option value="" disabled ${S.cls?'':'selected'}>اختاري فصلك</option>${['ثالثة ١','ثالثة ٢'].map(c=>`<option ${S.cls===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    <button class="btn" type="submit">ادخلي الغرفة الأولى</button>
+  </form>
+  <div class="card"><p><b>القواعد</b></p><p class="muted">إذا أخطأتِ يظهر لك تلميح، وتقدرين تجربين مرة ثانية. إذا أصبتِ يظهر لك الحل بالخطوات. حلّي في دفترك قبل ما تختارين. في النهاية تظهر لك شهادة الهروب: صوّريها وأرسليها لمعلمتك أ.&nbsp;لطفيه الطلحي في تيمز.</p></div>`;
+  document.getElementById('f').onsubmit = e => {
+    e.preventDefault();
+    const n = document.getElementById('nm').value.trim(), c = document.getElementById('cl').value.trim();
+    if(!n || !c) return;
+    Object.assign(S,{name:n,cls:c,room:0,q:0,stage:'q',got:[],tried:[],mistakes:0,start:Date.now()});
+    save(); render(); window.scrollTo(0,0);
+  };
+}
+
+function slotsHtml(){
+  const r = ROOMS[S.room];
+  return `<div class="slots" aria-label="أرقام الرمز">${[...r.code].map((_,i)=>{
+    const g = S.got[i] != null;
+    return `<div class="slot ${g?'got':''}">${g?AR(r.code[i]):''}</div>`;
+  }).join('')}</div>`;
+}
+
+function renderQ(item, isExit){
+  const r = isExit ? null : ROOMS[S.room];
+  const answered = isExit ? S.stage==='exitSolved' : S.got[S.q] != null;
+  app.innerHTML = `
+  ${mapHtml()}
+  <header class="roomhead">
+    <span class="tag">${isExit ? 'الباب الأخير' : `الغرفة ${AR(S.room+1)} · ${r.lesson}`}</span>
+    <h2>${isExit ? 'باب الخروج' : r.name}</h2>
+    ${!isExit && S.q===0 && !answered ? `<p class="muted">${r.intro}</p>` : ''}
+  </header>
+  ${isExit ? '' : slotsHtml()}
+  <section class="card" id="qc">
+    <div class="qnum">${isExit ? 'السؤال الأخير' : `السؤال ${AR(S.q+1)} من ${AR(ROOMS[S.room].qs.length)}`}</div>
+    <div class="qtext">${item.q}</div>
+    <div class="opts">${item.o.map((o,i)=>{
+      const wrong = S.tried.includes(i);
+      const right = answered && i===item.a;
+      return `<button class="opt ${wrong?'wrong':''} ${right?'right':''}" data-i="${i}" ${answered||wrong?'disabled':''}><span class="k">${LETTERS[i]}</span><span>${o}</span></button>`;
+    }).join('')}</div>
+    <div id="fb">${fbHtml(item, answered, isExit)}</div>
+  </section>
+  <div class="foot"><span class="muted">${esc(S.name)} · ${esc(S.cls)}</span><span class="muted">الأخطاء: ${AR(S.mistakes)}</span></div>`;
+  app.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(+b.dataset.i, item, isExit));
+  const nx = document.getElementById('nx');
+  if(nx) nx.onclick = () => next(isExit);
+}
+
+function fbHtml(item, answered, isExit){
+  if(answered){
+    const digit = isExit ? '' : `<div class="digit pop">حصلتِ على رقم من الرمز: <span class="big">${AR(ROOMS[S.room].code[S.q])}</span></div>`;
+    const last = !isExit && S.q===ROOMS[S.room].qs.length-1;
+    return `<div class="fb sol"><b>إجابة صحيحة. طريقة الحل:</b><span class="steps">${item.sol}</span></div>${digit}
+      <div class="row" style="margin-top:14px"><button class="btn" id="nx">${isExit ? 'اخرجي من القبو' : last ? 'اذهبي إلى القفل' : 'السؤال التالي'}</button></div>`;
+  }
+  if(S.tried.length) return `<div class="fb hint"><b>ليست الإجابة الصحيحة. تلميح:</b>${item.hint}</div>`;
+  return '';
+}
+
+function choose(i, item, isExit){
+  if(i === item.a){
+    if(isExit) S.stage='exitSolved'; else S.got[S.q] = true;
+  } else {
+    S.tried.push(i); S.mistakes++;
+  }
+  save(); render();
+  if(i !== item.a){ const c=document.getElementById('qc'); c.classList.add('shake'); }
+  document.getElementById('fb').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function next(isExit){
+  S.tried = [];
+  if(isExit){ S.stage='done'; S.end=Date.now(); }
+  else if(S.q < ROOMS[S.room].qs.length-1){ S.q++; }
+  else { S.stage='code'; }
+  save(); render(); window.scrollTo(0,0);
+}
+
+function renderCode(){
+  const r = ROOMS[S.room];
+  app.innerHTML = `
+  ${mapHtml()}
+  <header class="roomhead"><span class="tag">الغرفة ${AR(S.room+1)} · القفل</span><h2>افتحي قفل ${r.name}</h2>
+  <p class="muted">اكتبي أرقام الرمز بالترتيب نفسه الذي حصلتِ عليه.</p></header>
+  ${slotsHtml()}
+  <form class="card form" id="cf">
+    <div class="codebox">${[...r.code].map((_,i)=>`<input id="c${i}" inputmode="numeric" maxlength="1" aria-label="الرقم ${i+1}">`).join('')}</div>
+    <p class="err" id="ce" hidden>الرمز غير صحيح. راجعي الأرقام في الخانات بالأعلى.</p>
+    <button class="btn" type="submit">افتحي الباب</button>
+  </form>`;
+  const ins = [...r.code].map((_,i)=>document.getElementById('c'+i));
+  ins.forEach((inp,i)=>{
+    inp.oninput = () => { inp.value = AR(EN(inp.value).replace(/\D/g,'').slice(-1)); if(inp.value && ins[i+1]) ins[i+1].focus(); };
+    inp.onkeydown = e => { if(e.key==='Backspace' && !inp.value && ins[i-1]) ins[i-1].focus(); };
+  });
+  ins[0].focus();
+  document.getElementById('cf').onsubmit = e => {
+    e.preventDefault();
+    const v = ins.map(x=>EN(x.value)).join('');
+    if(v === r.code){
+      S.room++; S.q=0; S.got=[]; S.tried=[]; S.stage='q'; save(); render(); window.scrollTo(0,0);
+    } else {
+      document.getElementById('ce').hidden = false; document.getElementById('cf').classList.remove('shake'); void document.getElementById('cf').offsetWidth; document.getElementById('cf').classList.add('shake');
+    }
+  };
+}
+
+function renderDone(){
+  const mins = Math.max(1, Math.round((S.end - S.start)/60000));
+  const d = new Date(S.end);
+  const date = d.toLocaleDateString('ar-SA-u-ca-gregory-nu-arab',{day:'numeric',month:'long',year:'numeric'});
+  const time = d.toLocaleTimeString('ar-SA-u-nu-arab',{hour:'numeric',minute:'2-digit'});
+  const praise = S.mistakes === 0
+    ? {title:'أداء كامل بدون أي خطأ!', body:'فهمك للمعادلات الخطية واضح وقوي. حافظي على هذا المستوى، وراجعي بنفس الهمة، والدرجة الكاملة في الاختبار المركزي بإذن الله قريبة منك.'}
+    : S.mistakes <= 4
+    ? {title:'إنجاز رائع!', body:'أخطاؤك قليلة، وكل خطأ صححتيه صار خطوة تعلمتِها. ارجعي للأسئلة اللي توقفتِ عندها مرة ثانية، وبتدخلين الاختبار المركزي بثقة بإذن الله.'}
+    : {title:'ما استسلمتِ ووصلتِ!', body:'كل محاولة خاطئة كانت درسًا، والمهم إنك كملتِ حتى فتحتِ كل الأبواب. أعيدي الغرفة مرة ثانية وبتلاحظين بنفسك كم تحسنتِ. الاستمرار هو سر النجاح.'};
+  app.innerHTML = `
+  ${mapHtml()}
+  <section class="card cert pop">
+    <span class="tag">شهادة الهروب · الفصل الأول: المعادلات الخطية</span>
+    <h1>هربتِ من القبو</h1>
+    <div class="name">${esc(S.name)}</div>
+    <p class="muted">الفصل ${esc(S.cls)} · ${date} · ${time}</p>
+    <div class="stats">
+      <div class="stat"><div class="v">${AR(ROOMS.reduce((n,r)=>n+r.qs.length,0)+1)}</div><div class="l">سؤالًا محلولًا</div></div>
+      <div class="stat"><div class="v">${AR(S.mistakes)}</div><div class="l">محاولة خاطئة</div></div>
+      <div class="stat"><div class="v">${AR(mins)}</div><div class="l">دقيقة</div></div>
+    </div>
+    <div class="praise">
+      <p class="pt">${praise.title}</p>
+      <p>${praise.body}</p>
+      <p class="thanks">شكرًا لكِ يا ${esc(S.name.split(/\s+/)[0])} على جهدك وصبرك حتى آخر باب. فخورة بكِ، وأنتظر أن أراكِ في غرفة الفصل الثاني.<br><span class="muted">معلمتك: أ.&nbsp;لطفيه الطلحي</span></p>
+    </div>
+    <p class="muted">صوّري هذه الشهادة وأرسليها لمعلمتك أ.&nbsp;لطفيه الطلحي في تيمز.</p>
+  </section>
+  <div class="row"><button class="btn ghost" id="again">ابدئي من جديد</button></div>`;
+  document.getElementById('again').onclick = () => { const n=S.name, c=S.cls; S=fresh(); S.name=n; S.cls=c; save(); render(); window.scrollTo(0,0); };
+}
+
+render();
+</script>
+</body>
+</html>

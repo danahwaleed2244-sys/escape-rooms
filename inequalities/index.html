@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>غرفة الهروب: المتباينات الخطية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* عالم واحد: قبو ليلي بلون الحبر، ونحاس دافئ للأقفال والمفاتيح */
+  --ink:#0f1a24;
+  --panel:#172634;
+  --panel-2:#1e3142;
+  --line:#2e4659;
+  --text:#eef2f5;
+  --muted:#9fb3c3;
+  --brass:#e3a94b;
+  --brass-dk:#b9822c;
+  --ok:#4fc08d;
+  --bad:#e86a5c;
+  --display:"Lalezar","Tajawal",system-ui,sans-serif;
+  --body:"Tajawal","Segoe UI",Tahoma,system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--text);font-family:var(--body);font-size:18px;line-height:1.7}
+body{min-height:100%}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--display);font-weight:400;letter-spacing:0;margin:0;text-wrap:balance;line-height:1.35}
+h1{font-size:2rem;color:var(--brass)}
+h2{font-size:1.45rem}
+p{margin:0}
+.muted{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+button{font-family:var(--body);font-size:1rem;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.btn{background:var(--brass);color:#1b1206;border:0;border-radius:10px;padding:12px 20px;font-weight:800}
+.btn:hover{background:#f0b95c}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
+label{font-weight:700;display:block;margin-bottom:4px}
+input[type=text],select{width:100%;font:inherit;background:var(--ink);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.field{display:flex;flex-direction:column}
+.form{display:grid;gap:14px}
+
+/* خريطة الغرف */
+.map{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.door{background:var(--panel-2);border:1px solid var(--line);border-radius:10px 10px 4px 4px;padding:10px 4px 8px;text-align:center;font-size:.8rem;line-height:1.35;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;min-height:96px}
+.door svg{width:26px;height:26px}
+.door.open{border-color:var(--ok);color:var(--text)}
+.door.now{border-color:var(--brass);color:var(--text);box-shadow:0 0 0 2px rgba(227,169,75,.25)}
+
+/* رأس الغرفة */
+.roomhead{display:flex;flex-direction:column;gap:6px}
+.tag{display:inline-block;align-self:flex-start;background:var(--panel-2);border:1px solid var(--line);color:var(--brass);border-radius:999px;padding:2px 12px;font-size:.85rem;font-weight:700}
+.slots{display:flex;gap:8px;justify-content:center}
+.slot{width:48px;height:56px;border-radius:8px;border:2px dashed var(--line);display:grid;place-items:center;font-size:1.6rem;font-weight:800;color:var(--brass);background:var(--ink)}
+.slot.got{border-style:solid;border-color:var(--brass)}
+
+/* السؤال */
+.qnum{font-size:.9rem;color:var(--muted);font-weight:700}
+.qtext{font-size:1.12rem;font-weight:500}
+.opts{display:grid;gap:10px;margin-top:14px}
+.opt{display:flex;align-items:center;gap:12px;text-align:right;background:var(--panel-2);color:var(--text);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:1.08rem;line-height:1.6}
+.opt:hover:not(:disabled){border-color:var(--brass)}
+.opt .k{flex:0 0 32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--ink);color:var(--brass);font-weight:800}
+.opt.wrong{border-color:var(--bad);opacity:.55;text-decoration:line-through;text-decoration-color:var(--bad)}
+.opt.right{border-color:var(--ok);background:rgba(79,192,141,.12)}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;border-radius:12px;padding:14px;line-height:1.85}
+.fb.hint{background:rgba(232,106,92,.1);border:1px solid rgba(232,106,92,.45)}
+.fb.sol{background:rgba(79,192,141,.08);border:1px solid rgba(79,192,141,.45)}
+.fb b{display:block;margin-bottom:4px}
+.digit{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:700;color:var(--brass)}
+.digit span.big{font-size:1.8rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* الرمز */
+.codebox{display:flex;gap:8px;justify-content:center}
+.codebox input{width:52px;height:60px;text-align:center;font-size:1.6rem;font-weight:800;background:var(--ink);color:var(--brass);border:2px solid var(--line);border-radius:8px;font-family:var(--body)}
+.err{color:var(--bad);font-weight:700;text-align:center}
+
+/* الشهادة */
+.cert{border:2px solid var(--brass);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.cert .name{font-family:var(--display);font-size:1.8rem;color:var(--brass)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.stat{background:var(--panel-2);border-radius:10px;padding:10px 4px}
+.stat .v{font-size:1.4rem;font-weight:800}
+.stat .l{font-size:.8rem;color:var(--muted)}
+.praise{display:flex;flex-direction:column;gap:10px;background:var(--panel-2);border-radius:12px;padding:16px;width:100%;line-height:1.9}
+.praise .pt{font-family:var(--display);font-size:1.35rem;color:var(--ok)}
+.praise .thanks{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+
+/* الرياضيات: كل تعبير معزول باتجاه من اليمين لليسار مثل الكتاب */
+.m{unicode-bidi:isolate;direction:rtl;white-space:nowrap;font-weight:700}
+.m bdi{unicode-bidi:isolate}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;font-size:.85em;margin:0 2px}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.fr>span{padding:0 3px}
+sup{font-size:.7em;line-height:0}
+.steps{display:block}
+.nl{width:100%;max-width:420px;display:block;margin:10px auto 0}
+.shape{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.shape svg{max-width:220px;width:46%}
+
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .5s ease-out}
+@keyframes pop{from{transform:scale(.6)}to{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.shake,.pop{animation:none}}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media (max-width:400px){html,body{font-size:17px}.slot{width:42px;height:50px}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app" aria-live="polite"></main>
+
+<script>
+/* ===== أدوات كتابة الرياضيات ===== */
+const M = s => `<span class="m">${s}</span>`;
+const F = (a,b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const P = (base,exp) => `<bdi>${base}</bdi><bdi><sup>${exp}</sup></bdi>`;
+
+function numberLine(points, lo=-5, hi=6){
+  // خط أعداد، والسالب يسار مثل الكتاب
+  const ar = n => String(Math.abs(n)).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+  const step = 330/(hi-lo);
+  const x = n => 30 + (n-lo)*step;
+  let s = `<svg class="nl" viewBox="0 0 390 62" direction="ltr" role="img" aria-label="خط أعداد">`;
+  s += `<line x1="8" y1="22" x2="382" y2="22" stroke="#9fb3c3" stroke-width="2"/>`;
+  s += `<path d="M8 22 l10 -6 v12z M382 22 l-10 -6 v12z" fill="#9fb3c3"/>`;
+  for(let n=lo;n<=hi;n++){
+    s += `<line x1="${x(n)}" y1="15" x2="${x(n)}" y2="29" stroke="#9fb3c3" stroke-width="2"/>`;
+    s += `<text x="${x(n)}" y="50" fill="#eef2f5" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl">${n<0?'−':''}${ar(n)}</text>`;
+  }
+  points.forEach(p=> s += `<circle cx="${x(p)}" cy="22" r="7" fill="#e3a94b"/>`);
+  return s + `</svg>`;
+}
+
+const areaQ = `<div class="shape">
+<svg viewBox="0 0 220 140" role="img" aria-label="المستطيل الأول">
+ <rect x="45" y="15" width="150" height="80" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="122" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٣</text>
+ <text x="25" y="60" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٨</text>
+</svg>
+<svg viewBox="0 0 220 140" role="img" aria-label="المستطيل الثاني">
+ <rect x="45" y="30" width="150" height="60" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="117" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٧</text>
+ <text x="25" y="66" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٦</text>
+</svg></div>`;
+
+const shapesQ = `<div class="shape">
+<svg viewBox="0 0 220 130" role="img" aria-label="مستطيل">
+ <rect x="40" y="20" width="160" height="70" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="115" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ١٣</text>
+ <text x="22" y="60" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س</text>
+</svg>
+<svg viewBox="0 0 220 130" role="img" aria-label="مثلث">
+ <polygon points="45,15 45,95 205,95" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="125" y="120" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س + ٥</text>
+ <text x="22" y="62" fill="#eef2f5" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl" transform="rotate(-90 22 58)">٣س + ٤</text>
+ <text x="140" y="45" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٥س + ١</text>
+</svg></div>`;
+
+/* خط أعداد للمتباينات: دوائر مغلقة/مفتوحة، وأجزاء وأشعة مظللة */
+function NL(o){
+  const lo=o.lo, hi=o.hi, ar = n => String(Math.abs(n)).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+  const step = 330/(hi-lo), x = n => 30 + (n-lo)*step, C='#e3a94b', G='#9fb3c3';
+  let s = `<svg class="nl" viewBox="0 0 390 62" direction="ltr" role="img" aria-label="تمثيل على خط الأعداد">`;
+  s += `<line x1="8" y1="22" x2="382" y2="22" stroke="${G}" stroke-width="2"/>`;
+  s += `<path d="M8 22 l10 -6 v12z M382 22 l-10 -6 v12z" fill="${G}"/>`;
+  for(let n=lo;n<=hi;n++){
+    s += `<line x1="${x(n)}" y1="15" x2="${x(n)}" y2="29" stroke="${G}" stroke-width="2"/>`;
+    s += `<text x="${x(n)}" y="50" fill="#eef2f5" font-size="14" font-family="Tajawal" text-anchor="middle" direction="rtl">${n<0?'−':''}${ar(n)}</text>`;
+  }
+  (o.segs||[]).forEach(([a,b])=> s += `<line x1="${x(a)}" y1="22" x2="${x(b)}" y2="22" stroke="${C}" stroke-width="5"/>`);
+  (o.rays||[]).forEach(([a,dir])=>{
+    if(dir==='R') s += `<line x1="${x(a)}" y1="22" x2="372" y2="22" stroke="${C}" stroke-width="5"/><path d="M384 22 l-13 -8 v16z" fill="${C}"/>`;
+    else s += `<line x1="18" y1="22" x2="${x(a)}" y2="22" stroke="${C}" stroke-width="5"/><path d="M6 22 l13 -8 v16z" fill="${C}"/>`;
+  });
+  (o.closed||[]).forEach(p=> s += `<circle cx="${x(p)}" cy="22" r="7" fill="${C}"/>`);
+  (o.open||[]).forEach(p=> s += `<circle cx="${x(p)}" cy="22" r="6.5" fill="#0f1a24" stroke="${C}" stroke-width="2.5"/>`);
+  return s + `</svg>`;
+}
+
+/* ===== الغرف والأسئلة ===== */
+const ROOMS = [
+ { name:"غرفة الميزان", lesson:"المتباينات بالجمع والطرح والضرب والقسمة", code:"40317",
+   intro:"الباب مقفل برمز من خمسة أرقام. انتبهي: الضرب أو القسمة في عدد سالب يقلب اتجاه المتباينة، وغيره لا يقلبه.",
+   qs:[
+   { q:`حلّت ريم ولمى المتباينة ${M('٥ص < −٣٥')}:<br>ريم: ${M('ص < −٧')}<br>لمى: ${M('ص > −٧')}، «لأن في المتباينة عددًا سالبًا فيتغير الاتجاه»<br>أيهما على صواب؟`,
+     o:[ 'ريم، لأن القسمة على عدد موجب لا تغير اتجاه المتباينة', 'لمى، لأن العدد −٣٥ سالب', 'كلتاهما على صواب', `ولا واحدة منهما، والحل ${M('ص < ٧')}` ], a:0,
+     hint:`على أي عدد نقسم الطرفين؟ هل هو موجب أم سالب؟ الإشارة السالبة في الثابت لا تؤثر.`,
+     sol:`نقسم الطرفين على ${M('٥')} وهو موجب، فيبقى الاتجاه كما هو: ${M('ص < −٧')}.<br>الاتجاه يتغير فقط عند الضرب أو القسمة في عدد سالب، وليس لأن أحد الطرفين سالب.` },
+   { q:`في استطلاع، أجابت خُمس الطالبات المشاركات بأنهن يفضلن مادة الرياضيات، وكان عددهن أكثر من ٤٢ طالبة. ما عدد الطالبات المشاركات في الاستطلاع؟`,
+     o:[ M('ن > ٨٫٤'), M('ن > ٢١٠'), M('ن < ٢١٠'), M('ن > ٤٧') ], a:1,
+     hint:`خُمس العدد يعني ${M(`${F('١','٥')}ن`)}. اكتبي المتباينة ثم اضربي الطرفين في ٥.`,
+     sol:`${M(`${F('١','٥')}ن > ٤٢`)}<br>نضرب الطرفين في ٥ (عدد موجب): ${M('ن > ٢١٠')}<br>إذن عدد المشاركات أكثر من ٢١٠ طالبات.` },
+   { q:`مجموعة حل المتباينة ${M(`−${F('٢','٣')}ر ≥ ١٢`)} هي:`,
+     o:[ M('{ر | ر ≥ −١٨}'), M('{ر | ر ≤ −٨}'), M('{ر | ر ≤ −١٨}'), M('{ر | ر ≥ ١٨}') ], a:2,
+     hint:`اضربي الطرفين في مقلوب المعامل ${M(`−${F('٣','٢')}`)}، ولا تنسي ما يحدث للاتجاه عند الضرب في عدد سالب.`,
+     sol:`نضرب الطرفين في ${M(`−${F('٣','٢')}`)} ونغير اتجاه المتباينة:<br>${M(`ر ≤ ١٢ × (−${F('٣','٢')})`)} ← ${M('ر ≤ −١٨')}` },
+   { q:`أي تمثيل على خط الأعداد يمثل مجموعة حل المتباينة ${M('٣أ + ٤ ≤ ٤أ')}؟`,
+     o:[ NL({lo:-5,hi:6,closed:[4],rays:[[4,'R']]}), NL({lo:-5,hi:6,open:[4],rays:[[4,'R']]}), NL({lo:-5,hi:6,closed:[4],rays:[[4,'L']]}), NL({lo:-5,hi:6,closed:[-4],rays:[[-4,'R']]}) ], a:0, wide:true,
+     hint:`اطرحي ${M('٣أ')} من الطرفين. ثم انتبهي: هل الدائرة مغلقة (≤ أو ≥) أم مفتوحة (< أو >)؟`,
+     sol:`نطرح ${M('٣أ')}: ${M('٤ ≤ أ')}، أي ${M('أ ≥ ٤')}.<br>الدائرة مغلقة عند ٤ لأن العدد ٤ من الحلول، والسهم نحو اليمين (الأعداد الأكبر).` },
+   { q:`العدد ٣ مضافًا إلى مثلي عدد أصغر من ذلك العدد. مجموعة حل هذه المتباينة هي:`,
+     o:[ M('{ن | ن > −٣}'), M('{ن | ن < ٣}'), M('{ن | ن > ٣}'), M('{ن | ن < −٣}') ], a:3,
+     hint:`اكتبي المتباينة: ${M('٣ + ٢ن < ن')}، ثم اجمعي المتغيرات في طرف واحد.`,
+     sol:`${M('٣ + ٢ن < ن')}<br>نطرح ${M('٢ن')} من الطرفين: ${M('٣ < −ن')}<br>نضرب في ${M('−١')} ونغير الاتجاه: ${M('ن < −٣')}` }
+ ]},
+ { name:"غرفة الخطوات", lesson:"المتباينات المتعددة الخطوات", code:"92650",
+   intro:"كل متباينة هنا تحتاج أكثر من خطوة. اعملي مثل المعادلة تمامًا، وراقبي الاتجاه عند الضرب أو القسمة في سالب.",
+   qs:[
+   { q:`يحصل مندوب مبيعات على راتب شهري ٤٠٠٠ ريال، وعمولة ٥٪ من مبيعاته. إذا أراد أن يكون دخله الشهري ٩٠٠٠ ريال على الأقل، فما قيمة المبيعات اللازمة؟`,
+     o:[ M('س ≥ ٢٥٠'), M('س ≥ ١٠٠٠٠٠'), M('س ≥ ١٨٠٠٠٠'), M('س ≤ ١٠٠٠٠٠') ], a:1,
+     hint:`الدخل = الراتب + العمولة. و«على الأقل» تعني ${M('≥')}. العمولة ٥٪ تعني ${M('٠٫٠٥س')}.`,
+     sol:`${M('٤٠٠٠ + ٠٫٠٥س ≥ ٩٠٠٠')}<br>نطرح ٤٠٠٠: ${M('٠٫٠٥س ≥ ٥٠٠٠')}<br>نقسم على ٠٫٠٥: ${M('س ≥ ١٠٠٠٠٠')} ريال.` },
+   { q:`خمسة ناقص ثلاثة أمثال عدد أكبر من مثلي ذلك العدد زائد ٣٥. مجموعة حل هذه المتباينة هي:`,
+     o:[ M('{ن | ن > −٦}'), M('{ن | ن < ٦}'), M('{ن | ن < −٦}'), M('{ن | ن > −٨}') ], a:2,
+     hint:`اكتبي: ${M('٥ − ٣ن > ٢ن + ٣٥')}. وعند القسمة على معامل سالب غيّري الاتجاه.`,
+     sol:`${M('٥ − ٣ن > ٢ن + ٣٥')}<br>نطرح ${M('٢ن')} و٥: ${M('−٥ن > ٣٠')}<br>نقسم على ${M('−٥')} ونغير الاتجاه: ${M('ن < −٦')}` },
+   { q:`مجموعة حل المتباينة ${M('٧ت − ٣(ت − ٤) ≤ ٤(ت + ١)')} هي:`,
+     o:[ 'مجموعة الأعداد الحقيقية', M('{ت | ت ≤ ٢}'), M('∅'), M('{ت | ت ≥ ٢}') ], a:2,
+     hint:`وزّعي في الطرفين، واجمعي الحدود المتشابهة. ماذا يحدث للمتغير؟`,
+     sol:`${M('٧ت − ٣ت + ١٢ ≤ ٤ت + ٤')} ← ${M('٤ت + ١٢ ≤ ٤ت + ٤')}<br>نطرح ${M('٤ت')}: ${M('١٢ ≤ ٤')}، وهذه عبارة خاطئة دائمًا.<br>إذن مجموعة الحل هي المجموعة الخالية ${M('∅')}.` },
+   { q:`أرادت سلمى حل المتباينة ${M('−٤ف + ٩ < −٣')} دون أن تضرب أو تقسم على عدد سالب. أي الطرق الآتية صحيحة؟`,
+     o:[ `تطرح ٩ فتحصل على ${M('−٤ف < −١٢')}، ثم تحذف الإشارتين: ${M('ف < ٣')}`, `تضيف ${M('٤ف')} و٣ للطرفين فتحصل على ${M('١٢ < ٤ف')}، إذن ${M('ف > ٣')}`, `تضيف ${M('٤ف')} للطرفين فتحصل على ${M('٩ < ٤ف − ٣')}، إذن ${M('ف < ٣')}`, 'لا يمكن حلها دون القسمة على عدد سالب' ], a:1,
+     hint:`انقلي الحد ${M('−٤ف')} إلى الطرف الآخر ليصبح معامله موجبًا.`,
+     sol:`نضيف ${M('٤ف')}: ${M('٩ < ٤ف − ٣')}<br>نضيف ٣: ${M('١٢ < ٤ف')}<br>نقسم على ٤ (موجب): ${M('٣ < ف')}، أي ${M('ف > ٣')}.<br>بهذه الطريقة لا نحتاج لتغيير الاتجاه أبدًا.` },
+   { q:`مجموع ثلاثة أعداد صحيحة زوجية موجبة متتالية لا يزيد على ٣٦. ما أكبر قيمة ممكنة للعدد الأصغر؟`,
+     o:[ M('١٢'), M('١١'), M('١٠'), M('٨') ], a:2,
+     hint:`«لا يزيد على» تعني ${M('≤')}. والأعداد: ${M('ن ، ن + ٢ ، ن + ٤')}.`,
+     sol:`${M('ن + (ن + ٢) + (ن + ٤) ≤ ٣٦')} ← ${M('٣ن + ٦ ≤ ٣٦')}<br>${M('٣ن ≤ ٣٠')} ← ${M('ن ≤ ١٠')}<br>أكبر عدد زوجي يحقق ذلك ١٠، والأعداد ١٠ و١٢ و١٤ مجموعها ٣٦.` }
+ ]},
+ { name:"غرفة التقاطع", lesson:"المتباينات المركبة", code:"57184",
+   intro:"«و» تعني التقاطع: الحل في المنطقة المشتركة. «أو» تعني الاتحاد: الحل في أي من المنطقتين.",
+   qs:[
+   { q:`حلّت نورة وهيا المتباينة ${M('١ < ٣س − ٢ < ١٠')}:<br>نورة: ${M('١ < ٣س < ١٢')} ← ${M(`${F('١','٣')} < س < ٤`)}<br>هيا: ${M('٣ < ٣س < ١٢')} ← ${M('١ < س < ٤')}<br>أيهما على صواب؟`,
+     o:[ 'نورة، لأنها أضافت ٢ للجزء الأوسط فقط', 'هيا، لأنها أضافت ٢ لكل أجزاء المتباينة', 'كلتاهما على صواب', `ولا واحدة منهما، والحل ${M('١ < س < ١٠')}` ], a:1,
+     hint:`في المتباينة المركبة بصورة ${M('أ < ... < ب')}، أي عملية نجريها يجب أن تُطبق على الأجزاء الثلاثة.`,
+     sol:`نضيف ٢ للأجزاء الثلاثة: ${M('٣ < ٣س < ١٢')}<br>نقسم الأجزاء الثلاثة على ٣: ${M('١ < س < ٤')}<br>إذن هيا على صواب، ونورة نسيت إضافة ٢ للطرف الأيمن.` },
+   { q:`يُنصح بأن يكون ضغط الهواء في إطار السيارة بين ٣٠ و٣٥ رطلًا لكل بوصة مربعة. أي المتباينات تمثل الضغط غير المناسب (ض)؟`,
+     o:[ M('٣٠ < ض < ٣٥'), M('ض < ٣٠ و ض > ٣٥'), M('ض < ٣٠ أو ض > ٣٥'), M('ض > ٣٠ أو ض < ٣٥') ], a:2,
+     hint:`الضغط غير المناسب إما أقل من ٣٠ أو أكثر من ٣٥. هل يمكن أن يكون الاثنين معًا؟`,
+     sol:`غير المناسب: أقل من ٣٠ ${M('أو')} أكثر من ٣٥: ${M('ض < ٣٠ أو ض > ٣٥')}.<br>لا نستعمل «و» لأنه لا يوجد عدد أصغر من ٣٠ وأكبر من ٣٥ معًا، فتكون مجموعة الحل خالية.` },
+   { q:`ناتج جمع ثلاثة أمثال عدد مع أربعة يقع بين −٨ و١٠. ما مجموعة قيم هذا العدد؟`,
+     o:[ M('−١٢ < ن < ٦'), M('−٤ < ن < ٢'), M('ن < −٤ أو ن > ٢'), M('−٤ < ن < ١٠') ], a:1,
+     hint:`اكتبي: ${M('−٨ < ٣ن + ٤ < ١٠')}، ثم طبقي كل خطوة على الأجزاء الثلاثة.`,
+     sol:`${M('−٨ < ٣ن + ٤ < ١٠')}<br>نطرح ٤: ${M('−١٢ < ٣ن < ٦')}<br>نقسم على ٣: ${M('−٤ < ن < ٢')}` },
+   { q:`مجموعة حل المتباينة المركبة ${M('−٣م + ٤ ≤ ١٠ أو ٢م − ١ > ٧')} هي:`,
+     o:[ M('{م | م > ٤}'), M('{م | −٢ ≤ م < ٤}'), M('{م | م ≤ −٢ أو م > ٤}'), M('{م | م ≥ −٢}') ], a:3,
+     hint:`حلّي كل متباينة وحدها. ثم تذكري أن «أو» تعني الاتحاد: كل عدد يحقق إحداهما على الأقل.`,
+     sol:`الأولى: ${M('−٣م ≤ ٦')} ← ${M('م ≥ −٢')} (غيرنا الاتجاه)<br>الثانية: ${M('٢م > ٨')} ← ${M('م > ٤')}<br>كل عدد أكبر من ٤ هو أصلًا أكبر من −٢، فالاتحاد هو ${M('م ≥ −٢')}.` },
+   { q:`المتباينة المركبة التي يمثلها خط الأعداد الآتي هي:${NL({lo:-5,hi:6,closed:[-2],open:[3],rays:[[-2,'L'],[3,'R']]})}`,
+     o:[ M('−٢ ≤ س < ٣'), M('س < −٢ أو س ≥ ٣'), M('س ≤ −٢ و س > ٣'), M('س ≤ −٢ أو س > ٣') ], a:3,
+     hint:`التمثيل في جزأين منفصلين يعني «أو». ثم انظري لنوع كل دائرة.`,
+     sol:`الجزء الأيسر: دائرة مغلقة عند ${M('−٢')} والسهم لليسار ← ${M('س ≤ −٢')}<br>الجزء الأيمن: دائرة مفتوحة عند ٣ والسهم لليمين ← ${M('س > ٣')}<br>جزآن منفصلان، إذن: ${M('س ≤ −٢ أو س > ٣')}` }
+ ]},
+ { name:"غرفة المسافة", lesson:"المتباينات التي تتضمن القيمة المطلقة", code:"36829",
+   intro:"«أقل من» في القيمة المطلقة تعطي حلًا بين عددين (و)، و«أكبر من» تعطي حلًا في جهتين (أو).",
+   qs:[
+   { q:`مجموعة حل المتباينة ${M('|٢ن + ٤| ≥ ١٠')} هي:`,
+     o:[ M('{ن | −٧ ≤ ن ≤ ٣}'), M('{ن | ن ≤ −٧ أو ن ≥ ٣}'), M('{ن | ن ≥ ٣}'), M('{ن | ن ≤ −٣ أو ن ≥ ٧}') ], a:1,
+     hint:`«أكبر من أو يساوي» تعطي حالتين بينهما «أو»: ${M('٢ن + ٤ ≥ ١٠')} أو ${M('٢ن + ٤ ≤ −١٠')}.`,
+     sol:`${M('٢ن + ٤ ≥ ١٠')} ← ${M('٢ن ≥ ٦')} ← ${M('ن ≥ ٣')}<br>${M('٢ن + ٤ ≤ −١٠')} ← ${M('٢ن ≤ −١٤')} ← ${M('ن ≤ −٧')}<br>مجموعة الحل: ${M('{ن | ن ≤ −٧ أو ن ≥ ٣}')}` },
+   { q:`مجموعة حل المتباينة ${M('|جـ + ٢| > −٢')} هي:`,
+     o:[ M('∅'), M('{جـ | جـ > −٤}'), M('{جـ | −٤ < جـ < ٠}'), 'مجموعة الأعداد الحقيقية' ], a:3,
+     hint:`القيمة المطلقة دائمًا موجبة أو صفر. هل هي دائمًا أكبر من عدد سالب؟`,
+     sol:`${M('|جـ + ٢|')} لا تقل عن الصفر أبدًا، والصفر أكبر من ${M('−٢')}.<br>إذن المتباينة صحيحة لأي عدد، ومجموعة الحل هي مجموعة الأعداد الحقيقية.<br>انتبهي: ${M('|جـ + ٢| < −٢')} هي التي حلها ${M('∅')}.` },
+   { q:`أظهرت دراسة أن ٧٥٪ من الطلاب يمارسون الرياضة، بهامش خطأ ٤٪ زيادة أو نقصانًا. ما مدى النسبة الفعلية (س)؟`,
+     o:[ M('٧٥ ≤ س ≤ ٧٩'), M('٧١ ≤ س ≤ ٧٩'), M('٧١ ≤ س ≤ ٧٥'), M('س ≤ ٧١ أو س ≥ ٧٩') ], a:1,
+     hint:`اكتبي متباينة قيمة مطلقة: الفرق بين س و٧٥ لا يزيد على ٤.`,
+     sol:`${M('|س − ٧٥| ≤ ٤')}<br>${M('−٤ ≤ س − ٧٥ ≤ ٤')}<br>نضيف ٧٥: ${M('٧١ ≤ س ≤ ٧٩')}` },
+   { q:`مثّلت جود مجموعة حل المتباينة ${M('|ص − ١| > ٢')} كما في الشكل:${NL({lo:-5,hi:6,open:[-1,3],segs:[[-1,3]]})}هل تمثيلها صحيح؟`,
+     o:[ 'نعم، تمثيلها صحيح', 'لا، يجب أن تكون الدائرتان مغلقتين', `لا، الحل خارج الفترة: ${M('ص < −١ أو ص > ٣')}`, `لا، الحل ${M('ص > ٣')} فقط` ], a:2,
+     hint:`«أكبر من» في القيمة المطلقة تعني أن المسافة عن ١ أكبر من ٢. أين تقع هذه الأعداد؟`,
+     sol:`${M('ص − ١ > ٢')} ← ${M('ص > ٣')}، أو ${M('ص − ١ < −٢')} ← ${M('ص < −١')}<br>الحل في جهتين خارج الفترة، وجود ظللت ما بينهما وهو حل ${M('|ص − ١| < ٢')}.` },
+   { q:`مجموعة حل المتباينة ${M(`|${F('س − ٣','٤')}| < ٢`)} هي:`,
+     o:[ M('{س | ١ < س < ٥}'), M('{س | −٥ < س < ١١}'), M('{س | س < −٥ أو س > ١١}'), M('{س | −٨ < س < ٨}') ], a:1,
+     hint:`اكتبيها مركبة: ${M(`−٢ < ${F('س − ٣','٤')} < ٢`)}، ثم اضربي الأجزاء الثلاثة في ٤ قبل إضافة ٣.`,
+     sol:`${M(`−٢ < ${F('س − ٣','٤')} < ٢`)}<br>نضرب في ٤: ${M('−٨ < س − ٣ < ٨')}<br>نضيف ٣: ${M('−٥ < س < ١١')}<br>الخيار ${M('١ < س < ٥')} يأتي من نسيان الضرب في ٤.` }
+ ]}
+];
+
+const EXIT = {
+  q:`باب الخروج الأخير: ما رأيك في العبارة «إذا كان ${M('أ > ب')} فإن ${M(`${F('١','أ')} < ${F('١','ب')}`)}»؟`,
+  o:[ 'صحيحة دائمًا', 'صحيحة أحيانًا', 'غير صحيحة أبدًا', 'صحيحة فقط إذا كان أ و ب سالبين' ], a:1,
+  hint:`جرّبي أعدادًا: ${M('أ = ٢ ، ب = ١')}، ثم جرّبي ${M('أ = ١ ، ب = −١')}.`,
+  sol:`${M('أ = ٢ ، ب = ١')}: ${M(`${F('١','٢')} < ١`)} صحيحة.<br>${M('أ = ١ ، ب = −١')}: ${M('١ < −١')} خاطئة.<br>إذن العبارة صحيحة أحيانًا: تصح عندما يكون العددان بالإشارة نفسها، ولا تصح إذا اختلفت إشارتاهما.`
+};
+
+/* ===== الحالة ===== */
+const KEY = "escape-linear-ineq-v1";
+const LETTERS = ['أ','ب','ج','د'];
+const AR = s => String(s).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const EN = s => String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+let S = load() || fresh();
+function fresh(){ return {name:"",cls:"",room:-1,q:0,stage:"start",got:[],tried:[],mistakes:0,start:0,end:0}; }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const lockSvg = open => open
+ ? `<svg viewBox="0 0 24 24" fill="none" stroke="#4fc08d" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>`
+ : `<svg viewBox="0 0 24 24" fill="none" stroke="#e3a94b" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+
+function mapHtml(){
+  const names = ROOMS.map(r=>r.name.replace('غرفة ','')).concat(['باب الخروج']);
+  return `<div class="map">${names.map((n,i)=>{
+    const done = i < S.room || S.stage==='done';
+    const now = i === S.room && S.stage!=='done';
+    return `<div class="door ${done?'open':''} ${now?'now':''}">${lockSvg(done)}<span>${n}</span></div>`;
+  }).join('')}</div>`;
+}
+
+function render(){
+  if(S.stage==='start') return renderStart();
+  if(S.stage==='done') return renderDone();
+  if(S.stage==='code') return renderCode();
+  if(S.room === ROOMS.length) return renderQ(EXIT, true);
+  return renderQ(ROOMS[S.room].qs[S.q], false);
+}
+
+function renderStart(){
+  app.innerHTML = `
+  <header class="roomhead">
+    <span class="tag">الصف الثالث المتوسط · الفصل الرابع · أ.&nbsp;لطفيه الطلحي</span>
+    <h1>غرفة الهروب: المتباينات الخطية</h1>
+    <p class="muted">أنتِ محبوسة في قبو فيه أربع غرف مقفلة وباب خروج. كل إجابة صحيحة تعطيك رقمًا من رمز القفل. اجمعي أرقام الرمز، اكتبيه، وانتقلي للغرفة التالية.</p>
+  </header>
+  ${mapHtml()}
+  <form class="card form" id="f">
+    <div class="field"><label for="nm">اسمك الثلاثي</label><input type="text" id="nm" required autocomplete="name" value="${esc(S.name)}"></div>
+    <div class="field"><label for="cl">الفصل</label><select id="cl" required><option value="" disabled ${S.cls?'':'selected'}>اختاري فصلك</option>${['ثالثة ١','ثالثة ٢'].map(c=>`<option ${S.cls===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    <button class="btn" type="submit">ادخلي الغرفة الأولى</button>
+  </form>
+  <div class="card"><p><b>القواعد</b></p><p class="muted">إذا أخطأتِ يظهر لك تلميح، وتقدرين تجربين مرة ثانية. إذا أصبتِ يظهر لك الحل بالخطوات. حلّي في دفترك قبل ما تختارين. في النهاية تظهر لك شهادة الهروب: صوّريها وأرسليها لمعلمتك أ.&nbsp;لطفيه الطلحي في تيمز.</p></div>`;
+  document.getElementById('f').onsubmit = e => {
+    e.preventDefault();
+    const n = document.getElementById('nm').value.trim(), c = document.getElementById('cl').value.trim();
+    if(!n || !c) return;
+    Object.assign(S,{name:n,cls:c,room:0,q:0,stage:'q',got:[],tried:[],mistakes:0,start:Date.now()});
+    save(); render(); window.scrollTo(0,0);
+  };
+}
+
+function slotsHtml(){
+  const r = ROOMS[S.room];
+  return `<div class="slots" aria-label="أرقام الرمز">${[...r.code].map((_,i)=>{
+    const g = S.got[i] != null;
+    return `<div class="slot ${g?'got':''}">${g?AR(r.code[i]):''}</div>`;
+  }).join('')}</div>`;
+}
+
+function renderQ(item, isExit){
+  const r = isExit ? null : ROOMS[S.room];
+  const answered = isExit ? S.stage==='exitSolved' : S.got[S.q] != null;
+  app.innerHTML = `
+  ${mapHtml()}
+  <header class="roomhead">
+    <span class="tag">${isExit ? 'الباب الأخير' : `الغرفة ${AR(S.room+1)} · ${r.lesson}`}</span>
+    <h2>${isExit ? 'باب الخروج' : r.name}</h2>
+    ${!isExit && S.q===0 && !answered ? `<p class="muted">${r.intro}</p>` : ''}
+  </header>
+  ${isExit ? '' : slotsHtml()}
+  <section class="card" id="qc">
+    <div class="qnum">${isExit ? 'السؤال الأخير' : `السؤال ${AR(S.q+1)} من ${AR(ROOMS[S.room].qs.length)}`}</div>
+    <div class="qtext">${item.q}</div>
+    <div class="opts">${item.o.map((o,i)=>{
+      const wrong = S.tried.includes(i);
+      const right = answered && i===item.a;
+      return `<button class="opt ${wrong?'wrong':''} ${right?'right':''}" data-i="${i}" ${answered||wrong?'disabled':''}><span class="k">${LETTERS[i]}</span><span>${o}</span></button>`;
+    }).join('')}</div>
+    <div id="fb">${fbHtml(item, answered, isExit)}</div>
+  </section>
+  <div class="foot"><span class="muted">${esc(S.name)} · ${esc(S.cls)}</span><span class="muted">الأخطاء: ${AR(S.mistakes)}</span></div>`;
+  app.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(+b.dataset.i, item, isExit));
+  const nx = document.getElementById('nx');
+  if(nx) nx.onclick = () => next(isExit);
+}
+
+function fbHtml(item, answered, isExit){
+  if(answered){
+    const digit = isExit ? '' : `<div class="digit pop">حصلتِ على رقم من الرمز: <span class="big">${AR(ROOMS[S.room].code[S.q])}</span></div>`;
+    const last = !isExit && S.q===ROOMS[S.room].qs.length-1;
+    return `<div class="fb sol"><b>إجابة صحيحة. طريقة الحل:</b><span class="steps">${item.sol}</span></div>${digit}
+      <div class="row" style="margin-top:14px"><button class="btn" id="nx">${isExit ? 'اخرجي من القبو' : last ? 'اذهبي إلى القفل' : 'السؤال التالي'}</button></div>`;
+  }
+  if(S.tried.length) return `<div class="fb hint"><b>ليست الإجابة الصحيحة. تلميح:</b>${item.hint}</div>`;
+  return '';
+}
+
+function choose(i, item, isExit){
+  if(i === item.a){
+    if(isExit) S.stage='exitSolved'; else S.got[S.q] = true;
+  } else {
+    S.tried.push(i); S.mistakes++;
+  }
+  save(); render();
+  if(i !== item.a){ const c=document.getElementById('qc'); c.classList.add('shake'); }
+  document.getElementById('fb').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function next(isExit){
+  S.tried = [];
+  if(isExit){ S.stage='done'; S.end=Date.now(); }
+  else if(S.q < ROOMS[S.room].qs.length-1){ S.q++; }
+  else { S.stage='code'; }
+  save(); render(); window.scrollTo(0,0);
+}
+
+function renderCode(){
+  const r = ROOMS[S.room];
+  app.innerHTML = `
+  ${mapHtml()}
+  <header class="roomhead"><span class="tag">الغرفة ${AR(S.room+1)} · القفل</span><h2>افتحي قفل ${r.name}</h2>
+  <p class="muted">اكتبي أرقام الرمز بالترتيب نفسه الذي حصلتِ عليه.</p></header>
+  ${slotsHtml()}
+  <form class="card form" id="cf">
+    <div class="codebox">${[...r.code].map((_,i)=>`<input id="c${i}" inputmode="numeric" maxlength="1" aria-label="الرقم ${i+1}">`).join('')}</div>
+    <p class="err" id="ce" hidden>الرمز غير صحيح. راجعي الأرقام في الخانات بالأعلى.</p>
+    <button class="btn" type="submit">افتحي الباب</button>
+  </form>`;
+  const ins = [...r.code].map((_,i)=>document.getElementById('c'+i));
+  ins.forEach((inp,i)=>{
+    inp.oninput = () => { inp.value = AR(EN(inp.value).replace(/\D/g,'').slice(-1)); if(inp.value && ins[i+1]) ins[i+1].focus(); };
+    inp.onkeydown = e => { if(e.key==='Backspace' && !inp.value && ins[i-1]) ins[i-1].focus(); };
+  });
+  ins[0].focus();
+  document.getElementById('cf').onsubmit = e => {
+    e.preventDefault();
+    const v = ins.map(x=>EN(x.value)).join('');
+    if(v === r.code){
+      S.room++; S.q=0; S.got=[]; S.tried=[]; S.stage='q'; save(); render(); window.scrollTo(0,0);
+    } else {
+      document.getElementById('ce').hidden = false; document.getElementById('cf').classList.remove('shake'); void document.getElementById('cf').offsetWidth; document.getElementById('cf').classList.add('shake');
+    }
+  };
+}
+
+function renderDone(){
+  const mins = Math.max(1, Math.round((S.end - S.start)/60000));
+  const d = new Date(S.end);
+  const date = d.toLocaleDateString('ar-SA-u-ca-gregory-nu-arab',{day:'numeric',month:'long',year:'numeric'});
+  const time = d.toLocaleTimeString('ar-SA-u-nu-arab',{hour:'numeric',minute:'2-digit'});
+  const praise = S.mistakes === 0
+    ? {title:'أداء كامل بدون أي خطأ!', body:'فهمك للمتباينات الخطية واضح وقوي. حافظي على هذا المستوى، وراجعي بنفس الهمة، والدرجة الكاملة في الاختبار بإذن الله قريبة منك.'}
+    : S.mistakes <= 4
+    ? {title:'إنجاز رائع!', body:'أخطاؤك قليلة، وكل خطأ صححتيه صار خطوة تعلمتِها. ارجعي للأسئلة اللي توقفتِ عندها مرة ثانية، وبتدخلين الاختبار بثقة بإذن الله.'}
+    : {title:'ما استسلمتِ ووصلتِ!', body:'كل محاولة خاطئة كانت درسًا، والمهم إنك كملتِ حتى فتحتِ كل الأبواب. أعيدي الغرفة مرة ثانية وبتلاحظين بنفسك كم تحسنتِ. الاستمرار هو سر النجاح.'};
+  app.innerHTML = `
+  ${mapHtml()}
+  <section class="card cert pop">
+    <span class="tag">شهادة الهروب · الفصل الرابع: المتباينات الخطية</span>
+    <h1>هربتِ من القبو</h1>
+    <div class="name">${esc(S.name)}</div>
+    <p class="muted">الفصل ${esc(S.cls)} · ${date} · ${time}</p>
+    <div class="stats">
+      <div class="stat"><div class="v">${AR(ROOMS.reduce((n,r)=>n+r.qs.length,0)+1)}</div><div class="l">سؤالًا محلولًا</div></div>
+      <div class="stat"><div class="v">${AR(S.mistakes)}</div><div class="l">محاولة خاطئة</div></div>
+      <div class="stat"><div class="v">${AR(mins)}</div><div class="l">دقيقة</div></div>
+    </div>
+    <div class="praise">
+      <p class="pt">${praise.title}</p>
+      <p>${praise.body}</p>
+      <p class="thanks">شكرًا لكِ يا ${esc(S.name.split(/\s+/)[0])} على جهدك وصبرك حتى آخر باب. فخورة بكِ، وأنتظر أن أراكِ في الغرفة القادمة.<br><span class="muted">معلمتك: أ.&nbsp;لطفيه الطلحي</span></p>
+    </div>
+    <p class="muted">صوّري هذه الشهادة وأرسليها لمعلمتك أ.&nbsp;لطفيه الطلحي في تيمز.</p>
+  </section>
+  <div class="row"><button class="btn ghost" id="again">ابدئي من جديد</button></div>`;
+  document.getElementById('again').onclick = () => { const n=S.name, c=S.cls; S=fresh(); S.name=n; S.cls=c; save(); render(); window.scrollTo(0,0); };
+}
+
+render();
+</script>
+</body>
+</html>
