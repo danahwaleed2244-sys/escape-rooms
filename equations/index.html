@@ -9,20 +9,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* عالم واحد: قبو ليلي بلون الحبر، ونحاس دافئ للأقفال والمفاتيح */
-  --ink:#0f1a24;
-  --panel:#172634;
-  --panel-2:#1e3142;
-  --line:#2e4659;
-  --text:#eef2f5;
-  --muted:#9fb3c3;
-  --brass:#e3a94b;
-  --brass-dk:#b9822c;
-  --ok:#4fc08d;
-  --bad:#e86a5c;
+  /* لون هادئ خاص بكل فصل */
+  --ink:#edf6f1;
+  --panel:#ffffff;
+  --panel-2:#e1efe7;
+  --line:#c3dccd;
+  --text:#1f3a2e;
+  --muted:#5b7768;
+  --brass:#2e8b67;
+  --brass-dk:#24704f;
+  --ok:#2f9a68;
+  --bad:#cc4b3c;
   --display:"Lalezar","Tajawal",system-ui,sans-serif;
   --body:"Tajawal","Segoe UI",Tahoma,system-ui,sans-serif;
-  color-scheme:dark;
+  color-scheme:light;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--ink);color:var(--text);font-family:var(--body);font-size:18px;line-height:1.7}
@@ -36,8 +36,8 @@ p{margin:0}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
 button{font-family:var(--body);font-size:1rem;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
-.btn{background:var(--brass);color:#1b1206;border:0;border-radius:10px;padding:12px 20px;font-weight:800}
-.btn:hover{background:#f0b95c}
+.btn{background:var(--brass);color:#fff;border:0;border-radius:10px;padding:12px 20px;font-weight:800}
+.btn:hover{background:var(--brass-dk)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
 label{font-weight:700;display:block;margin-bottom:4px}
@@ -50,7 +50,7 @@ input[type=text],select{width:100%;font:inherit;background:var(--ink);color:var(
 .door{background:var(--panel-2);border:1px solid var(--line);border-radius:10px 10px 4px 4px;padding:10px 4px 8px;text-align:center;font-size:.8rem;line-height:1.35;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;min-height:96px}
 .door svg{width:26px;height:26px}
 .door.open{border-color:var(--ok);color:var(--text)}
-.door.now{border-color:var(--brass);color:var(--text);box-shadow:0 0 0 2px rgba(227,169,75,.25)}
+.door.now{border-color:var(--brass);color:var(--text);box-shadow:0 0 0 2px rgba(46,139,103,.25)}
 
 /* رأس الغرفة */
 .roomhead{display:flex;flex-direction:column;gap:6px}
@@ -67,11 +67,11 @@ input[type=text],select{width:100%;font:inherit;background:var(--ink);color:var(
 .opt:hover:not(:disabled){border-color:var(--brass)}
 .opt .k{flex:0 0 32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--ink);color:var(--brass);font-weight:800}
 .opt.wrong{border-color:var(--bad);opacity:.55;text-decoration:line-through;text-decoration-color:var(--bad)}
-.opt.right{border-color:var(--ok);background:rgba(79,192,141,.12)}
+.opt.right{border-color:var(--ok);background:rgba(47,154,104,.1)}
 .opt:disabled{cursor:default}
 .fb{margin-top:14px;border-radius:12px;padding:14px;line-height:1.85}
-.fb.hint{background:rgba(232,106,92,.1);border:1px solid rgba(232,106,92,.45)}
-.fb.sol{background:rgba(79,192,141,.08);border:1px solid rgba(79,192,141,.45)}
+.fb.hint{background:rgba(204,75,60,.07);border:1px solid rgba(204,75,60,.4)}
+.fb.sol{background:rgba(47,154,104,.07);border:1px solid rgba(47,154,104,.4)}
 .fb b{display:block;margin-bottom:4px}
 .digit{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:700;color:var(--brass)}
 .digit span.big{font-size:1.8rem}
@@ -110,6 +110,11 @@ sup{font-size:.7em;line-height:0}
 .pop{animation:pop .5s ease-out}
 @keyframes pop{from{transform:scale(.6)}to{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.shake,.pop{animation:none}}
+
+body{background-color:var(--ink);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cg opacity='.09'%3E%3Ctext x='10' y='28' font-size='22' fill='%232e8b67' font-family='Tajawal'%3E=%3C/text%3E%3Ctext x='42' y='58' font-size='18' fill='%232e8b67' font-family='Tajawal'%3Eس%3C/text%3E%3C/g%3E%3C/svg%3E")}
+.card{box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.motif{display:flex;justify-content:center}.motif svg{width:120px;height:96px}
+.opt .k{background:var(--panel)}
 .foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 @media (max-width:400px){html,body{font-size:17px}.slot{width:42px;height:50px}}
 </style>
@@ -118,6 +123,9 @@ sup{font-size:.7em;line-height:0}
 <main class="wrap" id="app" aria-live="polite"></main>
 
 <script>
+const T={acc:'#2e8b67',muted:'#5b7768',text:'#1f3a2e',line:'#c3dccd',bg:'#ffffff',ok:'#2f9a68'};
+const MOTIF=`<div class="motif" aria-hidden="true"><svg viewBox="0 0 120 96"><g fill="none" stroke="#2e8b67" stroke-width="3" stroke-linecap="round"><path d="M60 22v58M30 80h60M18 34h84"/><path d="M18 34l-12 26h24zM102 34l-12 26h24z"/><circle cx="60" cy="20" r="5" fill="#2e8b67"/></g><text x="18" y="70" font-size="13" fill="#2e8b67" font-family="Tajawal" text-anchor="middle">س</text><text x="102" y="70" font-size="13" fill="#2e8b67" font-family="Tajawal" text-anchor="middle">٧</text></svg></div>`;
+
 /* ===== أدوات كتابة الرياضيات ===== */
 const M = s => `<span class="m">${s}</span>`;
 const F = (a,b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
@@ -129,39 +137,39 @@ function numberLine(points, lo=-5, hi=6){
   const step = 330/(hi-lo);
   const x = n => 30 + (n-lo)*step;
   let s = `<svg class="nl" viewBox="0 0 390 62" direction="ltr" role="img" aria-label="خط أعداد">`;
-  s += `<line x1="8" y1="22" x2="382" y2="22" stroke="#9fb3c3" stroke-width="2"/>`;
-  s += `<path d="M8 22 l10 -6 v12z M382 22 l-10 -6 v12z" fill="#9fb3c3"/>`;
+  s += `<line x1="8" y1="22" x2="382" y2="22" stroke="${T.muted}" stroke-width="2"/>`;
+  s += `<path d="M8 22 l10 -6 v12z M382 22 l-10 -6 v12z" fill="${T.muted}"/>`;
   for(let n=lo;n<=hi;n++){
-    s += `<line x1="${x(n)}" y1="15" x2="${x(n)}" y2="29" stroke="#9fb3c3" stroke-width="2"/>`;
-    s += `<text x="${x(n)}" y="50" fill="#eef2f5" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl">${n<0?'−':''}${ar(n)}</text>`;
+    s += `<line x1="${x(n)}" y1="15" x2="${x(n)}" y2="29" stroke="${T.muted}" stroke-width="2"/>`;
+    s += `<text x="${x(n)}" y="50" fill="${T.text}" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl">${n<0?'−':''}${ar(n)}</text>`;
   }
-  points.forEach(p=> s += `<circle cx="${x(p)}" cy="22" r="7" fill="#e3a94b"/>`);
+  points.forEach(p=> s += `<circle cx="${x(p)}" cy="22" r="7" fill="${T.acc}"/>`);
   return s + `</svg>`;
 }
 
 const areaQ = `<div class="shape">
 <svg viewBox="0 0 220 140" role="img" aria-label="المستطيل الأول">
- <rect x="45" y="15" width="150" height="80" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
- <text x="120" y="122" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٣</text>
- <text x="25" y="60" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٨</text>
+ <rect x="45" y="15" width="150" height="80" fill="none" stroke="${T.acc}" stroke-width="2.5"/>
+ <text x="120" y="122" fill="${T.text}" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٣</text>
+ <text x="25" y="60" fill="${T.text}" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٨</text>
 </svg>
 <svg viewBox="0 0 220 140" role="img" aria-label="المستطيل الثاني">
- <rect x="45" y="30" width="150" height="60" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
- <text x="120" y="117" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٧</text>
- <text x="25" y="66" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٦</text>
+ <rect x="45" y="30" width="150" height="60" fill="none" stroke="${T.acc}" stroke-width="2.5"/>
+ <text x="120" y="117" fill="${T.text}" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٧</text>
+ <text x="25" y="66" fill="${T.text}" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٦</text>
 </svg></div>`;
 
 const shapesQ = `<div class="shape">
 <svg viewBox="0 0 220 130" role="img" aria-label="مستطيل">
- <rect x="40" y="20" width="160" height="70" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
- <text x="120" y="115" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ١٣</text>
- <text x="22" y="60" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س</text>
+ <rect x="40" y="20" width="160" height="70" fill="none" stroke="${T.acc}" stroke-width="2.5"/>
+ <text x="120" y="115" fill="${T.text}" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ١٣</text>
+ <text x="22" y="60" fill="${T.text}" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س</text>
 </svg>
 <svg viewBox="0 0 220 130" role="img" aria-label="مثلث">
- <polygon points="45,15 45,95 205,95" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
- <text x="125" y="120" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س + ٥</text>
- <text x="22" y="62" fill="#eef2f5" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl" transform="rotate(-90 22 58)">٣س + ٤</text>
- <text x="140" y="45" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٥س + ١</text>
+ <polygon points="45,15 45,95 205,95" fill="none" stroke="${T.acc}" stroke-width="2.5"/>
+ <text x="125" y="120" fill="${T.text}" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س + ٥</text>
+ <text x="22" y="62" fill="${T.text}" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl" transform="rotate(-90 22 58)">٣س + ٤</text>
+ <text x="140" y="45" fill="${T.text}" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٥س + ١</text>
 </svg></div>`;
 
 /* ===== الغرف والأسئلة ===== */
@@ -284,8 +292,8 @@ const app = document.getElementById('app');
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 const lockSvg = open => open
- ? `<svg viewBox="0 0 24 24" fill="none" stroke="#4fc08d" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>`
- : `<svg viewBox="0 0 24 24" fill="none" stroke="#e3a94b" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+ ? `<svg viewBox="0 0 24 24" fill="none" stroke="${T.ok}" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>`
+ : `<svg viewBox="0 0 24 24" fill="none" stroke="${T.acc}" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
 
 function mapHtml(){
   const names = ROOMS.map(r=>r.name.replace('غرفة ','')).concat(['باب الخروج']);
@@ -306,10 +314,11 @@ function render(){
 
 function renderStart(){
   app.innerHTML = `
+  ${MOTIF}
   <header class="roomhead">
     <span class="tag">الصف الثالث المتوسط · الفصل الأول · أ.&nbsp;لطفيه الطلحي</span>
     <h1>غرفة الهروب: المعادلات الخطية</h1>
-    <p class="muted">أنتِ محبوسة في قبو فيه أربع غرف مقفلة وباب خروج. كل إجابة صحيحة تعطيك رقمًا من رمز القفل. اجمعي أرقام الرمز، اكتبيه، وانتقلي للغرفة التالية.</p>
+    <p class="muted">أنتِ داخل قلعة الميزان، وفيها أربع غرف مقفلة وباب خروج. كل إجابة صحيحة تعطيك رقمًا من رمز القفل. اجمعي أرقام الرمز، اكتبيه، وانتقلي للغرفة التالية.</p>
   </header>
   ${mapHtml()}
   <form class="card form" id="f">
@@ -367,7 +376,7 @@ function fbHtml(item, answered, isExit){
     const digit = isExit ? '' : `<div class="digit pop">حصلتِ على رقم من الرمز: <span class="big">${AR(ROOMS[S.room].code[S.q])}</span></div>`;
     const last = !isExit && S.q===ROOMS[S.room].qs.length-1;
     return `<div class="fb sol"><b>إجابة صحيحة. طريقة الحل:</b><span class="steps">${item.sol}</span></div>${digit}
-      <div class="row" style="margin-top:14px"><button class="btn" id="nx">${isExit ? 'اخرجي من القبو' : last ? 'اذهبي إلى القفل' : 'السؤال التالي'}</button></div>`;
+      <div class="row" style="margin-top:14px"><button class="btn" id="nx">${isExit ? 'اخرجي من قلعة الميزان' : last ? 'اذهبي إلى القفل' : 'السؤال التالي'}</button></div>`;
   }
   if(S.tried.length) return `<div class="fb hint"><b>ليست الإجابة الصحيحة. تلميح:</b>${item.hint}</div>`;
   return '';
@@ -435,7 +444,7 @@ function renderDone(){
   ${mapHtml()}
   <section class="card cert pop">
     <span class="tag">شهادة الهروب · الفصل الأول: المعادلات الخطية</span>
-    <h1>هربتِ من القبو</h1>
+    <h1>هربتِ من قلعة الميزان</h1>
     <div class="name">${esc(S.name)}</div>
     <p class="muted">الفصل ${esc(S.cls)} · ${date} · ${time}</p>
     <div class="stats">
@@ -446,7 +455,7 @@ function renderDone(){
     <div class="praise">
       <p class="pt">${praise.title}</p>
       <p>${praise.body}</p>
-      <p class="thanks">شكرًا لكِ يا ${esc(S.name.split(/\s+/)[0])} على جهدك وصبرك حتى آخر باب. فخورة بكِ، وأنتظر أن أراكِ في غرفة الفصل الثاني.<br><span class="muted">معلمتك: أ.&nbsp;لطفيه الطلحي</span></p>
+      <p class="thanks">شكرًا لكِ يا ${esc(S.name.split(/\s+/)[0])} على جهدك وصبرك حتى آخر باب. فخورة بكِ، وأنتظر أن أراكِ في الغرفة القادمة.<br><span class="muted">معلمتك: أ.&nbsp;لطفيه الطلحي</span></p>
     </div>
     <p class="muted">صوّري هذه الشهادة وأرسليها لمعلمتك أ.&nbsp;لطفيه الطلحي في تيمز.</p>
   </section>
