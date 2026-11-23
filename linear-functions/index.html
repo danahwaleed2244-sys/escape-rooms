@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>غرفة الهروب: الدوال الخطية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* عالم واحد: قبو ليلي بلون الحبر، ونحاس دافئ للأقفال والمفاتيح */
+  --ink:#0f1a24;
+  --panel:#172634;
+  --panel-2:#1e3142;
+  --line:#2e4659;
+  --text:#eef2f5;
+  --muted:#9fb3c3;
+  --brass:#e3a94b;
+  --brass-dk:#b9822c;
+  --ok:#4fc08d;
+  --bad:#e86a5c;
+  --display:"Lalezar","Tajawal",system-ui,sans-serif;
+  --body:"Tajawal","Segoe UI",Tahoma,system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--text);font-family:var(--body);font-size:18px;line-height:1.7}
+body{min-height:100%}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:18px}
+h1,h2{font-family:var(--display);font-weight:400;letter-spacing:0;margin:0;text-wrap:balance;line-height:1.35}
+h1{font-size:2rem;color:var(--brass)}
+h2{font-size:1.45rem}
+p{margin:0}
+.muted{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+button{font-family:var(--body);font-size:1rem;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.btn{background:var(--brass);color:#1b1206;border:0;border-radius:10px;padding:12px 20px;font-weight:800}
+.btn:hover{background:#f0b95c}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
+label{font-weight:700;display:block;margin-bottom:4px}
+input[type=text],select{width:100%;font:inherit;background:var(--ink);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.field{display:flex;flex-direction:column}
+.form{display:grid;gap:14px}
+
+/* خريطة الغرف */
+.map{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.door{background:var(--panel-2);border:1px solid var(--line);border-radius:10px 10px 4px 4px;padding:10px 4px 8px;text-align:center;font-size:.8rem;line-height:1.35;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;min-height:96px}
+.door svg{width:26px;height:26px}
+.door.open{border-color:var(--ok);color:var(--text)}
+.door.now{border-color:var(--brass);color:var(--text);box-shadow:0 0 0 2px rgba(227,169,75,.25)}
+
+/* رأس الغرفة */
+.roomhead{display:flex;flex-direction:column;gap:6px}
+.tag{display:inline-block;align-self:flex-start;background:var(--panel-2);border:1px solid var(--line);color:var(--brass);border-radius:999px;padding:2px 12px;font-size:.85rem;font-weight:700}
+.slots{display:flex;gap:8px;justify-content:center}
+.slot{width:48px;height:56px;border-radius:8px;border:2px dashed var(--line);display:grid;place-items:center;font-size:1.6rem;font-weight:800;color:var(--brass);background:var(--ink)}
+.slot.got{border-style:solid;border-color:var(--brass)}
+
+/* السؤال */
+.qnum{font-size:.9rem;color:var(--muted);font-weight:700}
+.qtext{font-size:1.12rem;font-weight:500}
+.opts{display:grid;gap:10px;margin-top:14px}
+.opt{display:flex;align-items:center;gap:12px;text-align:right;background:var(--panel-2);color:var(--text);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:1.08rem;line-height:1.6}
+.opt:hover:not(:disabled){border-color:var(--brass)}
+.opt .k{flex:0 0 32px;height:32px;border-radius:8px;display:grid;place-items:center;background:var(--ink);color:var(--brass);font-weight:800}
+.opt.wrong{border-color:var(--bad);opacity:.55;text-decoration:line-through;text-decoration-color:var(--bad)}
+.opt.right{border-color:var(--ok);background:rgba(79,192,141,.12)}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;border-radius:12px;padding:14px;line-height:1.85}
+.fb.hint{background:rgba(232,106,92,.1);border:1px solid rgba(232,106,92,.45)}
+.fb.sol{background:rgba(79,192,141,.08);border:1px solid rgba(79,192,141,.45)}
+.fb b{display:block;margin-bottom:4px}
+.digit{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:700;color:var(--brass)}
+.digit span.big{font-size:1.8rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* الرمز */
+.codebox{display:flex;gap:8px;justify-content:center}
+.codebox input{width:52px;height:60px;text-align:center;font-size:1.6rem;font-weight:800;background:var(--ink);color:var(--brass);border:2px solid var(--line);border-radius:8px;font-family:var(--body)}
+.err{color:var(--bad);font-weight:700;text-align:center}
+
+/* الشهادة */
+.cert{border:2px solid var(--brass);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.cert .name{font-family:var(--display);font-size:1.8rem;color:var(--brass)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.stat{background:var(--panel-2);border-radius:10px;padding:10px 4px}
+.stat .v{font-size:1.4rem;font-weight:800}
+.stat .l{font-size:.8rem;color:var(--muted)}
+.praise{display:flex;flex-direction:column;gap:10px;background:var(--panel-2);border-radius:12px;padding:16px;width:100%;line-height:1.9}
+.praise .pt{font-family:var(--display);font-size:1.35rem;color:var(--ok)}
+.praise .thanks{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+
+/* الرياضيات: كل تعبير معزول باتجاه من اليمين لليسار مثل الكتاب */
+.m{unicode-bidi:isolate;direction:rtl;white-space:nowrap;font-weight:700}
+.m bdi{unicode-bidi:isolate}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;font-size:.85em;margin:0 2px}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 3px}
+.fr>span{padding:0 3px}
+sup{font-size:.7em;line-height:0}
+.steps{display:block}
+.pl{width:100%;display:block;margin:10px auto 0}
+.tbl{overflow-x:auto;margin-top:10px}.tbl table{border-collapse:collapse;margin:0 auto;font-weight:700}.tbl th,.tbl td{border:1px solid var(--line);padding:6px 12px;text-align:center}.tbl th{color:var(--brass);font-weight:700}
+.opt .pl{margin:0}
+.nl{width:100%;max-width:420px;display:block;margin:10px auto 0}
+.shape{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.shape svg{max-width:220px;width:46%}
+
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .5s ease-out}
+@keyframes pop{from{transform:scale(.6)}to{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.shake,.pop{animation:none}}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media (max-width:400px){html,body{font-size:17px}.slot{width:42px;height:50px}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app" aria-live="polite"></main>
+
+<script>
+/* ===== أدوات كتابة الرياضيات ===== */
+const M = s => `<span class="m">${s}</span>`;
+const F = (a,b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const P = (base,exp) => `<bdi>${base}</bdi><bdi><sup>${exp}</sup></bdi>`;
+
+function numberLine(points, lo=-5, hi=6){
+  // خط أعداد، والسالب يسار مثل الكتاب
+  const ar = n => String(Math.abs(n)).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+  const step = 330/(hi-lo);
+  const x = n => 30 + (n-lo)*step;
+  let s = `<svg class="nl" viewBox="0 0 390 62" direction="ltr" role="img" aria-label="خط أعداد">`;
+  s += `<line x1="8" y1="22" x2="382" y2="22" stroke="#9fb3c3" stroke-width="2"/>`;
+  s += `<path d="M8 22 l10 -6 v12z M382 22 l-10 -6 v12z" fill="#9fb3c3"/>`;
+  for(let n=lo;n<=hi;n++){
+    s += `<line x1="${x(n)}" y1="15" x2="${x(n)}" y2="29" stroke="#9fb3c3" stroke-width="2"/>`;
+    s += `<text x="${x(n)}" y="50" fill="#eef2f5" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl">${n<0?'−':''}${ar(n)}</text>`;
+  }
+  points.forEach(p=> s += `<circle cx="${x(p)}" cy="22" r="7" fill="#e3a94b"/>`);
+  return s + `</svg>`;
+}
+
+const areaQ = `<div class="shape">
+<svg viewBox="0 0 220 140" role="img" aria-label="المستطيل الأول">
+ <rect x="45" y="15" width="150" height="80" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="122" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٣</text>
+ <text x="25" y="60" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٨</text>
+</svg>
+<svg viewBox="0 0 220 140" role="img" aria-label="المستطيل الثاني">
+ <rect x="45" y="30" width="150" height="60" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="117" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ٧</text>
+ <text x="25" y="66" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٦</text>
+</svg></div>`;
+
+const shapesQ = `<div class="shape">
+<svg viewBox="0 0 220 130" role="img" aria-label="مستطيل">
+ <rect x="40" y="20" width="160" height="70" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="120" y="115" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">س + ١٣</text>
+ <text x="22" y="60" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س</text>
+</svg>
+<svg viewBox="0 0 220 130" role="img" aria-label="مثلث">
+ <polygon points="45,15 45,95 205,95" fill="none" stroke="#e3a94b" stroke-width="2.5"/>
+ <text x="125" y="120" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٢س + ٥</text>
+ <text x="22" y="62" fill="#eef2f5" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl" transform="rotate(-90 22 58)">٣س + ٤</text>
+ <text x="140" y="45" fill="#eef2f5" font-size="17" font-family="Tajawal" text-anchor="middle" direction="rtl">٥س + ١</text>
+</svg></div>`;
+
+/* ===== رسومات: مستوى إحداثي، مخطط سهمي، تمثيل وصفي ===== */
+const ARD = n => String(Math.abs(n)).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const C='#e3a94b', G='#9fb3c3', GL='#2e4659', TX='#eef2f5';
+
+// مستوى إحداثي من -r إلى r مع نقاط و/أو مستقيمات
+function PL(o){
+  const r=o.r||5, sz=o.size||220, pad=14, u=(sz-2*pad)/(2*r);
+  const X=x=>pad+(x+r)*u, Y=y=>pad+(r-y)*u;
+  let s=`<svg class="pl" viewBox="0 0 ${sz} ${sz}" style="max-width:${sz}px" direction="ltr" role="img" aria-label="مستوى إحداثي">`;
+  for(let i=-r;i<=r;i++){ s+=`<line x1="${X(i)}" y1="${Y(-r)}" x2="${X(i)}" y2="${Y(r)}" stroke="${GL}" stroke-width="1"/><line x1="${X(-r)}" y1="${Y(i)}" x2="${X(r)}" y2="${Y(i)}" stroke="${GL}" stroke-width="1"/>`; }
+  s+=`<line x1="${X(-r)}" y1="${Y(0)}" x2="${X(r)}" y2="${Y(0)}" stroke="${G}" stroke-width="2"/><line x1="${X(0)}" y1="${Y(-r)}" x2="${X(0)}" y2="${Y(r)}" stroke="${G}" stroke-width="2"/>`;
+  s+=`<text x="${X(r)-4}" y="${Y(0)-5}" fill="${TX}" font-size="12" font-family="Tajawal" text-anchor="end">س</text><text x="${X(0)+5}" y="${Y(r)+11}" fill="${TX}" font-size="12" font-family="Tajawal">ص</text>`;
+  (o.ticks||[]).forEach(([v,axis])=>{
+    const lbl=(v<0?'−':'')+ARD(v);
+    if(axis==='x') s+=`<text x="${X(v)}" y="${Y(0)+13}" fill="${TX}" font-size="11" font-family="Tajawal" text-anchor="middle" direction="rtl">${lbl}</text>`;
+    else s+=`<text x="${X(0)-4}" y="${Y(v)+4}" fill="${TX}" font-size="11" font-family="Tajawal" text-anchor="end" direction="rtl">${lbl}</text>`;
+  });
+  (o.lines||[]).forEach(([x1,y1,x2,y2])=> s+=`<line x1="${X(x1)}" y1="${Y(y1)}" x2="${X(x2)}" y2="${Y(y2)}" stroke="${C}" stroke-width="3"/>`);
+  (o.paths||[]).forEach(d=> s+=`<path d="${d.map((p,i)=>(i?'L':'M')+X(p[0])+' '+Y(p[1])).join(' ')}" fill="none" stroke="${C}" stroke-width="3"/>`);
+  (o.points||[]).forEach(([x,y])=> s+=`<circle cx="${X(x)}" cy="${Y(y)}" r="4.5" fill="${C}"/>`);
+  (o.labels||[]).forEach(([x,y,t,dx,dy])=> s+=`<text x="${X(x)+(dx||0)}" y="${Y(y)+(dy||0)}" fill="${TX}" font-size="13" font-weight="700" font-family="Tajawal" text-anchor="middle">${t}</text>`);
+  return s+`</svg>`;
+}
+
+// مخطط سهمي: المجال يمين والمدى يسار كما في الكتاب
+function MAP(dom, rng, pairs){
+  const h=Math.max(dom.length,rng.length)*34+40;
+  const yD=i=>30+i*34+(Math.max(dom.length,rng.length)-dom.length)*17;
+  const yR=i=>30+i*34+(Math.max(dom.length,rng.length)-rng.length)*17;
+  const lab=v=>(v<0?'−':'')+ARD(v);
+  let s=`<svg class="pl" viewBox="0 0 240 ${h}" style="max-width:240px" direction="ltr" role="img" aria-label="مخطط سهمي">`;
+  s+=`<text x="190" y="14" fill="${G}" font-size="12" font-family="Tajawal" text-anchor="middle">المجال</text><text x="50" y="14" fill="${G}" font-size="12" font-family="Tajawal" text-anchor="middle">المدى</text>`;
+  s+=`<rect x="165" y="20" width="50" height="${h-28}" rx="22" fill="none" stroke="${G}" stroke-width="1.5"/><rect x="25" y="20" width="50" height="${h-28}" rx="22" fill="none" stroke="${G}" stroke-width="1.5"/>`;
+  s+=`<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="${C}"/></marker></defs>`;
+  pairs.forEach(([a,b])=> s+=`<line x1="175" y1="${yD(dom.indexOf(a))}" x2="68" y2="${yR(rng.indexOf(b))}" stroke="${C}" stroke-width="2" marker-end="url(#ah)"/>`);
+  dom.forEach((v,i)=> s+=`<text x="195" y="${yD(i)+5}" fill="${TX}" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl">${lab(v)}</text>`);
+  rng.forEach((v,i)=> s+=`<text x="48" y="${yR(i)+5}" fill="${TX}" font-size="15" font-family="Tajawal" text-anchor="middle" direction="rtl">${lab(v)}</text>`);
+  return s+`</svg>`;
+}
+
+// تمثيل وصفي (بلا تدريج): محور الزمن ومحور الكمية
+function STORY(pts, yl, xl){
+  let s=`<svg class="pl" viewBox="0 0 240 170" style="max-width:240px" direction="ltr" role="img" aria-label="تمثيل بياني">`;
+  s+=`<line x1="30" y1="140" x2="230" y2="140" stroke="${G}" stroke-width="2"/><line x1="30" y1="140" x2="30" y2="10" stroke="${G}" stroke-width="2"/>`;
+  s+=`<text x="130" y="162" fill="${TX}" font-size="12" font-family="Tajawal" text-anchor="middle">${xl}</text><text x="16" y="75" fill="${TX}" font-size="12" font-family="Tajawal" text-anchor="middle" transform="rotate(-90 16 75)">${yl}</text>`;
+  s+=`<polyline points="${pts.map(([x,y])=>`${30+x*2} ${140-y*1.3}`).join(' ')}" fill="none" stroke="${C}" stroke-width="3"/>`;
+  return s+`</svg>`;
+}
+
+/* ===== الغرف والأسئلة ===== */
+const ROOMS = [
+ { name:"غرفة المقطع", lesson:"تمثيل المعادلات بصيغة الميل والمقطع", code:"58214",
+   intro:"الباب مقفل برمز من خمسة أرقام. صيغة الميل والمقطع: ص = م س + ب، حيث م الميل و ب المقطع الصادي.",
+   qs:[
+   { q:`أي المعادلات الآتية يمثلها المستقيم في الشكل؟${PL({r:5,size:210,lines:[[-5,4.5,5,-0.5]],points:[[0,2],[4,0]],labels:[[0,2,'(٠، ٢)',26,-8],[4,0,'(٤، ٠)',-2,20]]})}`,
+     o:[ M(`ص = −${F('١','٢')}س + ٢`), M('ص = −٢س + ٢'), M(`ص = ${F('١','٢')}س + ٢`), M(`ص = −${F('١','٢')}س + ٤`) ], a:0,
+     hint:`أين يقطع المستقيم محور الصادات؟ ثم تحركي من نقطة إلى أخرى: كم وحدة للأسفل وكم وحدة لليمين؟`,
+     sol:`المقطع الصادي ٢، لأن المستقيم يمر بالنقطة ${M('(٠، ٢)')}.<br>من ${M('(٠، ٢)')} إلى ${M('(٤، ٠)')}: نزول ٢ وتقدم ٤، إذن الميل ${M(`−${F('٢','٤')} = −${F('١','٢')}`)}.<br>المعادلة: ${M(`ص = −${F('١','٢')}س + ٢`)}` },
+   { q:`ما الميل والمقطع الصادي للمستقيم ${M('٤س − ٢ص = ٨')}؟`,
+     o:[ 'الميل ٤، والمقطع الصادي ٨', 'الميل ٢، والمقطع الصادي −٤', 'الميل −٢، والمقطع الصادي ٤', 'الميل ٢، والمقطع الصادي ٤' ], a:1,
+     hint:`اجعلي ص وحدها في طرف: اطرحي ${M('٤س')} من الطرفين، ثم اقسمي على ${M('−٢')}.`,
+     sol:`${M('−٢ص = −٤س + ٨')}<br>نقسم على ${M('−٢')}: ${M('ص = ٢س − ٤')}<br>الميل ٢، والمقطع الصادي ${M('−٤')}.` },
+   { q:`كان عدد المها العربي في محميات المملكة نحو ٤٠٠ رأس عام ١٤١٧هـ، ويزداد بمعدل ٥٠ رأسًا كل سنة. إذا استمرت الزيادة بالمعدل نفسه، فكم يقدَّر عدده عام ١٤٤٥هـ؟`,
+     o:[ M('١٤٠٠'), M('١٨٠٠'), M('٢٠٥٠'), M('٤٥٠') ], a:1,
+     hint:`اكتبي المعادلة ${M('ص = ٥٠س + ٤٠٠')}، حيث س عدد السنوات منذ ١٤١٧هـ. كم سنة بين ١٤١٧ و١٤٤٥؟`,
+     sol:`${M('س = ١٤٤٥ − ١٤١٧ = ٢٨')} سنة<br>${M('ص = ٥٠(٢٨) + ٤٠٠ = ١٤٠٠ + ٤٠٠ = ١٨٠٠')}<br>الخيار ١٤٠٠ هو مقدار الزيادة فقط، بدون العدد الأصلي.` },
+   { q:`أي المستقيمات الآتية <b>لا</b> يمكن كتابة معادلته بصيغة الميل والمقطع؟`,
+     o:[ M('ص = ٣'), M('ص = −س'), M('س = ٣'), M('ص = ٠') ], a:2,
+     hint:`أي هذه المستقيمات رأسي؟ وما ميل المستقيم الرأسي؟`,
+     sol:`${M('س = ٣')} مستقيم رأسي، وميله غير معرَّف، فلا يمكن كتابته على الصورة ${M('ص = م س + ب')}.<br>أما ${M('ص = ٣')} فمستقيم أفقي ميله صفر: ${M('ص = ٠س + ٣')}.` },
+   { q:`مستقيم ميله موجب ومقطعه الصادي سالب. إذا ضوعف كل من الميل والمقطع الصادي، فماذا يحدث للمقطع السيني؟`,
+     o:[ 'يصبح مثلي المقطع الأصلي', 'يصبح نصف المقطع الأصلي', 'يصبح أربعة أمثال المقطع الأصلي', 'يبقى كما هو' ], a:3,
+     hint:`جرّبي مثالًا: ${M('ص = ٢س − ٤')}، ثم ${M('ص = ٤س − ٨')}. أين يقطع كل منهما محور السينات؟`,
+     sol:`${M('ص = ٢س − ٤')}: عند ص = ٠، ${M('س = ٢')}.<br>${M('ص = ٤س − ٨')}: عند ص = ٠، ${M('س = ٢')} أيضًا.<br>المقطع السيني ${M(`= −${F('ب','م')}`)}، ومضاعفة البسط والمقام لا تغيّر الكسر.` }
+ ]},
+ { name:"غرفة النقطتين", lesson:"كتابة المعادلات بصيغة الميل والمقطع", code:"90375",
+   intro:"إذا عرفتِ نقطتين، فأوجدي الميل أولًا، ثم عوّضي إحدى النقطتين لإيجاد المقطع الصادي.",
+   qs:[
+   { q:`معادلة المستقيم المار بالنقطتين ${M('(−١، ٤)')} و ${M('(٣، −٤)')} بصيغة الميل والمقطع هي:`,
+     o:[ M('ص = −٢س + ٢'), M('ص = ٢س + ٦'), M(`ص = −${F('١','٢')}س + ${F('٧','٢')}`), M('ص = −٢س + ٦') ], a:0,
+     hint:`الميل ${M(`${F('−٤ − ٤','٣ − (−١)')}`)}، ثم عوّضي ${M('(−١، ٤)')} في ${M('ص = م س + ب')}.`,
+     sol:`${M(`م = ${F('−٨','٤')} = −٢`)}<br>${M('٤ = −٢(−١) + ب')} ← ${M('٤ = ٢ + ب')} ← ${M('ب = ٢')}<br>${M('ص = −٢س + ٢')}. تحقق بالنقطة الثانية: ${M('−٢(٣) + ٢ = −٤')}` },
+   { q:`يبين الجدول عدد زوار معرض للكتاب (بالآلاف). إذا استمرت الزيادة بالمعدل نفسه، فكم يقدَّر عدد الزوار عام ١٤٥٠هـ؟<div class="tbl"><table><tr><th>العام</th><td>١٤٤٠</td><td>١٤٤٢</td><td>١٤٤٤</td></tr><tr><th>الزوار (ألف)</th><td>١٢٠</td><td>١٣٠</td><td>١٤٠</td></tr></table></div>`,
+     o:[ M('١٥٠ ألفًا'), M('١٧٠ ألفًا'), M('٢٢٠ ألفًا'), M('١٧٥ ألفًا') ], a:1,
+     hint:`الزيادة ١٠ آلاف كل سنتين، فكم الزيادة في السنة الواحدة؟ اجعلي س عدد السنوات منذ ١٤٤٠هـ.`,
+     sol:`الميل ${M(`${F('١٣٠ − ١٢٠','٢')} = ٥`)} آلاف في السنة، والمقطع الصادي ١٢٠.<br>${M('ص = ٥س + ١٢٠')}، وعام ١٤٥٠ يعني ${M('س = ١٠')}.<br>${M('ص = ٥(١٠) + ١٢٠ = ١٧٠')} ألف زائر.` },
+   { q:`أي النقاط الآتية تقع على المستقيم ${M(`ص = −${F('١','٢')}س + ٥`)}؟`,
+     o:[ M('(٢، ٦)'), M('(−٢، ٤)'), M('(٦، ١)'), M('(٤، ٣)') ], a:3,
+     hint:`عوّضي قيمة س لكل نقطة في المعادلة، وانظري هل تحصلين على قيمة ص نفسها.`,
+     sol:`${M(`−${F('١','٢')}(٤) + ٥ = −٢ + ٥ = ٣`)}، إذن ${M('(٤، ٣)')} تقع على المستقيم.<br>أما ${M('(٢، ٦)')} فتعطي ٤، و ${M('(−٢، ٤)')} تعطي ٦، و ${M('(٦، ١)')} تعطي ٢.` },
+   { q:`ما قيمة هـ التي تجعل النقاط ${M('(١، ٣)')} و ${M('(٣، ٧)')} و ${M('(٦، هـ)')} تقع على مستقيم واحد؟`,
+     o:[ M('١٠'), M('١١'), M('١٣'), M('١٥') ], a:2,
+     hint:`أوجدي الميل من النقطتين الأوليين. النقطة الثالثة تقع على المستقيم إذا أعطت الميل نفسه.`,
+     sol:`${M(`م = ${F('٧ − ٣','٣ − ١')} = ٢`)}<br>${M(`${F('هـ − ٧','٦ − ٣')} = ٢`)} ← ${M('هـ − ٧ = ٦')} ← ${M('هـ = ١٣')}` },
+   { q:`إذا كانت معادلة مستقيم بالصورة القياسية ${M('أس + ب ص = جـ')}، حيث ${M('ب ≠ ٠')}، فما ميله؟`,
+     o:[ M(F('أ','ب')), M(`−${F('ب','أ')}`), M(F('جـ','ب')), M(`−${F('أ','ب')}`) ], a:3,
+     hint:`أعيدي كتابة المعادلة بصيغة الميل والمقطع: اطرحي ${M('أس')} من الطرفين، ثم اقسمي على ب.`,
+     sol:`${M('ب ص = −أس + جـ')}<br>${M(`ص = −${F('أ','ب')}س + ${F('جـ','ب')}`)}<br>الميل ${M(`−${F('أ','ب')}`)}، والمقطع الصادي ${M(F('جـ','ب'))}. مثال: ${M('٤س + ٢ص = ٨')} ميله ${M('−٢')}.` }
+ ]},
+ { name:"غرفة النقطة", lesson:"كتابة المعادلات بصيغة الميل ونقطة", code:"26741",
+   intro:"صيغة الميل ونقطة: ص − ص١ = م(س − س١). انتبهي للإشارات عند التعويض بأعداد سالبة.",
+   qs:[
+   { q:`معادلة المستقيم المار بالنقطة ${M('(−٢، ٥)')} وميله ${M('−٣')} بصيغة الميل ونقطة هي:`,
+     o:[ M('ص − ٥ = −٣(س − ٢)'), M('ص + ٥ = −٣(س − ٢)'), M('ص − ٥ = −٣(س + ٢)'), M('ص − ٥ = ٣(س + ٢)') ], a:2,
+     hint:`عوّضي في ${M('ص − ص١ = م(س − س١)')}. ماذا يصبح ${M('س − (−٢)')}؟`,
+     sol:`${M('ص − ٥ = −٣(س − (−٢))')}<br>${M('ص − ٥ = −٣(س + ٢)')}<br>طرح عدد سالب يصبح جمعًا، وهذا أكثر خطأ شائع في هذا الدرس.` },
+   { q:`الصورة القياسية للمعادلة ${M(`ص + ٢ = ${F('٢','٣')}(س − ٣)`)} هي:`,
+     o:[ M('٢س + ٣ص = ١٢'), M('٢س − ٣ص = ١٢'), M('−٢س + ٣ص = −١٢'), M('٢س − ٣ص = ٠') ], a:1,
+     hint:`اضربي الطرفين في ٣ للتخلص من الكسر، ثم انقلي س و ص إلى طرف واحد، وتأكدي أن معامل س موجب.`,
+     sol:`نضرب في ٣: ${M('٣ص + ٦ = ٢س − ٦')}<br>${M('١٢ = ٢س − ٣ص')}، أي ${M('٢س − ٣ص = ١٢')}<br>الخيار ${M('−٢س + ٣ص = −١٢')} مكافئ لها، لكنه ليس صورة قياسية لأن معامل س سالب.` },
+   { q:`كتبت سلمى ونورة معادلة المستقيم المار بالنقطتين ${M('(٢، −١)')} و ${M('(٤، ٥)')} بصيغة الميل ونقطة:<br>سلمى: ${M('ص + ١ = ٣(س − ٢)')}<br>نورة: ${M('ص − ٥ = ٣(س − ٤)')}<br>أيهما على صواب؟`,
+     o:[ 'سلمى فقط، لأنها استعملت النقطة الأولى', 'نورة فقط، لأنها استعملت النقطة الثانية', 'كلتاهما على صواب', 'كلتاهما على خطأ، لأن الميل ٢' ], a:2,
+     hint:`احسبي الميل أولًا. ثم حوّلي كل معادلة إلى صيغة الميل والمقطع وقارني.`,
+     sol:`${M(`م = ${F('٥ − (−١)','٤ − ٢')} = ٣`)}<br>سلمى: ${M('ص = ٣س − ٧')}، ونورة: ${M('ص = ٣س − ١٢ + ٥ = ٣س − ٧')}<br>المعادلتان متكافئتان، فيمكن استعمال أي نقطة على المستقيم.` },
+   { q:`الضغط الجوي دالة خطية في الارتفاع: يساوي ٥٩٨ ملم زئبق عند ارتفاع ١٫٨ كم، و٥٧٧ ملم زئبق عند ارتفاع ٢٫١ كم. ماذا يعني ميل هذه الدالة؟`,
+     o:[ 'ينخفض الضغط ٢١ ملم زئبق لكل كيلومتر', 'ينخفض الضغط ٧٠ ملم زئبق لكل كيلومتر', 'يزداد الضغط ٧٠ ملم زئبق لكل كيلومتر', 'ينخفض الضغط ٧ ملم زئبق لكل كيلومتر' ], a:1,
+     hint:`الميل = التغير في الضغط ÷ التغير في الارتفاع. انتبهي: الارتفاع تغيّر ٠٫٣ كم فقط.`,
+     sol:`${M(`م = ${F('٥٧٧ − ٥٩٨','٢٫١ − ١٫٨')} = ${F('−٢١','٠٫٣')} = −٧٠`)}<br>الإشارة السالبة تعني أن الضغط ينخفض ٧٠ ملم زئبق كلما ارتفعنا كيلومترًا.<br>الخيار ٢١ هو التغير في الضغط فقط، بدون القسمة على التغير في الارتفاع.` },
+   { q:`يقدم متجر قسيمة شرائية بقيمة ١٠ ريالات عن كل ١٥٠ ريالًا من المشتريات. إذا أرادت عميلة الحصول على قسائم بقيمة ٦٠ ريالًا، فكم عليها أن تشتري؟`,
+     o:[ M('٦٠٠ ريال'), M('٩٠٠ ريال'), M('١٥٠٠ ريال'), M('٩٠٠٠ ريال') ], a:1,
+     hint:`كم قسيمة تحتاج لتصل إلى ٦٠ ريالًا؟ وكل قسيمة تحتاج كم ريالًا من المشتريات؟`,
+     sol:`${M('٦٠ ÷ ١٠ = ٦')} قسائم<br>${M('٦ × ١٥٠ = ٩٠٠')} ريال<br>الخيار ٩٠٠٠ ريال يأتي من ضرب ٦٠ في ١٥٠ مباشرة.` }
+ ]},
+ { name:"غرفة الزوايا", lesson:"المستقيمات المتوازية والمستقيمات المتعامدة", code:"73058",
+   intro:"المستقيمان المتوازيان لهما الميل نفسه. والمستقيمان المتعامدان حاصل ضرب ميليهما −١.",
+   qs:[
+   { q:`إذا كان المستقيم المار بالنقطتين ${M('(−١، ٢)')} و ${M('(٣، د)')} موازيًا للمستقيم ${M('ص = ٢س − ٥')}، فما قيمة د؟`,
+     o:[ M('٦'), M('٤'), M('١٠'), M('٠') ], a:2,
+     hint:`المستقيمان المتوازيان لهما الميل نفسه، إذن ميل المستقيم المار بالنقطتين يساوي ٢.`,
+     sol:`${M(`${F('د − ٢','٣ − (−١)')} = ٢`)}<br>${M(`${F('د − ٢','٤')} = ٢`)} ← ${M('د − ٢ = ٨')} ← ${M('د = ١٠')}` },
+   { q:`رؤوس الشكل الرباعي أ ب جـ د هي: ${M('أ(٠، ٠)')}، ${M('ب(٤، ٢)')}، ${M('جـ(٣، ٤)')}، ${M('د(−١، ٢)')}. هل الشكل مستطيل؟${PL({r:5,size:210,paths:[[[0,0],[4,2],[3,4],[-1,2],[0,0]]],points:[[0,0],[4,2],[3,4],[-1,2]],labels:[[0,0,'أ',8,14],[4,2,'ب',10,4],[3,4,'جـ',4,-8],[-1,2,'د',-12,0]]})}`,
+     o:[ 'نعم، لأن الأضلاع المتقابلة متوازية والأضلاع المتجاورة متعامدة', 'لا، لأن أطوال الأضلاع غير متساوية', 'لا، لأن الأضلاع المتجاورة غير متعامدة', 'لا يمكن التحديد من الشكل' ], a:0,
+     hint:`احسبي ميل كل ضلع: أ ب، ب جـ، جـ د، د أ. ثم قارني الأضلاع المتقابلة والمتجاورة.`,
+     sol:`ميل أ ب ${M(F('١','٢'))}، ميل ب جـ ${M('−٢')}، ميل جـ د ${M(F('١','٢'))}، ميل د أ ${M('−٢')}.<br>المتقابلة لها الميل نفسه فهي متوازية، و ${M(`${F('١','٢')} × (−٢) = −١`)} فالمتجاورة متعامدة.<br>إذن الشكل مستطيل. والمستطيل لا يشترط تساوي جميع الأضلاع.` },
+   { q:`كتبت رنا وهالة معادلة المستقيم المار بالنقطة ${M('(−١، ٤)')} والعمودي على المستقيم ${M(`ص = ${F('١','٢')}س + ٢`)}:<br>رنا: ${M('ص = ٢س + ٦')}<br>هالة: ${M('ص = −٢س + ٢')}<br>أيهما على صواب؟`,
+     o:[ 'رنا، لأنها استعملت مقلوب الميل', 'هالة، لأنها استعملت معكوس مقلوب الميل', 'كلتاهما على صواب', `ولا واحدة منهما، والصحيح ${M(`ص = −${F('١','٢')}س + ${F('٧','٢')}`)}` ], a:1,
+     hint:`ميل العمودي هو معكوس مقلوب الميل: نقلب الكسر ونغير الإشارة. هل غيّرت رنا الإشارة؟`,
+     sol:`معكوس مقلوب ${M(F('١','٢'))} هو ${M('−٢')}.<br>${M('ص − ٤ = −٢(س + ١)')} ← ${M('ص = −٢س + ٢')}<br>رنا قلبت الكسر ولم تغيّر الإشارة، فكتبت مستقيمًا ميله ٢، وهو ليس عموديًا.` },
+   { q:`ما العلاقة بين المستقيمين ${M('٢س + ٣ص = ٦')} و ${M('٣س − ٢ص = ٤')}؟`,
+     o:[ 'متوازيان', 'متعامدان', 'متطابقان', 'غير متوازيين وغير متعامدين' ], a:1,
+     hint:`أوجدي ميل كل مستقيم: ميل ${M('أس + ب ص = جـ')} هو ${M(`−${F('أ','ب')}`)}.`,
+     sol:`ميل الأول ${M(`−${F('٢','٣')}`)}، وميل الثاني ${M(`−${F('٣','−٢')} = ${F('٣','٢')}`)}.<br>${M(`−${F('٢','٣')} × ${F('٣','٢')} = −١`)}، إذن المستقيمان متعامدان.` },
+   { q:`هل المستقيم الأفقي يعامد المستقيم الرأسي؟`,
+     o:[ 'دائمًا', 'أحيانًا', 'أبدًا', 'فقط إذا مر كلاهما بنقطة الأصل' ], a:0,
+     hint:`ارسمي في ذهنك أي مستقيم أفقي وأي مستقيم رأسي. ما الزاوية بينهما؟ ولماذا لا نستطيع استعمال حاصل ضرب الميلين هنا؟`,
+     sol:`المستقيم الأفقي يوازي محور السينات، والرأسي يوازي محور الصادات، والمحوران متعامدان، إذن هما متعامدان دائمًا.<br>لا نستعمل قاعدة ضرب الميلين لأن ميل المستقيم الرأسي غير معرّف.` }
+ ]}
+];
+
+const EXIT = {
+  q:`باب الخروج الأخير: يبين الجدول العلاقة الخطية بين درجات الحرارة السيليزية (س) والفهرنهايتية (ف). أي المعادلات تمثل هذه العلاقة؟<div class="tbl"><table><tr><th>س</th><td>١٠°</td><td>١٥°</td><td>٢٠°</td><td>٢٥°</td></tr><tr><th>ف</th><td>٥٠°</td><td>٥٩°</td><td>٦٨°</td><td>٧٧°</td></tr></table></div>`,
+  o:[ M(`ف = ${F('٨','٥')}س + ٣٥`), M(`ف = ${F('٩','٥')}س + ٣٢`), M(`ف = ${F('٤','٥')}س + ٤٢`), M('ف = ٥س') ], a:1,
+  hint:`أوجدي الميل من أي صفين في الجدول، ثم عوّضي نقطة لإيجاد المقطع الصادي.`,
+  sol:`${M(`م = ${F('٥٩ − ٥٠','١٥ − ١٠')} = ${F('٩','٥')}`)}<br>${M(`٥٠ = ${F('٩','٥')}(١٠) + ب`)} ← ${M('٥٠ = ١٨ + ب')} ← ${M('ب = ٣٢')}<br>${M(`ف = ${F('٩','٥')}س + ٣٢`)}. تحقق: ${M(`${F('٩','٥')}(٢٥) + ٣٢ = ٧٧`)}`
+};
+
+/* ===== الحالة ===== */
+const KEY = "escape-linear-functions-v1";
+const LETTERS = ['أ','ب','ج','د'];
+const AR = s => String(s).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const EN = s => String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+let S = load() || fresh();
+function fresh(){ return {name:"",cls:"",room:-1,q:0,stage:"start",got:[],tried:[],mistakes:0,start:0,end:0}; }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const lockSvg = open => open
+ ? `<svg viewBox="0 0 24 24" fill="none" stroke="#4fc08d" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>`
+ : `<svg viewBox="0 0 24 24" fill="none" stroke="#e3a94b" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+
+function mapHtml(){
+  const names = ROOMS.map(r=>r.name.replace('غرفة ','')).concat(['باب الخروج']);
+  return `<div class="map">${names.map((n,i)=>{
+    const done = i < S.room || S.stage==='done';
+    const now = i === S.room && S.stage!=='done';
+    return `<div class="door ${done?'open':''} ${now?'now':''}">${lockSvg(done)}<span>${n}</span></div>`;
+  }).join('')}</div>`;
+}
+
+function render(){
+  if(S.stage==='start') return renderStart();
+  if(S.stage==='done') return renderDone();
+  if(S.stage==='code') return renderCode();
+  if(S.room === ROOMS.length) return renderQ(EXIT, true);
+  return renderQ(ROOMS[S.room].qs[S.q], false);
+}
+
+function renderStart(){
+  app.innerHTML = `
+  <header class="roomhead">
+    <span class="tag">الصف الثالث المتوسط · الفصل الثالث · أ.&nbsp;لطفيه الطلحي</span>
+    <h1>غرفة الهروب: الدوال الخطية</h1>
+    <p class="muted">أنتِ محبوسة في قبو فيه أربع غرف مقفلة وباب خروج. كل إجابة صحيحة تعطيك رقمًا من رمز القفل. اجمعي أرقام الرمز، اكتبيه، وانتقلي للغرفة التالية.</p>
+  </header>
+  ${mapHtml()}
+  <form class="card form" id="f">
+    <div class="field"><label for="nm">اسمك الثلاثي</label><input type="text" id="nm" required autocomplete="name" value="${esc(S.name)}"></div>
+    <div class="field"><label for="cl">الفصل</label><select id="cl" required><option value="" disabled ${S.cls?'':'selected'}>اختاري فصلك</option>${['ثالثة ١','ثالثة ٢'].map(c=>`<option ${S.cls===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    <button class="btn" type="submit">ادخلي الغرفة الأولى</button>
+  </form>
+  <div class="card"><p><b>القواعد</b></p><p class="muted">إذا أخطأتِ يظهر لك تلميح، وتقدرين تجربين مرة ثانية. إذا أصبتِ يظهر لك الحل بالخطوات. حلّي في دفترك قبل ما تختارين. في النهاية تظهر لك شهادة الهروب: صوّريها وأرسليها لمعلمتك أ.&nbsp;لطفيه الطلحي في تيمز.</p></div>`;
+  document.getElementById('f').onsubmit = e => {
+    e.preventDefault();
+    const n = document.getElementById('nm').value.trim(), c = document.getElementById('cl').value.trim();
+    if(!n || !c) return;
+    Object.assign(S,{name:n,cls:c,room:0,q:0,stage:'q',got:[],tried:[],mistakes:0,start:Date.now()});
+    save(); render(); window.scrollTo(0,0);
+  };
+}
+
+function slotsHtml(){
+  const r = ROOMS[S.room];
+  return `<div class="slots" aria-label="أرقام الرمز">${[...r.code].map((_,i)=>{
+    const g = S.got[i] != null;
+    return `<div class="slot ${g?'got':''}">${g?AR(r.code[i]):''}</div>`;
+  }).join('')}</div>`;
+}
+
+function renderQ(item, isExit){
+  const r = isExit ? null : ROOMS[S.room];
+  const answered = isExit ? S.stage==='exitSolved' : S.got[S.q] != null;
+  app.innerHTML = `
+  ${mapHtml()}
+  <header class="roomhead">
+    <span class="tag">${isExit ? 'الباب الأخير' : `الغرفة ${AR(S.room+1)} · ${r.lesson}`}</span>
+    <h2>${isExit ? 'باب الخروج' : r.name}</h2>
+    ${!isExit && S.q===0 && !answered ? `<p class="muted">${r.intro}</p>` : ''}
+  </header>
+  ${isExit ? '' : slotsHtml()}
+  <section class="card" id="qc">
+    <div class="qnum">${isExit ? 'السؤال الأخير' : `السؤال ${AR(S.q+1)} من ${AR(ROOMS[S.room].qs.length)}`}</div>
+    <div class="qtext">${item.q}</div>
+    <div class="opts">${item.o.map((o,i)=>{
+      const wrong = S.tried.includes(i);
+      const right = answered && i===item.a;
+      return `<button class="opt ${wrong?'wrong':''} ${right?'right':''}" data-i="${i}" ${answered||wrong?'disabled':''}><span class="k">${LETTERS[i]}</span><span>${o}</span></button>`;
+    }).join('')}</div>
+    <div id="fb">${fbHtml(item, answered, isExit)}</div>
+  </section>
+  <div class="foot"><span class="muted">${esc(S.name)} · ${esc(S.cls)}</span><span class="muted">الأخطاء: ${AR(S.mistakes)}</span></div>`;
+  app.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(+b.dataset.i, item, isExit));
+  const nx = document.getElementById('nx');
+  if(nx) nx.onclick = () => next(isExit);
+}
+
+function fbHtml(item, answered, isExit){
+  if(answered){
+    const digit = isExit ? '' : `<div class="digit pop">حصلتِ على رقم من الرمز: <span class="big">${AR(ROOMS[S.room].code[S.q])}</span></div>`;
+    const last = !isExit && S.q===ROOMS[S.room].qs.length-1;
+    return `<div class="fb sol"><b>إجابة صحيحة. طريقة الحل:</b><span class="steps">${item.sol}</span></div>${digit}
+      <div class="row" style="margin-top:14px"><button class="btn" id="nx">${isExit ? 'اخرجي من القبو' : last ? 'اذهبي إلى القفل' : 'السؤال التالي'}</button></div>`;
+  }
+  if(S.tried.length) return `<div class="fb hint"><b>ليست الإجابة الصحيحة. تلميح:</b>${item.hint}</div>`;
+  return '';
+}
+
+function choose(i, item, isExit){
+  if(i === item.a){
+    if(isExit) S.stage='exitSolved'; else S.got[S.q] = true;
+  } else {
+    S.tried.push(i); S.mistakes++;
+  }
+  save(); render();
+  if(i !== item.a){ const c=document.getElementById('qc'); c.classList.add('shake'); }
+  document.getElementById('fb').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function next(isExit){
+  S.tried = [];
+  if(isExit){ S.stage='done'; S.end=Date.now(); }
+  else if(S.q < ROOMS[S.room].qs.length-1){ S.q++; }
+  else { S.stage='code'; }
+  save(); render(); window.scrollTo(0,0);
+}
+
+function renderCode(){
+  const r = ROOMS[S.room];
+  app.innerHTML = `
+  ${mapHtml()}
+  <header class="roomhead"><span class="tag">الغرفة ${AR(S.room+1)} · القفل</span><h2>افتحي قفل ${r.name}</h2>
+  <p class="muted">اكتبي أرقام الرمز بالترتيب نفسه الذي حصلتِ عليه.</p></header>
+  ${slotsHtml()}
+  <form class="card form" id="cf">
+    <div class="codebox">${[...r.code].map((_,i)=>`<input id="c${i}" inputmode="numeric" maxlength="1" aria-label="الرقم ${i+1}">`).join('')}</div>
+    <p class="err" id="ce" hidden>الرمز غير صحيح. راجعي الأرقام في الخانات بالأعلى.</p>
+    <button class="btn" type="submit">افتحي الباب</button>
+  </form>`;
+  const ins = [...r.code].map((_,i)=>document.getElementById('c'+i));
+  ins.forEach((inp,i)=>{
+    inp.oninput = () => { inp.value = AR(EN(inp.value).replace(/\D/g,'').slice(-1)); if(inp.value && ins[i+1]) ins[i+1].focus(); };
+    inp.onkeydown = e => { if(e.key==='Backspace' && !inp.value && ins[i-1]) ins[i-1].focus(); };
+  });
+  ins[0].focus();
+  document.getElementById('cf').onsubmit = e => {
+    e.preventDefault();
+    const v = ins.map(x=>EN(x.value)).join('');
+    if(v === r.code){
+      S.room++; S.q=0; S.got=[]; S.tried=[]; S.stage='q'; save(); render(); window.scrollTo(0,0);
+    } else {
+      document.getElementById('ce').hidden = false; document.getElementById('cf').classList.remove('shake'); void document.getElementById('cf').offsetWidth; document.getElementById('cf').classList.add('shake');
+    }
+  };
+}
+
+function renderDone(){
+  const mins = Math.max(1, Math.round((S.end - S.start)/60000));
+  const d = new Date(S.end);
+  const date = d.toLocaleDateString('ar-SA-u-ca-gregory-nu-arab',{day:'numeric',month:'long',year:'numeric'});
+  const time = d.toLocaleTimeString('ar-SA-u-nu-arab',{hour:'numeric',minute:'2-digit'});
+  const praise = S.mistakes === 0
+    ? {title:'أداء كامل بدون أي خطأ!', body:'فهمك للمتباينات الخطية واضح وقوي. حافظي على هذا المستوى، وراجعي بنفس الهمة، والدرجة الكاملة في الاختبار بإذن الله قريبة منك.'}
+    : S.mistakes <= 4
+    ? {title:'إنجاز رائع!', body:'أخطاؤك قليلة، وكل خطأ صححتيه صار خطوة تعلمتِها. ارجعي للأسئلة اللي توقفتِ عندها مرة ثانية، وبتدخلين الاختبار بثقة بإذن الله.'}
+    : {title:'ما استسلمتِ ووصلتِ!', body:'كل محاولة خاطئة كانت درسًا، والمهم إنك كملتِ حتى فتحتِ كل الأبواب. أعيدي الغرفة مرة ثانية وبتلاحظين بنفسك كم تحسنتِ. الاستمرار هو سر النجاح.'};
+  app.innerHTML = `
+  ${mapHtml()}
+  <section class="card cert pop">
+    <span class="tag">شهادة الهروب · الفصل الثالث: الدوال الخطية</span>
+    <h1>هربتِ من القبو</h1>
+    <div class="name">${esc(S.name)}</div>
+    <p class="muted">الفصل ${esc(S.cls)} · ${date} · ${time}</p>
+    <div class="stats">
+      <div class="stat"><div class="v">${AR(ROOMS.reduce((n,r)=>n+r.qs.length,0)+1)}</div><div class="l">سؤالًا محلولًا</div></div>
+      <div class="stat"><div class="v">${AR(S.mistakes)}</div><div class="l">محاولة خاطئة</div></div>
+      <div class="stat"><div class="v">${AR(mins)}</div><div class="l">دقيقة</div></div>
+    </div>
+    <div class="praise">
+      <p class="pt">${praise.title}</p>
+      <p>${praise.body}</p>
+      <p class="thanks">شكرًا لكِ يا ${esc(S.name.split(/\s+/)[0])} على جهدك وصبرك حتى آخر باب. فخورة بكِ، وأنتظر أن أراكِ في الغرفة القادمة.<br><span class="muted">معلمتك: أ.&nbsp;لطفيه الطلحي</span></p>
+    </div>
+    <p class="muted">صوّري هذه الشهادة وأرسليها لمعلمتك أ.&nbsp;لطفيه الطلحي في تيمز.</p>
+  </section>
+  <div class="row"><button class="btn ghost" id="again">ابدئي من جديد</button></div>`;
+  document.getElementById('again').onclick = () => { const n=S.name, c=S.cls; S=fresh(); S.name=n; S.cls=c; save(); render(); window.scrollTo(0,0); };
+}
+
+render();
+</script>
+</body>
+</html>
