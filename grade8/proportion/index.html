@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>غرفة الهروب: التناسب والتشابه</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700;800&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: هادئ ودافئ، مثل متحف للمجسّمات المصغّرة
+   IDEA: متحف المقاييس: ثلاث قاعات وباب خروج، لكل قاعة قفل من خمس خانات
+   PICTURE: مثلثان متشابهان بينهما رمز التشابه في الترويسة، والقفل
+   COLOUR and TYPE: طيني دافئ، ورق فاتح، أخضر زيتوني للتمييز؛ القاهرة للعناوين، تجوال للنص، نسخ للرياضيات
+   LAYOUT: عمود واحد هادئ */
+:root{color-scheme:light dark;
+--bg:light-dark(#f7f2ec,#1b1512);--card:light-dark(#fffdfa,#261e1a);--ink:light-dark(#33241e,#f1e7e0);
+--mute:light-dark(#76655c,#b8a69b);--sea:light-dark(#a4553d,#e79a7f);--sea2:light-dark(#f4e3da,#40291f);
+--deep:light-dark(#4b2e26,#2c1d17);--acc:light-dark(#5f7a35,#a9c46e);--ok:light-dark(#2f7d4f,#6fd39a);
+--okbg:light-dark(#e4f2e8,#173d2a);--bad:light-dark(#b8483a,#f0907f);--badbg:light-dark(#fbeae5,#43221d);
+--line:light-dark(#eadfd5,#4a3a31);--chip:light-dark(#4b2e26,#f6dfd3);--on:light-dark(#fff,#1f140f);
+--display:"Cairo","Tajawal",sans-serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 19px/1.8 Tajawal,"Noto Naskh Arabic",sans-serif;overflow-x:clip}
+button,input{font:inherit;color:inherit}
+h1,h2{font-family:var(--display);font-weight:700;margin:0;line-height:1.35;text-wrap:balance}
+.top{background:var(--deep);color:#f7ece6;position:relative;overflow:hidden;border-bottom:4px solid var(--acc)}
+.top .in{max-width:680px;margin:auto;padding:20px max(5vw,16px) 50px;position:relative;z-index:1;padding-inline-end:150px}
+.top h1{font-size:clamp(26px,6vw,36px);font-weight:800}
+.top .tg{display:inline-block;font-size:15px;color:#f0d9cc;background:rgba(255,255,255,.1);border-radius:99px;padding:2px 12px;margin-bottom:6px}
+.pyth{position:absolute;left:max(2vw,8px);top:10px;width:140px;height:130px;opacity:.9}
+@media(max-width:480px){.top .in{padding-inline-end:16px}.pyth{opacity:.22;width:120px}}
+.wrap{max-width:680px;margin:-28px auto 40px;padding:0 max(4vw,12px);position:relative;z-index:2;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border-radius:18px;border:1px solid var(--line);padding:clamp(16px,4vw,26px);box-shadow:0 10px 30px -18px rgba(75,46,38,.45)}
+.mute{color:var(--mute)}
+.card h2{font-size:28px!important}
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.door{background:var(--card);border:1.5px solid var(--line);border-radius:22px 22px 6px 6px;padding:8px 4px;text-align:center;font-size:15px;line-height:1.35;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700}
+.door svg{width:24px;height:24px}
+.simsym{width:1em;height:.6em;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;margin:0 2px}
+.dsym{font:700 15px "Noto Naskh Arabic",serif;color:var(--sea);direction:rtl}
+.door.open{border-color:var(--ok);color:var(--ok)}
+.door.now{border-color:var(--sea);color:var(--ink);background:var(--sea2)}
+.lock{display:flex;justify-content:center;gap:clamp(6px,2vw,10px);margin:10px 0 4px;direction:ltr}
+.slot{width:clamp(44px,12vw,56px);height:clamp(54px,14vw,66px);border-radius:6px;background:var(--sea2);display:grid;place-items:center;font:700 clamp(26px,7vw,32px) "Noto Naskh Arabic",serif;color:var(--chip);border:2px dashed var(--sea)}
+.slot.got{background:var(--sea);color:var(--on);border-style:solid}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;align-items:center}
+.tag{font-size:15px;padding:2px 10px;border-radius:99px;background:var(--sea2);color:var(--chip);font-weight:700}
+.tag.hot{background:var(--acc);color:light-dark(#fff,#1b1a0c)}
+.q{font-size:clamp(20px,4.6vw,23px);font-weight:500;line-height:2.15;margin:4px 0 14px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opts.wide{grid-template-columns:minmax(0,1fr)}
+@media(max-width:560px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{min-height:60px;font-size:20px;font-weight:500;padding:8px 12px;border-radius:12px;border:2px solid var(--line);background:transparent;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:start;line-height:2}
+.opt b{flex:none;width:30px;height:30px;border-radius:8px;background:var(--sea2);color:var(--chip);display:grid;place-items:center;font-size:14px}
+.opt:hover:not([disabled]){border-color:var(--sea)}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg);opacity:.7}
+.opt.wrong span{text-decoration:line-through;text-decoration-color:var(--bad)}
+.opt[disabled]{cursor:default}
+.box{margin-top:14px;border-radius:12px;padding:12px 16px;line-height:2.15;font-size:19px}
+.box h4{margin:0 0 4px;font-size:18px}
+.hint{background:light-dark(#fdf3dc,#3a321c);border-inline-start:5px solid var(--acc)}
+.sol{background:var(--okbg);border-inline-start:5px solid var(--ok)}
+.sol>div{overflow-x:auto;padding:2px 0}
+.digit{display:flex;align-items:center;gap:10px;margin-top:12px;font-weight:700;color:var(--sea);font-size:18px}
+.digit .big{font:700 30px "Noto Naskh Arabic",serif;background:var(--sea);color:var(--on);border-radius:8px;padding:0 14px;direction:ltr}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn{min-height:48px;padding:6px 20px;border-radius:10px;border:0;background:var(--sea);color:var(--on);font-weight:800;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--sea);border:2px solid var(--sea)}
+.btn.coral{background:var(--acc);color:light-dark(#fff,#1b1a0c)}
+.btn:focus-visible,.opt:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+label{display:block;font-weight:700;margin-bottom:4px}
+.namein{width:100%;min-height:50px;border-radius:10px;border:2px solid var(--line);background:var(--bg);padding:6px 14px;font-size:18px}
+.codebox{display:flex;gap:8px;justify-content:center;direction:ltr;margin:6px 0}
+.codebox input{width:52px;height:62px;text-align:center;font:700 28px "Noto Naskh Arabic",serif;background:var(--bg);color:var(--sea);border:2px solid var(--sea);border-radius:8px}
+.err{color:var(--bad);font-weight:700;text-align:center;margin:6px 0 0}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--mute);font-size:16px}
+.link{background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;font-size:14px;padding:0}
+/* الرياضيات */
+.m{font-family:"Noto Naskh Arabic",serif;font-weight:600;white-space:nowrap;unicode-bidi:isolate;direction:rtl;font-size:1.1em}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 2px;font-size:.92em}
+.fr>span{padding:0 3px}.fr>span:first-child{border-bottom:1.6px solid currentColor}
+.mx{display:inline;white-space:nowrap}.mx>.fr{margin-inline-end:3px}
+.pw{unicode-bidi:isolate;direction:rtl}.pw>.pb,.pw>sup{unicode-bidi:isolate}
+.pw sup{font-size:.68em;vertical-align:.95em;line-height:0}
+.fr .pw sup{vertical-align:.6em}
+.ov{text-decoration:overline;text-decoration-thickness:1.5px}
+/* إشارة الجذر بالاتجاه العربي: الإشارة يمين والخط فوق العدد */
+.rt{display:inline-flex;align-items:stretch;margin:0 1px;padding-top:2px}
+.rs{width:.6em;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round;overflow:visible}
+.rr{align-self:baseline;border-top:1.7px solid currentColor;padding:1px 3px 0;line-height:1.35}
+.rr .fr{vertical-align:middle;margin:2px 1px}
+.tb{border-collapse:collapse;margin:10px auto;font-size:16px;line-height:1.8}.tb th,.tb td{border:1px solid var(--line);padding:4px 14px;text-align:center}.tb th{background:var(--sea2);color:var(--chip)}
+/* الرسومات */
+.fig{display:block;margin:10px auto;width:100%;max-width:340px;height:auto}
+.fig.tri{max-width:300px}
+.ax{stroke:var(--ink);stroke-width:2}.axf{fill:var(--ink)}
+.tx{fill:var(--ink);font-size:17px;font-weight:600}.tx.b{font-weight:700}.tx.big{font-size:21px;font-weight:700}.tx.s{font-size:12px}
+.pt{fill:var(--acc)}.sh{fill:var(--sea2);stroke:var(--sea);stroke-width:2.5;stroke-linejoin:round}
+.frame{fill:none;stroke:var(--mute);stroke-width:1.5}
+.c1{fill:light-dark(rgba(91,74,134,.16),rgba(180,163,224,.18));stroke:var(--sea);stroke-width:2}
+.c2{fill:light-dark(rgba(196,132,26,.14),rgba(240,180,76,.16));stroke:var(--acc);stroke-width:2}
+.gr{stroke:var(--line);stroke-width:1}.sg{stroke:var(--sea);stroke-width:3}
+.sh2{fill:light-dark(rgba(95,122,53,.16),rgba(169,196,110,.18));stroke:var(--acc);stroke-width:2.5;stroke-linejoin:round}
+.arc{fill:none;stroke:var(--ink);stroke-width:1.4}.thin{stroke-width:1.4}
+.ray{stroke:var(--mute);stroke-width:1.6;stroke-dasharray:5 4}.dim{stroke:var(--sea);stroke-width:2}
+.body{fill:var(--sea)}.trunk{fill:light-dark(#8a5a3c,#b98a68)}.leaf{fill:light-dark(#7d9a4a,#88a85a)}
+.tb.sm{margin:0;font-size:16px;line-height:1.5}.tb.sm th,.tb.sm td{padding:2px 10px}.opt .tb{background:var(--card)}
+/* الشهادة */
+.cert{border:3px double var(--sea);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;background:light-dark(#fffaf5,#241b16)}
+.cert h1{color:var(--sea);font-size:clamp(26px,6vw,36px)}
+.cert .nm{font-family:var(--display);font-size:clamp(26px,7vw,36px);color:var(--acc);line-height:1.4}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
+.stat{background:var(--sea2);border-radius:10px;padding:10px 4px}
+.stat .v{font:700 26px "Noto Naskh Arabic",serif;color:var(--chip)}
+.stat .l{font-size:15px;color:var(--chip)}
+.praise{background:var(--okbg);border-radius:12px;padding:16px;width:100%;line-height:1.95;text-align:center}
+.praise .pt{font-family:var(--display);font-size:22px;color:var(--ok);margin:0;fill:none}
+.praise p{margin:6px 0}
+.praise .thanks{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+.shake{animation:shake .35s}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .45s ease-out}@keyframes pop{from{transform:scale(.7);opacity:.3}to{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.shake,.pop{animation:none}}
+@media(max-width:400px){.codebox input{width:46px;height:56px}.door{font-size:13px}}
+</style>
+</head>
+<body>
+<header class="top">
+<svg class="pyth" viewBox="0 0 140 130" aria-hidden="true">
+<polygon points="10,110 50,110 22,72" fill="none" stroke="#f0d9cc" stroke-width="2"/>
+<polygon points="70,110 130,110 88,53" fill="#a9c46e" opacity=".85"/>
+<text x="60" y="90" text-anchor="middle" fill="#f0d9cc" font-size="26" font-family="serif">∽</text>
+</svg>
+<div class="in">
+<span class="tg">الصف الثاني المتوسط · الفصل الثالث · أ. لطفيه الطلحي</span>
+<h1>غرفة الهروب: التناسب والتشابه</h1>
+</div>
+</header>
+<main class="wrap" id="app" aria-live="polite"></main>
+<script>
+{
+const F=(n,d)=>`<span class="fr"><span>${n}</span><span>${d}</span></span>`;
+const X=(w,n,d)=>`<span class="mx">${F(n,d)}<span>${w}</span></span>`;
+const P=(b,e)=>`<span class="pw"><span class="pb">${b}</span><sup>${e}</sup></span>`;
+const m=s=>`<span class="m">${s}</span>`;
+const SG=s=>`<span class="ov">${s}</span>`;
+const N='−',TR='△',SIM='<svg class="simsym" viewBox="0 0 22 12" role="img" aria-label="يشابه"><path d="M2 4 C5 10,9 10,11 6 C13 2,17 2,20 8"/></svg>';
+const T=(head,rows,c)=>`<table class="tb ${c||''}"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+const HOT='مهارة تفكير عليا';
+const SV='font-family="Tajawal,sans-serif"';
+const t=(x,y,s,a,c)=>`<text x="${x}" y="${y}" text-anchor="${a||'middle'}" class="tx ${c||''}" ${SV}>${s}</text>`;
+/* عدد كسري داخل الرسم: الكسر يمين العدد الصحيح، والوحدة يسارهما */
+const SMX=(x,y,w,n,d,u)=>`${t(x+9,y-8,n,'middle','s')}<line x1="${x+3}" y1="${y-4}" x2="${x+15}" y2="${y-4}" class="ax thin"/>${t(x+9,y+9,d,'middle','s')}${t(x-1,y+1,w,'end')}${u?t(x-14,y+1,u,'end'):''}`;
+/* تمثيل بياني: المسافة والزمن */
+const GRAPH=()=>{const X0=56,Y0=180,ux=52,uy=150/160;const X=v=>X0+v*ux,Y=v=>Y0-v*uy;let s=`<svg class="fig" viewBox="0 0 300 232" direction="ltr" role="img" aria-label="تمثيل بياني للمسافة والزمن">`;
+for(let i=0;i<=4;i++)s+=`<line x1="${X(i)}" y1="${Y(0)}" x2="${X(i)}" y2="${Y(160)}" class="gr"/>`;for(let j=0;j<=160;j+=40)s+=`<line x1="${X(0)}" y1="${Y(j)}" x2="${X(4)}" y2="${Y(j)}" class="gr"/>`;
+s+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(4)+10}" y2="${Y(0)}" class="ax"/><line x1="${X(0)}" y1="${Y(0)}" x2="${X(0)}" y2="${Y(160)-10}" class="ax"/>`;
+for(let i=0;i<=4;i++)s+=t(X(i),Y(0)+18,i,'middle','s');for(let j=40;j<=160;j+=40)s+=t(X(0)-6,Y(j)+4,j,'end','s');
+s+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(4)}" y2="${Y(160)}" class="sg"/>`;[1,2,3,4].forEach(i=>s+=`<circle cx="${X(i)}" cy="${Y(i*40)}" r="4.5" class="pt"/>`);
+return s+t(X(2),226,'الزمن (ساعة)','middle','s b')+`<text x="14" y="${Y(80)}" text-anchor="middle" class="tx s b" transform="rotate(-90 14 ${Y(80)})" ${SV}>المسافة (كلم)</text></svg>`};
+/* مثلثان متشابهان: الكبير يمين والصغير يسار */
+const SIMTRI=()=>`<svg class="fig" viewBox="0 0 350 185" direction="ltr" role="img" aria-label="مثلثان متشابهان">
+<polygon points="180,150 330,150 220,40" class="sh"/><polygon points="20,150 120,150 46.7,76.7" class="sh2"/>
+<path d="M195 150 A15 15 0 0 0 186 136" class="arc"/><path d="M30 150 A10 10 0 0 0 24 140.5" class="arc"/>
+<path d="M314 150 A16 16 0 0 1 319 139" class="arc"/><path d="M309 150 A21 21 0 0 1 315 135" class="arc"/>
+<path d="M109 150 A11 11 0 0 1 112.5 142.5" class="arc"/><path d="M105 150 A15 15 0 0 1 109.5 139.5" class="arc"/>
+${t(174,168,'أ')}${t(338,168,'ب')}${t(220,30,'جـ')}${t(14,168,'س')}${t(126,168,'ص')}${t(46,66,'ع')}
+${t(255,172,'١٢ سم','middle','b')}${t(292,92,'١٨ سم','start','b')}${t(70,172,'٨ سم','middle','b')}${t(92,106,'؟','start','b big')}</svg>`;
+/* مستوى إحداثي بأرقام */
+const PLANE=()=>{const u=30,x0=0,x1=6,y0=0,y1=7,X=x=>28+(x-x0)*u,Y=y=>16+(y1-y)*u;let s=`<svg class="fig" viewBox="0 0 230 262" style="max-width:240px" direction="ltr" role="img" aria-label="مستوى إحداثي">`;
+for(let i=x0;i<=x1;i++)s+=`<line x1="${X(i)}" y1="${Y(y0)}" x2="${X(i)}" y2="${Y(y1)}" class="gr"/>`;for(let j=y0;j<=y1;j++)s+=`<line x1="${X(x0)}" y1="${Y(j)}" x2="${X(x1)}" y2="${Y(j)}" class="gr"/>`;
+s+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(x1)}" y2="${Y(0)}" class="ax"/><line x1="${X(0)}" y1="${Y(0)}" x2="${X(0)}" y2="${Y(y1)}" class="ax"/>`;
+for(let i=1;i<=x1;i++)s+=t(X(i),Y(0)+16,i,'middle','s');for(let j=1;j<=y1;j++)s+=t(X(0)-7,Y(j)+4,j,'end','s');s+=t(X(0)-7,Y(0)+16,'٠','end','s');
+s+=t(X(x1)+8,Y(0)+4,'س','start','s b')+t(X(0)+12,Y(y1)+4,'ص','middle','s b');
+s+=`<polygon points="${X(1)},${Y(1)} ${X(4)},${Y(1)} ${X(1)},${Y(3)}" class="sh"/>`;
+[[1,1,'أ',-12,14],[4,1,'ب',8,14],[1,3,'جـ',-14,-4]].forEach(([x,y,l,dx,dy])=>s+=`<circle cx="${X(x)}" cy="${Y(y)}" r="4" class="pt"/>`+t(X(x)+dx,Y(y)+dy,l,'middle','b'));
+return s+`</svg>`};
+/* الظلال: الطفلة يسار والشجرة يمين */
+const SHADOW=()=>`<svg class="fig" viewBox="0 0 345 190" direction="ltr" role="img" aria-label="طفلة وشجرة وظلاهما">
+<line x1="4" y1="160" x2="341" y2="160" class="ax"/>
+<line x1="20" y1="160" x2="80" y2="115" class="ray"/><line x1="120" y1="160" x2="300" y2="25" class="ray"/>
+<rect x="76" y="124" width="8" height="36" rx="3" class="body"/><circle cx="80" cy="119" r="6" class="body"/>
+<rect x="295" y="95" width="10" height="65" class="trunk"/><circle cx="300" cy="58" r="33" class="leaf"/><circle cx="282" cy="76" r="20" class="leaf"/><circle cx="318" cy="76" r="20" class="leaf"/>
+<line x1="20" y1="168" x2="80" y2="168" class="dim"/><line x1="120" y1="176" x2="300" y2="176" class="dim"/>
+${t(50,184,'٢ م','middle','b')}${t(210,172,'٦ م','middle','b')}
+${SMX(113,140,'١','١','٢','م')}${t(326,128,'؟','start','b big')}</svg>`;
+const HP=(a,b)=>`<div class="hp"><span>عدد الساعات</span>${a}<span>الأجر (ريال)</span>${b}</div>`;
+const ROOMS=[
+{name:'قاعة النِّسَب',sym:'أ : ب',intro:`القاعة مقفلة برمز من خمسة أرقام. كل إجابة صحيحة تكشف لكِ رقمًا منه. حلّي في دفتركِ قبل أن تختاري.`,code:'64205',
+qs:[
+{q:`أيّ الجداول الآتية يمثّل علاقة <b>متناسبة</b> بين عدد ساعات العمل والأجر؟`,wide:1,
+o:[T(['عدد الساعات','1','2','3'],[['الأجر (ريال)','12','22','32']],'sm'),T(['عدد الساعات','2','4','6'],[['الأجر (ريال)','5','10','16']],'sm'),T(['عدد الساعات','1','2','3'],[['الأجر (ريال)','15','30','45']],'sm'),T(['عدد الساعات','3','6','9'],[['الأجر (ريال)','9','15','21']],'sm')],a:2,
+h:`في العلاقة المتناسبة تكون نسبة الأجر إلى عدد الساعات ثابتة في كل أعمدة الجدول. اقسمي الأجر على عدد الساعات في كل عمود.`,
+s:[`(أ): ${m(`${F(12,1)} = 12`)}، ${m(`${F(22,2)} = 11`)} ← النسب مختلفة ✗`,`(ب): ${m(`${F(5,2)} = 2.5`)}، ${m(`${F(16,6)} ≈ 2.67`)} ✗`,`(جـ): ${m(`${F(15,1)} = ${F(30,2)} = ${F(45,3)} = 15`)} ← النسبة ثابتة ✓`,`(د): ${m(`${F(9,3)} = 3`)}، ${m(`${F(15,6)} = 2.5`)} ✗`,`إذن الجدول (جـ) يمثّل علاقة متناسبة: الأجر ${m('15')} ريالًا لكل ساعة.`]},
+{q:`حلّ التناسب: ${m(`${F('س',12)} = ${F(20,16)}`)}`,
+o:[m('15'),m('9.6'),m('24'),m('16')],a:0,
+h:`اضربي ضربًا تبادليًّا: ${m('16 × س = 12 × 20')}، ثم اقسمي الطرفين على ${m('16')}.`,
+s:[m(`${F('س',12)} = ${F(20,16)}`),`نضرب ضربًا تبادليًّا: ${m('16س = 12 × 20')}`,m('16س = 240'),m(`${F('16س',16)} = ${F(240,16)}`)+' ← '+m('س = 15'),`تحقق: ${m(`${F(15,12)} = 1.25`)} و ${m(`${F(20,16)} = 1.25`)} ✓`]},
+{q:`يبيّن الجدول درجة الحرارة في أحد أيام الصيف. ما معدل تغيّر درجة الحرارة لكل ساعة؟${T(['الساعة','٦ صباحًا','١١ صباحًا'],[['درجة الحرارة',m('17°س'),m('32°س')]])}`,
+o:[m('15°س')+' لكل ساعة',m('5°س')+' لكل ساعة',m('2.9°س')+' لكل ساعة',m('3°س')+' لكل ساعة'],a:3,
+h:`معدل التغيّر = ${m(F('التغيّر في درجة الحرارة','التغيّر في الزمن'))}. كم ساعة مرّت من ${m('6')} إلى ${m('11')} صباحًا؟`,
+s:[`التغيّر في درجة الحرارة: ${m('32 − 17 = 15°س')}`,`التغيّر في الزمن: ${m('11 − 6 = 5')} ساعات`,m(`معدل التغيّر = ${F('15°س','5 ساعات')} = ${F('3°س','1 ساعة')}`),`أي ترتفع درجة الحرارة ${m('3°س')} كل ساعة.`,`الخيار ${m('15°س')} هو مقدار التغيّر الكلي، و ${m('5')} عدد الساعات.`]},
+{hot:HOT,q:`عمر خالد ${m('10')} سنوات، وعمر أخيه ${m('5')} سنوات، أي إن عمر خالد مثلا عمر أخيه الآن. هل العلاقة بين عمريهما على مرّ السنين علاقة متناسبة؟`,wide:1,
+o:[`نعم، لأن عمر خالد سيبقى دائمًا مثلي عمر أخيه`,`لا، لأن الفرق بين العمرين ثابت (${m('5')} سنوات) أما النسبة بينهما فتتغيّر`,`نعم، لأن النسبة ${m('10 : 5')} ثابتة لا تتغيّر`,`لا، لأن خالدًا أكبر من أخيه`],a:1,
+h:`كوّني جدولًا لعمريهما بعد ${m('5')} سنوات، وبعد ${m('10')} سنوات، ثم احسبي النسبة في كل مرة. هل تبقى ثابتة؟`,
+s:[T(['','عمر خالد','عمر أخيه','النسبة'],[['الآن',m('10'),m('5'),m(`${F(10,5)} = 2`)],['بعد ٥ سنوات',m('15'),m('10'),m(`${F(15,10)} = 1.5`)],['بعد ١٠ سنوات',m('20'),m('15'),m(`${F(20,15)} ≈ 1.33`)]],'sm'),`النسبة تتغيّر، إذن العلاقة <b>غير متناسبة</b>.`,`الثابت هو الفرق بين العمرين: ${m('5')} سنوات دائمًا.`]}
+]},
+{name:'قاعة المعدّلات',sym:'↗',intro:`أحسنتِ! هنا معدّلات وتمثيلات بيانية ومسائل تناسب من الحياة. اقرئي محاور التمثيل البياني جيدًا قبل الحل.`,code:'18397',
+qs:[
+{q:`يبيّن التمثيل البياني المسافة التي تقطعها سيارة بسرعة ثابتة. ما المعدل الثابت للتغيّر، وما معناه؟${GRAPH()}`,wide:1,
+o:[`${m('160')} كلم لكل ساعة`,`${m(F(1,40))} ساعة لكل كيلومتر`,`${m('40')} كلم لكل ساعة: تقطع السيارة ${m('40')} كلم كل ساعة`,`${m('80')} كلم لكل ساعة: تقطع السيارة ${m('80')} كلم كل ساعة`],a:2,
+h:`اختاري نقطتين على المستقيم، مثل ${m('(1، 40)')} و ${m('(3، 120)')}، ثم احسبي: ${m(F('التغيّر في المسافة','التغيّر في الزمن'))}.`,
+s:[`النقطتان ${m('(1، 40)')} و ${m('(3، 120)')}`,m(`${F('120 − 40','3 − 1')} = ${F('80 كلم','2 ساعة')} = ${F('40 كلم','1 ساعة')}`),`المعنى: تزداد المسافة ${m('40')} كلم كل ساعة.`,`الخيار ${m('80')} هو التغيّر في ساعتين وليس في ساعة، و ${m('160')} هي المسافة بعد ${m('4')} ساعات.`]},
+{q:`يبيّن الجدول أجرة سيارة أجرة حسب المسافة. أيّ العبارات الآتية صحيحة؟${T(['المسافة (كلم)','1','2','3','4'],[['الأجرة (ريال)','10','14','18','22']])}`,wide:1,
+o:[`العلاقة خطية ومتناسبة`,`العلاقة خطية وغير متناسبة، ومعدل التغيّر ${m('4')} ريالات لكل كيلومتر`,`العلاقة غير خطية`,`العلاقة خطية ومتناسبة، ومعدل التغيّر ${m('10')} ريالات لكل كيلومتر`],a:1,
+h:`هل تزداد الأجرة بمقدار ثابت؟ إذا كان كذلك فالعلاقة خطية. ثم هل نسبة الأجرة إلى المسافة ثابتة؟`,
+s:[`الأجرة تزداد ${m('4')} ريالات مع كل كيلومتر: ${m('14 − 10 = 18 − 14 = 22 − 18 = 4')} ← خطية`,`النسب: ${m(`${F(10,1)} = 10`)}، ${m(`${F(14,2)} = 7`)} ← غير ثابتة، إذن غير متناسبة`,`لو مددنا النمط إلى ${m('0')} كلم لكانت الأجرة ${m('6')} ريالات وليست ${m('0')}، ولهذا لا تمر بنقطة الأصل.`]},
+{q:`تحتاج وصفة كعك إلى ${m(X(1,1,2))} كوب من الحليب لكل ${m('4')} أكواب من الطحين. كم كوبًا من الحليب يلزم إذا استُعمل ${m('10')} أكواب من الطحين؟`,
+o:[m(X(26,2,3)),m(X(3,1,4)),m('15'),m(X(3,3,4))],a:3,
+h:`اكتبي تناسبًا بالترتيب نفسه في الطرفين: ${m(`${F('الحليب','الطحين')} = ${F('الحليب','الطحين')}`)}، أي ${m(`${F(X(1,1,2),4)} = ${F('س',10)}`)}.`,
+s:[m(`${F(X(1,1,2),4)} = ${F('س',10)}`),`نضرب تبادليًّا: ${m(`4س = ${X(1,1,2)} × 10`)}`,m(`4س = ${F(3,2)} × 10 = 15`),m(`س = ${F(15,4)} = ${X(3,3,4)}`)+' كوب',`الخيار ${m(X(26,2,3))} ينتج من عكس النسبة في أحد الطرفين.`]},
+{hot:'استراتيجية الرسم',q:`يتسلّق حمد جدارًا ارتفاعه ${m('15')} مترًا في لعبة تسلّق. في كل دقيقة يصعد ${m('3')} أمتار، ثم ينزلق مترًا واحدًا ليستريح. بعد كم دقيقة يصل إلى القمة؟`,
+o:[m('7')+' دقائق',m('8')+' دقائق',m('5')+' دقائق',m('7.5')+' دقائق'],a:0,
+h:`ارسمي الجدار وتتبّعي موقع حمد دقيقة بدقيقة. انتبهي: عندما يصل إلى القمة لا ينزلق بعدها!`,
+s:[T(['الدقيقة','أعلى نقطة يصلها (م)','بعد الانزلاق (م)'],[1,2,3,4,5,6].map(k=>[m(String(k)),m(String(2*k+1)),m(String(2*k))]).concat([[m('7'),m('15'),'وصل القمة ✓']]),'sm'),`في الدقيقة السابعة يصعد من ${m('12')} إلى ${m('15')} فيصل إلى القمة.`,`الخطأ الشائع: ${m(`${F(15,2)} = 7.5`)} أو ${m('8')}، لأنه يهمل أن حمد لا ينزلق بعد وصوله.`]}
+]},
+{name:'قاعة التشابه',sym:SIM,intro:`القاعة الأخيرة قبل الخروج! أشكال متشابهة وتمدّد وقياس غير مباشر. حدّدي الأضلاع المتناظرة أولًا في كل شكل.`,code:'75620',
+qs:[
+{q:`في الشكل: ${m(`${TR} أ ب جـ ${SIM} ${TR} س ص ع`)}. ما طول الضلع ${m(SG('ص ع'))}؟${SIMTRI()}`,
+o:[m('27')+' سم',m('12')+' سم',m('14')+' سم',m('10')+' سم'],a:1,
+h:`ترتيب الرؤوس يحدّد التناظر: ${m(SG('أ ب'))} يناظر ${m(SG('س ص'))}، و ${m(SG('ب جـ'))} يناظر ${m(SG('ص ع'))}. اكتبي تناسبًا وحلّيه.`,
+s:[m(`${F(SG('س ص'),SG('أ ب'))} = ${F(SG('ص ع'),SG('ب جـ'))}`),m(`${F(8,12)} = ${F('ل',18)}`),`نضرب تبادليًّا: ${m('12ل = 8 × 18 = 144')}`,m(`ل = ${F(144,12)} = 12`)+' سم',`أو: عامل المقياس ${m(`${F(8,12)} = ${F(2,3)}`)}، و ${m(`18 × ${F(2,3)} = 12`)}`,`الخيار ${m('27')} ينتج من ضرب ${m('18')} في ${m(F(3,2))} بدل ${m(F(2,3))}.`]},
+{q:`مستطيلان متشابهان، النسبة بين طولي كل ضلعين متناظرين فيهما (الأول إلى الثاني) تساوي ${m(F(2,3))}. إذا كان محيط المستطيل الأول ${m('36')} سم، فما محيط المستطيل الثاني؟`,
+o:[m('24')+' سم',m('81')+' سم',m('36')+' سم',m('54')+' سم'],a:3,
+h:`إذا تشابه شكلان، فالنسبة بين محيطيهما تساوي عامل المقياس نفسه: ${m(`${F('محيط الأول','محيط الثاني')} = ${F(2,3)}`)}.`,
+s:[m(`${F(36,'ح')} = ${F(2,3)}`),`نضرب تبادليًّا: ${m('2ح = 3 × 36 = 108')}`,m(`ح = ${F(108,2)} = 54`)+' سم',`منطقيًّا: النسبة ${m(F(2,3))} أقل من ${m('1')}، إذن المستطيل الثاني أكبر، ومحيطه أكبر من ${m('36')}. الخيار ${m('24')} عكس ذلك.`]},
+{q:`أُجري للمثلث أ ب جـ المبيّن تمدّدٌ عامل مقياسه ${m('2')}. ما إحداثيا الرأس ${m('جَـ')} في الصورة، وهل التمدد تكبير أم تصغير؟${PLANE()}`,wide:1,
+o:[`${m('جَـ(2، 6)')}، والتمدد تكبير`,`${m('جَـ(3، 5)')}، والتمدد تكبير`,`${m('جَـ(2، 6)')}، والتمدد تصغير`,`${m('جَـ(1، 6)')}، والتمدد تكبير`],a:0,
+h:`في التمدد من نقطة الأصل نضرب كلا الإحداثيين في عامل المقياس. وإذا كان عامل المقياس أكبر من ${m('1')} فالتمدد تكبير.`,
+s:[`من الشكل: ${m('جـ(1، 3)')}`,m('جَـ(1 × 2، 3 × 2) = جَـ(2، 6)'),`عامل المقياس ${m('2 &gt; 1')}، إذن التمدد <b>تكبير</b>.`,`الخيار ${m('(3، 5)')} ينتج من جمع ${m('2')} بدل الضرب فيه.`]},
+{q:`طفلة طولها ${m(X(1,1,2))} م، وطول ظلها ${m('2')} م. وفي الوقت نفسه كان طول ظل شجرة بجانبها ${m('6')} م. ما طول الشجرة؟${SHADOW()}`,
+o:[m('8')+' م',m(X(2,1,4))+' م',m(X(4,1,2))+' م',m(X(7,1,2))+' م'],a:2,
+h:`الطفلة وظلها، والشجرة وظلها، يكوّنان مثلثين متشابهين. اكتبي: ${m(`${F('طول الطفلة','ظل الطفلة')} = ${F('طول الشجرة','ظل الشجرة')}`)}.`,
+s:[m(`${F(X(1,1,2),2)} = ${F('ل',6)}`),`نضرب تبادليًّا: ${m(`2ل = ${X(1,1,2)} × 6 = ${F(3,2)} × 6 = 9`)}`,m(`ل = ${F(9,2)} = ${X(4,1,2)}`)+' م',`منطقيًّا: ظل الشجرة ثلاثة أمثال ظل الطفلة، إذن طولها ثلاثة أمثال طول الطفلة: ${m(`3 × ${X(1,1,2)} = ${X(4,1,2)}`)} ✓`]}
+]}];
+
+const EXIT={hot:'سؤال الهروب',q:`تحدٍّ أخير: مستطيلان متشابهان، والثاني تكبير للأول بعامل مقياس ${m('3')}. إذا كانت مساحة المستطيل الأول ${m('8')} سم<sup>2</sup>، فما مساحة المستطيل الثاني؟`,
+o:[m('24')+' سم<sup>2</sup>',m('72')+' سم<sup>2</sup>',m('11')+' سم<sup>2</sup>',m('216')+' سم<sup>2</sup>'],a:1,
+h:`جرّبي مثالًا: مستطيل بعداه ${m('2')} سم و ${m('4')} سم. ما بعدا صورته بعد التكبير بعامل ${m('3')}؟ وكم مرة تضاعفت المساحة؟`,
+s:[`مثال: مستطيل ${m('2 × 4')} مساحته ${m('8')} سم<sup>2</sup>`,`بعد التكبير: ${m('(2 × 3) × (4 × 3) = 6 × 12 = 72')} سم<sup>2</sup>`,`السبب: الطول والعرض يُضرب كلٌّ منهما في ${m('3')}، فتُضرب المساحة في ${m(`3 × 3 = ${P('3','2')} = 9`)}`,m(`8 × ${P('3','2')} = 8 × 9 = 72`)+' سم<sup>2</sup>',`الخيار ${m('24')} يضرب في ${m('3')} مرة واحدة فقط، وهذا صحيح للمحيط وليس للمساحة.`]};
+
+ROOMS[0].qs.push({q:`إذا كان ثمن ${m('3')} كيلوجرامات من التفاح ${m('24')} ريالًا، فكم ثمن ${m('5')} كيلوجرامات بالسعر نفسه؟`,
+o:[m('32')+' ريالًا',m('40')+' ريالًا',m('26')+' ريالًا',m('45')+' ريالًا'],a:1,
+h:`اكتبي تناسبًا: ${m(`${F(24,3)} = ${F('س',5)}`)}، أو أوجدي ثمن الكيلوجرام الواحد أولًا.`,
+s:[m(`${F(24,3)} = ${F('س',5)}`),`نضرب تبادليًّا: ${m('3س = 24 × 5 = 120')}`,m(`س = ${F(120,3)} = 40`)+' ريالًا',`أو: ثمن الكيلوجرام ${m(`${F(24,3)} = 8`)} ريالات، و ${m('8 × 5 = 40')} ✓`]});
+ROOMS[1].qs.push({q:`كان ارتفاع الماء في خزان ${m('90')} سم، وبعد ${m('6')} ساعات أصبح ${m('60')} سم. ما معدل تغيّر ارتفاع الماء؟`,
+o:[m('5')+' سم لكل ساعة',m(N+'30')+' سم لكل ساعة',m(N+'5')+' سم لكل ساعة',m(N+'15')+' سم لكل ساعة'],a:2,
+h:`معدل التغيّر = ${m(F('التغيّر في الارتفاع','التغيّر في الزمن'))}. الارتفاع نقص، فالمعدل سالب.`,
+s:[`التغيّر في الارتفاع: ${m(`60 − 90 = ${N}30`)} سم`,m(`${F(N+'30 سم','6 ساعات')} = ${F(N+'5 سم','1 ساعة')}`),`أي ينخفض الماء ${m('5')} سم كل ساعة. والمعدل السالب يعني نقصانًا.`,`الخيار ${m(N+'30')} هو التغيّر الكلي، وليس المعدل لكل ساعة.`]});
+ROOMS[2].qs.push({q:`كُبّرت صورة أبعادها ${m('4')} سم × ${m('6')} سم، فأصبحت أبعادها ${m('10')} سم × ${m('15')} سم. ما عامل المقياس، وما نوع التمدد؟`,wide:1,
+o:[`${m(F(5,2))}، والتمدد تكبير`,`${m(F(2,5))}، والتمدد تصغير`,`${m(F(2,5))}، والتمدد تكبير`,`${m('6')}، والتمدد تكبير`],a:0,
+h:`عامل المقياس = ${m(F('طول الصورة','الطول الأصلي'))}. وإذا كان أكبر من ${m('1')} فالتمدد تكبير.`,
+s:[m(`${F(10,4)} = ${F(5,2)}`)+' و '+m(`${F(15,6)} = ${F(5,2)}`)+' ✓ النسبة نفسها',`عامل المقياس ${m(`${F(5,2)} = ${X(2,1,2)}`)}، وهو أكبر من ${m('1')} ← <b>تكبير</b>`,`الخيار ${m(F(2,5))} ينتج من قسمة الطول الأصلي على طول الصورة (عكس الترتيب).`]});
+const SLOTS=[[0],[1],[2],[3],[4]];
+const KEY='escape-g8-ch3-v2';
+const LETTERS=['أ','ب','جـ','د'];
+const DIG='٠١٢٣٤٥٦٧٨٩';
+const AR=s=>String(s).replace(/\d/g,d=>DIG[d]);
+const EN=s=>String(s).replace(/[٠-٩]/g,d=>DIG.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+const arab=el=>{const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){n.nodeValue=n.nodeValue.replace(/(\d)\.(\d)/g,'$1,$2').replace(/\d/g,d=>DIG[d])}};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fresh=()=>({name:'',room:0,q:0,stage:'start',got:[],tried:[],mistakes:0,start:0,end:0});
+let S;try{S=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){S=fresh()}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const app=document.getElementById('app');
+const TOTAL=ROOMS.reduce((n,r)=>n+r.qs.length,0)+1;
+
+const lockSvg=open=>open
+ ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>`
+ :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+function mapHtml(){
+  const names=ROOMS.map(r=>r.name).concat(['باب الخروج']);
+  return `<nav class="map">${names.map((n,i)=>{const done=i<S.room||S.stage==='done';const now=i===S.room&&S.stage!=='done'&&S.stage!=='start';
+    return `<div class="door ${done?'open':''} ${now?'now':''}">${lockSvg(done)}<span>${n}</span>${i<ROOMS.length?`<span class="dsym">${ROOMS[i].sym}</span>`:''}</div>`}).join('')}</nav>`}
+function slotsHtml(){const code=ROOMS[S.room].code;const got=new Set();S.got.forEach((g,j)=>{if(g)SLOTS[j].forEach(x=>got.add(x))});
+  return `<div class="lock" aria-label="أرقام الرمز">${[...code].map((c,i)=>`<div class="slot ${got.has(i)?'got':''}">${got.has(i)?c:'؟'}</div>`).join('')}</div>`}
+const foot=()=>`<div class="foot"><span>${esc(S.name)}</span><span>المحاولات الخاطئة: ${S.mistakes}</span><button class="link" id="rst">ابدئي من جديد</button></div>`;
+
+function render(){
+  let h='';
+  if(S.stage==='start')h=startHtml();
+  else if(S.stage==='done')h=doneHtml();
+  else if(S.stage==='code')h=codeHtml();
+  else if(S.room===ROOMS.length)h=qHtml(EXIT,true);
+  else h=qHtml(ROOMS[S.room].qs[S.q],false);
+  app.innerHTML=h;arab(app);bind();
+}
+
+function startHtml(){
+  return `${mapHtml()}
+  <section class="card">
+    <h2 style="font-size:26px">أهلًا بكِ في متحف المقاييس!</h2>
+    <p class="mute" style="margin:6px 0 0">أنتِ داخل متحف للمجسّمات المصغّرة، أمام ثلاث قاعات مقفلة وباب خروج. في كل قاعة ${'5'} أسئلة متنوعة من الفصل كاملًا، وكل إجابة صحيحة تعطيكِ رقمًا من رمز القفل. اجمعي الرمز واكتبيه لتنتقلي للقاعة التالية، وفي النهاية سؤال الهروب.</p>
+  </section>
+  <form class="card" id="f">
+    <label for="nm">اسمكِ الثلاثي</label>
+    <input class="namein" id="nm" autocomplete="name" value="${esc(S.name)}" required>
+    <p class="err" id="ne" hidden>فضلًا اكتبي اسمكِ كاملًا.</p>
+    <div class="row"><button class="btn" type="submit">ادخلي قاعة النِّسَب</button></div>
+  </form>
+  <section class="card"><b>القواعد</b>
+    <p class="mute" style="margin:4px 0 0">إذا أخطأتِ يظهر لكِ تلميح، وتقدرين تحاولين مرة ثانية. وإذا أصبتِ يظهر لكِ الحل بالخطوات. حلّي في دفتركِ قبل أن تختاري. في النهاية تظهر لكِ شهادة الهروب: صوّريها وأرسليها لمعلمتكِ أ. لطفيه الطلحي في تيمز.</p>
+  </section>`}
+
+function qHtml(Q,isExit){
+  const r=isExit?null:ROOMS[S.room];
+  const answered=isExit?S.stage==='exitSolved':!!S.got[S.q];
+  return `${mapHtml()}
+  ${isExit?`<section class="card"><h2 style="font-size:26px">باب الخروج 🗝️</h2><p class="mute" style="margin:4px 0 0">سؤال أخير يجمع أفكار الفصل. أجيبي عنه لتخرجي وتستلمي شهادتكِ.</p></section>`
+   :`<section class="card"><h2 style="font-size:26px">${r.name}</h2>${S.q===0&&!answered?`<p class="mute" style="margin:4px 0 0">${r.intro}</p>`:''}${slotsHtml()}</section>`}
+  <section class="card" id="qc">
+    <div class="tags"><span class="tag">${isExit?'السؤال الأخير':`السؤال ${S.q+1} من ${r.qs.length}`}</span>${Q.hot?`<span class="tag hot">${Q.hot}</span>`:''}</div>
+    <div class="q">${Q.q}</div>
+    <div class="opts${Q.wide?' wide':''}">${Q.o.map((o,i)=>{const wrong=S.tried.includes(i),right=answered&&i===Q.a;
+      return `<button class="opt ${wrong?'wrong':''} ${right?'right':''}" data-i="${i}" ${answered||wrong?'disabled':''}><b>${LETTERS[i]}</b><span>${o}</span></button>`}).join('')}</div>
+    <div id="fb">${fbHtml(Q,answered,isExit)}</div>
+  </section>
+  ${foot()}`}
+
+function fbHtml(Q,answered,isExit){
+  if(answered){
+    const code=isExit?'':ROOMS[S.room].code;const dg=isExit?'':SLOTS[S.q].map(x=>code[x]).join('');
+    const last=!isExit&&S.q===ROOMS[S.room].qs.length-1;
+    return `<div class="box sol"><h4>إجابة صحيحة، أحسنتِ! طريقة الحل:</h4>${Q.s.map(x=>`<div>${x}</div>`).join('')}</div>
+    ${isExit?'':`<div class="digit pop">${dg.length>1?'حصلتِ على رقمين من الرمز:':'حصلتِ على رقم من الرمز:'} <span class="big">${dg}</span></div>`}
+    <div class="row"><button class="btn ${isExit?'coral':''}" id="nx">${isExit?'اخرجي واستلمي شهادتكِ 🎓':last?'اذهبي إلى القفل ←':'السؤال التالي ←'}</button></div>`}
+  if(S.tried.length)return `<div class="box hint"><h4>ليست الإجابة الصحيحة. تلميح:</h4>${Q.h}</div>`;
+  return ''}
+
+function codeHtml(){
+  const r=ROOMS[S.room];
+  return `${mapHtml()}
+  <section class="card"><h2 style="font-size:26px">افتحي قفل ${r.name}</h2><p class="mute" style="margin:4px 0 0">اكتبي أرقام الرمز بالترتيب نفسه الظاهر في الخانات، من اليسار إلى اليمين.</p>${slotsHtml()}</section>
+  <form class="card" id="cf">
+    <div class="codebox">${[...r.code].map((_,i)=>`<input id="c${i}" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="الرقم ${i+1}">`).join('')}</div>
+    <p class="err" id="ce" hidden>الرمز غير صحيح. راجعي الأرقام في الخانات بالأعلى.</p>
+    <div class="row" style="justify-content:center"><button class="btn coral" type="submit">افتحي الباب</button></div>
+  </form>
+  ${foot()}`}
+
+function doneHtml(){
+  const mins=Math.max(1,Math.round((S.end-S.start)/60000));
+  let date='';try{date=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(new Date(S.end))}catch(e){}
+  const first=S.name.trim().split(/\s+/)[0];
+  const pr=S.mistakes===0
+   ?{t:'أداء كامل بدون أي خطأ!',b:'فهمكِ للتناسب والتشابه واضح وقوي. حافظي على هذا المستوى، وراجعي بنفس الهمّة، والدرجة الكاملة في الاختبار المركزي بإذن الله قريبة منكِ.'}
+   :S.mistakes<=4
+   ?{t:'إنجاز رائع!',b:'أخطاؤكِ قليلة، وكل خطأ صحّحتِه صار خطوة تعلّمتِها. ارجعي للأسئلة التي توقفتِ عندها مرة ثانية، وستدخلين الاختبار بثقة بإذن الله.'}
+   :{t:'ما استسلمتِ ووصلتِ!',b:'كل محاولة خاطئة كانت درسًا، والمهم أنكِ أكملتِ حتى فتحتِ كل الأبواب. أعيدي الغرفة مرة ثانية وستلاحظين بنفسكِ كم تحسّنتِ. الاستمرار سرّ النجاح.'};
+  return `${mapHtml()}
+  <section class="card cert pop">
+    <span class="tag">شهادة الهروب · الفصل الثالث: التناسب والتشابه</span>
+    <h1>خرجتِ من متحف المقاييس!</h1>
+    <div class="nm">${esc(S.name)}</div>
+    <p class="mute" style="margin:0">الصف الثاني المتوسط${date?' · '+date:''}</p>
+    <div class="stats">
+      <div class="stat"><div class="v">${TOTAL}</div><div class="l">سؤالًا محلولًا</div></div>
+      <div class="stat"><div class="v">${S.mistakes}</div><div class="l">محاولة خاطئة</div></div>
+      <div class="stat"><div class="v">${mins}</div><div class="l">دقيقة</div></div>
+    </div>
+    <div class="praise">
+      <p class="pt">${pr.t}</p>
+      <p>${pr.b}</p>
+      <p class="thanks">شكرًا لكِ يا ${esc(first)} على جهدكِ وصبركِ حتى آخر باب. فخورة بكِ، وأنتظر أن أراكِ في الغرفة القادمة.<br><span class="mute">معلمة المادة: لطفيه الطلحي</span></p>
+    </div>
+    <p class="mute" style="margin:0">صوّري هذه الشهادة وأرسليها لمعلمتكِ أ. لطفيه الطلحي في تيمز.</p>
+  </section>
+  <div class="row"><button class="btn ghost" id="again">ابدئي من جديد</button></div>`}
+
+function bind(){
+  const g=id=>document.getElementById(id);
+  if(g('rst'))g('rst').onclick=()=>{if(g('rst').dataset.sure){const n=S.name;S=fresh();S.name=n;save();render();scrollTo(0,0)}else{g('rst').dataset.sure=1;g('rst').textContent='اضغطي مرة أخرى للتأكيد (سيُمسح تقدّمكِ)'}};
+  if(S.stage==='start'){g('f').onsubmit=e=>{e.preventDefault();const n=g('nm').value.trim().replace(/\s+/g,' ');if(n.length<3){g('ne').hidden=false;return}
+    Object.assign(S,{name:n,room:0,q:0,stage:'q',got:[],tried:[],mistakes:0,start:Date.now()});save();render();scrollTo(0,0)};return}
+  if(S.stage==='done'){g('again').onclick=()=>{const n=S.name;S=fresh();S.name=n;save();render();scrollTo(0,0)};return}
+  if(S.stage==='code'){const r=ROOMS[S.room];const ins=[...r.code].map((_,i)=>g('c'+i));
+    ins.forEach((inp,i)=>{inp.oninput=()=>{inp.value=AR(EN(inp.value).replace(/\D/g,'').slice(-1));if(inp.value&&ins[i+1])ins[i+1].focus()};
+      inp.onkeydown=e=>{if(e.key==='Backspace'&&!inp.value&&ins[i-1])ins[i-1].focus()}});
+    ins[0].focus();
+    g('cf').onsubmit=e=>{e.preventDefault();const v=ins.map(x=>EN(x.value)).join('');
+      if(v===r.code){S.room++;S.q=0;S.got=[];S.tried=[];S.stage='q';save();render();scrollTo(0,0)}
+      else{g('ce').hidden=false;const f=g('cf');f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake')}};return}
+  const isExit=S.room===ROOMS.length;const Q=isExit?EXIT:ROOMS[S.room].qs[S.q];
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;
+    if(i===Q.a){if(isExit)S.stage='exitSolved';else S.got[S.q]=true}else{S.tried.push(i);S.mistakes++}
+    save();render();if(i!==Q.a)g('qc').classList.add('shake');g('fb').scrollIntoView({behavior:'smooth',block:'nearest'})});
+  if(g('nx'))g('nx').onclick=()=>{S.tried=[];
+    if(isExit){S.stage='done';S.end=Date.now()}else if(S.q<ROOMS[S.room].qs.length-1)S.q++;else S.stage='code';
+    save();render();scrollTo(0,0)};
+}
+render();
+}
+</script>
+</body>
+</html>

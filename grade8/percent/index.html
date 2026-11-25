@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>غرفة الهروب: النسبة المئوية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700;800&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: هادئ ومرتّب، مثل سوق صغير نظيف فيه بطاقات أسعار
+   IDEA: سوق النسبة المئوية: ثلاثة دكاكين وباب خروج، لكل دكّان قفل من خمس خانات
+   PICTURE: بطاقة سعر عليها علامة النسبة المئوية في الترويسة، والقفل
+   COLOUR and TYPE: أزرق رمادي هادئ، أبيض مائل للزرقة، وردي مغبّر للتمييز؛ القاهرة للعناوين، تجوال للنص، نسخ للرياضيات
+   LAYOUT: عمود واحد هادئ */
+:root{color-scheme:light dark;
+--bg:light-dark(#f1f5f8,#111820);--card:light-dark(#fdfeff,#19232d);--ink:light-dark(#1f2f3c,#e5edf3);
+--mute:light-dark(#5d6f7d,#9fb2c1);--sea:light-dark(#33658a,#8dbbe0);--sea2:light-dark(#dfeaf3,#213445);
+--deep:light-dark(#1d3a4f,#14283a);--acc:light-dark(#b24f73,#eb92b2);--ok:light-dark(#2f7d4f,#6fd39a);
+--okbg:light-dark(#e4f2e8,#173d2a);--bad:light-dark(#b8483a,#f0907f);--badbg:light-dark(#fbeae5,#43221d);
+--line:light-dark(#d9e3eb,#2e4153);--chip:light-dark(#1d3a4f,#dcebf7);--on:light-dark(#fff,#0e1a24);
+--display:"Cairo","Tajawal",sans-serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 19px/1.8 Tajawal,"Noto Naskh Arabic",sans-serif;overflow-x:clip}
+button,input{font:inherit;color:inherit}
+h1,h2{font-family:var(--display);font-weight:700;margin:0;line-height:1.35;text-wrap:balance}
+.top{background:var(--deep);color:#eaf2f8;position:relative;overflow:hidden;border-bottom:4px solid var(--acc)}
+.top .in{max-width:680px;margin:auto;padding:20px max(5vw,16px) 50px;position:relative;z-index:1;padding-inline-end:150px}
+.top h1{font-size:clamp(26px,6vw,36px);font-weight:800}
+.top .tg{display:inline-block;font-size:15px;color:#cfe0ee;background:rgba(255,255,255,.1);border-radius:99px;padding:2px 12px;margin-bottom:6px}
+.pyth{position:absolute;left:max(2vw,8px);top:10px;width:140px;height:130px;opacity:.9}
+@media(max-width:480px){.top .in{padding-inline-end:16px}.pyth{opacity:.22;width:120px}}
+.wrap{max-width:680px;margin:-28px auto 40px;padding:0 max(4vw,12px);position:relative;z-index:2;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border-radius:18px;border:1px solid var(--line);padding:clamp(16px,4vw,26px);box-shadow:0 10px 30px -18px rgba(29,58,79,.45)}
+.mute{color:var(--mute)}
+.card h2{font-size:28px!important}
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.door{background:var(--card);border:1.5px solid var(--line);border-radius:6px;border-top:5px solid var(--sea2);padding:8px 4px;text-align:center;font-size:15px;line-height:1.35;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700}
+.door svg{width:24px;height:24px}
+.simsym{width:1em;height:.6em;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;margin:0 2px}
+.dsym{font:700 15px "Noto Naskh Arabic",serif;color:var(--sea);direction:rtl}
+.door.open{border-color:var(--ok);color:var(--ok)}
+.door.now{border-color:var(--sea);border-top-color:var(--acc);color:var(--ink);background:var(--sea2)}
+.lock{display:flex;justify-content:center;gap:clamp(6px,2vw,10px);margin:10px 0 4px;direction:ltr}
+.slot{width:clamp(44px,12vw,56px);height:clamp(54px,14vw,66px);border-radius:6px;background:var(--sea2);display:grid;place-items:center;font:700 clamp(26px,7vw,32px) "Noto Naskh Arabic",serif;color:var(--chip);border:2px dashed var(--sea)}
+.slot.got{background:var(--sea);color:var(--on);border-style:solid}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;align-items:center}
+.tag{font-size:15px;padding:2px 10px;border-radius:99px;background:var(--sea2);color:var(--chip);font-weight:700}
+.tag.hot{background:var(--acc);color:light-dark(#fff,#1b1a0c)}
+.q{font-size:clamp(20px,4.6vw,23px);font-weight:500;line-height:2.15;margin:4px 0 14px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opts.wide{grid-template-columns:minmax(0,1fr)}
+@media(max-width:560px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{min-height:60px;font-size:20px;font-weight:500;padding:8px 12px;border-radius:12px;border:2px solid var(--line);background:transparent;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:start;line-height:2}
+.opt b{flex:none;width:30px;height:30px;border-radius:8px;background:var(--sea2);color:var(--chip);display:grid;place-items:center;font-size:14px}
+.opt:hover:not([disabled]){border-color:var(--sea)}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg);opacity:.7}
+.opt.wrong span{text-decoration:line-through;text-decoration-color:var(--bad)}
+.opt[disabled]{cursor:default}
+.box{margin-top:14px;border-radius:12px;padding:12px 16px;line-height:2.15;font-size:19px}
+.box h4{margin:0 0 4px;font-size:18px}
+.hint{background:light-dark(#fdf3dc,#3a321c);border-inline-start:5px solid var(--acc)}
+.sol{background:var(--okbg);border-inline-start:5px solid var(--ok)}
+.sol>div{overflow-x:auto;padding:2px 0}
+.digit{display:flex;align-items:center;gap:10px;margin-top:12px;font-weight:700;color:var(--sea);font-size:18px}
+.digit .big{font:700 30px "Noto Naskh Arabic",serif;background:var(--sea);color:var(--on);border-radius:8px;padding:0 14px;direction:ltr}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn{min-height:48px;padding:6px 20px;border-radius:10px;border:0;background:var(--sea);color:var(--on);font-weight:800;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--sea);border:2px solid var(--sea)}
+.btn.coral{background:var(--acc);color:light-dark(#fff,#1b1a0c)}
+.btn:focus-visible,.opt:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+label{display:block;font-weight:700;margin-bottom:4px}
+.namein{width:100%;min-height:50px;border-radius:10px;border:2px solid var(--line);background:var(--bg);padding:6px 14px;font-size:18px}
+.codebox{display:flex;gap:8px;justify-content:center;direction:ltr;margin:6px 0}
+.codebox input{width:52px;height:62px;text-align:center;font:700 28px "Noto Naskh Arabic",serif;background:var(--bg);color:var(--sea);border:2px solid var(--sea);border-radius:8px}
+.err{color:var(--bad);font-weight:700;text-align:center;margin:6px 0 0}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--mute);font-size:16px}
+.link{background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;font-size:14px;padding:0}
+/* الرياضيات */
+.m{font-family:"Noto Naskh Arabic",serif;font-weight:600;white-space:nowrap;unicode-bidi:isolate;direction:rtl;font-size:1.1em}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 2px;font-size:.92em}
+.fr>span{padding:0 3px}.fr>span:first-child{border-bottom:1.6px solid currentColor}
+.mx{display:inline;white-space:nowrap}.mx>.fr{margin-inline-end:3px}
+.pw{unicode-bidi:isolate;direction:rtl}.pw>.pb,.pw>sup{unicode-bidi:isolate}
+.pw sup{font-size:.68em;vertical-align:.95em;line-height:0}
+.fr .pw sup{vertical-align:.6em}
+.ov{text-decoration:overline;text-decoration-thickness:1.5px}
+/* إشارة الجذر بالاتجاه العربي: الإشارة يمين والخط فوق العدد */
+.rt{display:inline-flex;align-items:stretch;margin:0 1px;padding-top:2px}
+.rs{width:.6em;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round;overflow:visible}
+.rr{align-self:baseline;border-top:1.7px solid currentColor;padding:1px 3px 0;line-height:1.35}
+.rr .fr{vertical-align:middle;margin:2px 1px}
+.tb{border-collapse:collapse;margin:10px auto;font-size:16px;line-height:1.8}.tb th,.tb td{border:1px solid var(--line);padding:4px 14px;text-align:center}.tb th{background:var(--sea2);color:var(--chip)}
+/* الرسومات */
+.fig{display:block;margin:10px auto;width:100%;max-width:340px;height:auto}
+.fig.tri{max-width:300px}
+.ax{stroke:var(--ink);stroke-width:2}.axf{fill:var(--ink)}
+.tx{fill:var(--ink);font-size:17px;font-weight:600}.tx.b{font-weight:700}.tx.big{font-size:21px;font-weight:700}.tx.s{font-size:12px}
+.pt{fill:var(--acc)}.sh{fill:var(--sea2);stroke:var(--sea);stroke-width:2.5;stroke-linejoin:round}
+.frame{fill:none;stroke:var(--mute);stroke-width:1.5}
+.c1{fill:light-dark(rgba(91,74,134,.16),rgba(180,163,224,.18));stroke:var(--sea);stroke-width:2}
+.c2{fill:light-dark(rgba(196,132,26,.14),rgba(240,180,76,.16));stroke:var(--acc);stroke-width:2}
+.gr{stroke:var(--line);stroke-width:1}.sg{stroke:var(--sea);stroke-width:3}
+.sh2{fill:light-dark(rgba(95,122,53,.16),rgba(169,196,110,.18));stroke:var(--acc);stroke-width:2.5;stroke-linejoin:round}
+.arc{fill:none;stroke:var(--ink);stroke-width:1.4}.thin{stroke-width:1.4}
+.ray{stroke:var(--mute);stroke-width:1.6;stroke-dasharray:5 4}.dim{stroke:var(--sea);stroke-width:2}
+.body{fill:var(--sea)}
+.cell{fill:var(--card);stroke:var(--sea);stroke-width:2}.cell.on{fill:var(--acc);fill-opacity:.75}
+.bar1{fill:var(--sea2);stroke:var(--sea);stroke-width:2}.bar2{fill:var(--acc);fill-opacity:.35;stroke:var(--acc);stroke-width:2}.trunk{fill:light-dark(#8a5a3c,#b98a68)}.leaf{fill:light-dark(#7d9a4a,#88a85a)}
+.tb.sm{margin:0;font-size:16px;line-height:1.5}.tb.sm th,.tb.sm td{padding:2px 10px}.opt .tb{background:var(--card)}
+/* الشهادة */
+.cert{border:3px double var(--sea);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;background:light-dark(#f8fbfe,#16212b)}
+.cert h1{color:var(--sea);font-size:clamp(26px,6vw,36px)}
+.cert .nm{font-family:var(--display);font-size:clamp(26px,7vw,36px);color:var(--acc);line-height:1.4}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
+.stat{background:var(--sea2);border-radius:10px;padding:10px 4px}
+.stat .v{font:700 26px "Noto Naskh Arabic",serif;color:var(--chip)}
+.stat .l{font-size:15px;color:var(--chip)}
+.praise{background:var(--okbg);border-radius:12px;padding:16px;width:100%;line-height:1.95;text-align:center}
+.praise .pt{font-family:var(--display);font-size:22px;color:var(--ok);margin:0;fill:none}
+.praise p{margin:6px 0}
+.praise .thanks{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+.shake{animation:shake .35s}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .45s ease-out}@keyframes pop{from{transform:scale(.7);opacity:.3}to{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.shake,.pop{animation:none}}
+@media(max-width:400px){.codebox input{width:46px;height:56px}.door{font-size:13px}}
+</style>
+</head>
+<body>
+<header class="top">
+<svg class="pyth" viewBox="0 0 140 130" aria-hidden="true">
+<path d="M40 20 H118 V100 H40 L14 60 Z" fill="#eb92b2" opacity=".9"/>
+<circle cx="30" cy="60" r="5" fill="#1d3a4f"/>
+<text x="80" y="76" text-anchor="middle" fill="#1d3a4f" font-size="44" font-weight="700" font-family="sans-serif">٪</text>
+</svg>
+<div class="in">
+<span class="tg">الصف الثاني المتوسط · الفصل الرابع · أ. لطفيه الطلحي</span>
+<h1>غرفة الهروب: النسبة المئوية</h1>
+</div>
+</header>
+<main class="wrap" id="app" aria-live="polite"></main>
+<script>
+{
+const F=(n,d)=>`<span class="fr"><span>${n}</span><span>${d}</span></span>`;
+const X=(w,n,d)=>`<span class="mx">${F(n,d)}<span>${w}</span></span>`;
+const P=(b,e)=>`<span class="pw"><span class="pb">${b}</span><sup>${e}</sup></span>`;
+const m=s=>`<span class="m">${s}</span>`;
+const N='−',PC='٪';
+const T=(head,rows,c)=>`<table class="tb ${c||''}"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+const HOT='مهارة تفكير عليا';
+const SV='font-family="Tajawal,sans-serif"';
+const t=(x,y,s,a,c)=>`<text x="${x}" y="${y}" text-anchor="${a||'middle'}" class="tx ${c||''}" ${SV}>${s}</text>`;
+/* شبكة ٤ × ٥ فيها ٧ مربعات مظللة */
+const GRID=()=>{const on=new Set(['0,0','0,3','1,1','1,4','2,2','3,0','3,3']);let s=`<svg class="fig" viewBox="0 0 260 214" style="max-width:260px" direction="ltr" role="img" aria-label="شكل مقسّم إلى ٢٠ مربعًا متطابقًا، ٧ منها مظللة">`;
+for(let r=0;r<4;r++)for(let c=0;c<5;c++)s+=`<rect x="${10+c*48}" y="${10+r*48}" width="48" height="48" class="${on.has(r+','+c)?'cell on':'cell'}"/>`;return s+`</svg>`};
+/* نموذج شريطي: السعر الأصلي والربح */
+const BAR=(a,b,la,lb,pa,pb)=>`<svg class="fig" style="max-width:300px" viewBox="0 0 330 100" direction="ltr" role="img" aria-label="نموذج شريطي"><rect x="10" y="30" width="250" height="34" class="bar1"/><rect x="260" y="30" width="60" height="34" class="bar2"/>${t(135,53,la,'middle','b')}${t(290,53,lb,'middle','b')}${t(135,22,pa,'middle','b')}${t(290,22,pb,'middle','b')}${t(165,90,'ثمن البيع = '+a,'middle','b')}</svg>`;
+
+const ROOMS=[
+{name:'دكّان الحساب الذهني',sym:'٪',intro:`الدكّان مقفل برمز من خمسة أرقام. كل إجابة صحيحة تكشف لكِ رقمًا منه. احسبي ذهنيًّا أو في دفتركِ قبل أن تختاري.`,code:'29164',
+qs:[
+{q:`احسب ذهنيًّا: ${m(`${X(66,2,3)}${PC} من 48`)}`,
+o:[m('32'),m('30'),m('16'),m('31.7')],a:0,
+h:`النسبة ${m(`${X(66,2,3)}${PC}`)} تكافئ الكسر الاعتيادي ${m(F(2,3))}. أوجدي ${m(F(1,3))} العدد ${m('48')} أولًا.`,
+s:[m(`${X(66,2,3)}${PC} = ${F(2,3)}`),m(`${F(1,3)} × 48 = 16`),m(`${F(2,3)} × 48 = 2 × 16 = 32`),`الخيار ${m('16')} هو ${m(`${X(33,1,3)}${PC}`)} فقط من العدد.`]},
+{hot:'اكتشف الخطأ',q:`أرادت ريم وسارة حساب ${m(`1${PC} من 380`)} ذهنيًّا:<br>ريم: ${m(`1${PC} من 380 = 38`)}<br>سارة: ${m(`1${PC} من 380 = 3.8`)}<br>أيّهما إجابتها صحيحة؟`,wide:1,
+o:[`ريم، لأننا نحذف صفرًا واحدًا من العدد`,`سارة، لأن ${m(`1${PC} = 0.01`)}، فنحرّك الفاصلة العشرية منزلتين إلى اليسار`,`كلتاهما صحيحة`,`كلتاهما خطأ، والصواب ${m('0.38')}`],a:1,
+h:`اكتبي ${m(`1${PC}`)} على صورة كسر عشري. وتذكّري: ${m(`10${PC}`)} تحرّك الفاصلة منزلة واحدة، فكم منزلة تحرّكها ${m(`1${PC}`)}؟`,
+s:[m(`1${PC} = ${F(1,100)} = 0.01`),m(`0.01 × 380 = 3.8`),`ريم حسبت ${m(`10${PC}`)} من العدد وليس ${m(`1${PC}`)}: ${m(`10${PC} من 380 = 38`)}`,`إذن إجابة سارة هي الصحيحة.`]},
+{q:`قدّر: ${m(`38${PC} من 81`)}`,
+o:[m('27'),m('43'),m('32'),m('308')],a:2,
+h:`استعملي أعدادًا متناغمة: ${m(`38${PC}`)} قريبة من ${m(`40${PC} = ${F(2,5)}`)}، و ${m('81')} قريب من ${m('80')}.`,
+s:[m(`38${PC} ≈ 40${PC} = ${F(2,5)}`)+' و '+m('81 ≈ 80'),m(`${F(2,5)} × 80 = 2 × 16 = 32`),`إذن ${m(`38${PC} من 81`)} تساوي ${m('32')} تقريبًا.`,`تحقّق: القيمة الدقيقة ${m('30.78')}، وهي قريبة من ${m('32')} ✓`]},
+{q:`الشكل الآتي مقسّم إلى مربعات متطابقة. ما النسبة المئوية للجزء المظلّل؟ وإذا كانت مساحة الشكل كاملًا ${m('60')} سم<sup>2</sup>، فما مساحة الجزء المظلّل؟${GRID()}`,wide:1,
+o:[`${m(`7${PC}`)}، والمساحة ${m('7')} سم<sup>2</sup>`,`${m(`35${PC}`)}، والمساحة ${m('35')} سم<sup>2</sup>`,`${m(`20${PC}`)}، والمساحة ${m('12')} سم<sup>2</sup>`,`${m(`35${PC}`)}، والمساحة ${m('21')} سم<sup>2</sup>`],a:3,
+h:`عُدّي المربعات كلها، ثم المظلّلة. اكتبي الكسر ثم حوّليه إلى نسبة مئوية بمقام ${m('100')}.`,
+s:[`عدد المربعات ${m('4 × 5 = 20')}، والمظلّل منها ${m('7')}`,m(`${F(7,20)} = ${F(35,100)} = 35${PC}`),m(`35${PC} من 60 = 0.35 × 60 = 21`)+' سم<sup>2</sup>',`أو: مساحة المربع الواحد ${m(`${F(60,20)} = 3`)} سم<sup>2</sup>، و ${m('7 × 3 = 21')} سم<sup>2</sup>`]}
+]},
+{name:'دكّان المعادلة',sym:'≈',intro:`أحسنتِ! هنا المعادلة المئوية: الجزء = النسبة المئوية × الكل. حدّدي في كل مسألة: ما الجزء؟ وما الكل؟ وما النسبة؟`,code:'57038',
+qs:[
+{q:`ما العدد الذي ${m(`40${PC}`)} منه يساوي ${m('68')}؟`,
+o:[m('27.2'),m('170'),m('108'),m('272')],a:1,
+h:`الكل هو المجهول. اكتبي المعادلة المئوية: ${m('68 = 0.4 × ك')}، ثم اقسمي الطرفين على ${m('0.4')}.`,
+s:[`الجزء = النسبة المئوية × الكل`,m('68 = 0.4 × ك'),m(`${F(68,'0.4')} = ${F('0.4ك','0.4')}`),m('ك = 170'),`تحقّق: ${m(`40${PC} من 170 = 68`)} ✓`,`الخيار ${m('27.2')} هو ${m(`40${PC}`)} من ${m('68')}، وليس العدد المطلوب.`]},
+{q:`ما النسبة المئوية للعدد ${m('42')} من ${m('280')}؟`,
+o:[m(`6.7${PC}`),m(`12${PC}`),m(`24${PC}`),m(`15${PC}`)],a:3,
+h:`الجزء ${m('42')}، والكل ${m('280')}، والنسبة مجهولة: ${m('42 = ن × 280')}.`,
+s:[m('42 = ن × 280'),m(`ن = ${F(42,280)} = 0.15`),m(`0.15 = 15${PC}`),`تحقّق من المعقولية: ${m(`10${PC}`)} من ${m('280')} = ${m('28')}، و ${m(`20${PC}`)} = ${m('56')}، و ${m('42')} بينهما ✓`]},
+{hot:'التحقق من معقولية الإجابة',q:`ادّخرت هند ${m('2480')} ريالًا، وتريد أن تنفق ${m(`25${PC}`)} منها على شراء كتب. أيّ المبالغ الآتية هو المبلغ المعقول الذي ستنفقه؟`,
+o:[m('620')+' ريالًا',m('248')+' ريالًا',m('992')+' ريالًا',m('1240')+' ريالًا'],a:0,
+h:`${m(`25${PC} = ${F(1,4)}`)}. قدّري ربع المبلغ: ${m('2480')} قريب من ${m('2400')}.`,
+s:[`تقدير: ${m(`${F(1,4)} × 2400 = 600`)}، فالإجابة قريبة من ${m('600')}`,`بالضبط: ${m(`${F(1,4)} × 2480 = 620`)} ريالًا ✓`,`${m('248')} هو ${m(`10${PC}`)}، و ${m('1240')} هو ${m(`50${PC}`)}، و ${m('992')} هو ${m(`40${PC}`)}: كلها غير معقولة.`]},
+{q:`اشترى تاجر هاتفًا بمبلغ ${m('800')} ريال، وباعه بربح ${m(`15${PC}`)}. بكم باعه؟`,
+o:[m('120')+' ريالًا',m('815')+' ريالًا',m('920')+' ريالًا',m('680')+' ريالًا'],a:2,
+h:`أوجدي مقدار الربح أولًا: ${m(`15${PC}`)} من ${m('800')}، ثم أضيفيه إلى ثمن الشراء.`,
+s:[`مقدار الربح: ${m('0.15 × 800 = 120')} ريالًا`,`ثمن البيع: ${m('800 + 120 = 920')} ريالًا`,`طريقة أخرى: ${m(`100${PC} + 15${PC} = 115${PC}`)}، و ${m('1.15 × 800 = 920')}`,BAR('٩٢٠ ريالًا','','٨٠٠ ريال','١٢٠','١٠٠٪','١٥٪'),`الخيار ${m('120')} هو الربح فقط، و ${m('680')} ينتج من الطرح بدل الجمع.`]}
+]},
+{name:'دكّان التغيّر',sym:'↑↓',intro:`الدكّان الأخير قبل الخروج! زيادة ونقصان وخصم. تذكّري: نقسم دائمًا على الكمية <b>الأصلية</b>.`,code:'81425',
+qs:[
+{hot:'اكتشف الخطأ',q:`ارتفع سعر تذكرة من ${m('40')} ريالًا إلى ${m('50')} ريالًا. حسبت نورة الزيادة المئوية: ${m(`${F(10,50)} = 20${PC}`)}، وحسبتها لمى: ${m(`${F(10,40)} = 25${PC}`)}. أيّهما إجابتها صحيحة؟`,wide:1,
+o:[`نورة، لأنها قسمت على السعر الجديد`,`لمى، لأن التغيّر المئوي = مقدار التغيّر ÷ الكمية الأصلية`,`كلتاهما صحيحة`,`كلتاهما خطأ، والصواب ${m(`10${PC}`)}`],a:1,
+h:`التغيّر المئوي = ${m(F('مقدار التغيّر','الكمية الأصلية'))}. ما السعر الأصلي هنا؟`,
+s:[`مقدار التغيّر: ${m('50 − 40 = 10')} ريالات`,`الكمية الأصلية ${m('40')} (السعر القديم)`,m(`${F(10,40)} = 0.25 = 25${PC}`)+' زيادة',`نورة قسمت على السعر الجديد ${m('50')}، وهذا خطأ.`]},
+{q:`كان متوسط عدد زوّار موقع إلكتروني ${m('80')} زائرًا يوميًّا، ثم أصبح ${m('68')} زائرًا. أوجد التغيّر المئوي، وبيّن نوعه.`,
+o:[`${m(`12${PC}`)} نقصان`,`${m(`15${PC}`)} زيادة`,`${m(`15${PC}`)} نقصان`,`${m(`17.6${PC}`)} نقصان`],a:2,
+h:`العدد الجديد أصغر من الأصلي، إذن هو نقصان. اقسمي مقدار التغيّر على العدد الأصلي ${m('80')}.`,
+s:[`مقدار التغيّر: ${m('80 − 68 = 12')}`,m(`${F(12,80)} = 0.15 = 15${PC}`),`العدد نقص، إذن التغيّر <b>نقصان مئوي</b> ${m(`15${PC}`)}`,`الخيار ${m(`17.6${PC}`)} ينتج من القسمة على ${m('68')} (العدد الجديد).`]},
+{hot:HOT,q:`سعر غسالة ${m('2000')} ريال. عُرضت بخصم ${m(`30${PC}`)}، ثم أُضيف خصم آخر ${m(`20${PC}`)} على السعر بعد الخصم الأول. ما السعر النهائي للغسالة؟`,
+o:[m('1000')+' ريال',m('1400')+' ريال',m('1600')+' ريال',m('1120')+' ريالًا'],a:3,
+h:`الخصم الثاني يُحسب من السعر الجديد وليس من ${m('2000')}. لا تجمعي الخصمين!`,
+s:[`الخصم الأول: ${m(`30${PC} من 2000 = 600`)}، فيصبح السعر ${m('2000 − 600 = 1400')}`,`الخصم الثاني: ${m(`20${PC} من 1400 = 280`)}`,`السعر النهائي: ${m('1400 − 280 = 1120')} ريالًا`,`الخيار ${m('1000')} ينتج من جمع الخصمين ${m(`50${PC}`)}، وهذا خطأ.`]},
+{q:`بعد خصم ${m(`25${PC}`)} أصبح سعر حقيبة ${m('90')} ريالًا. ما سعرها الأصلي؟`,
+o:[m('120')+' ريالًا',m('112.5')+' ريالًا',m('67.5')+' ريالًا',m('115')+' ريالًا'],a:0,
+h:`بعد خصم ${m(`25${PC}`)} يبقى ${m(`75${PC}`)} من السعر الأصلي. إذن ${m(`75${PC}`)} من الأصلي = ${m('90')}.`,
+s:[m(`100${PC} − 25${PC} = 75${PC}`),m('90 = 0.75 × ك'),m(`ك = ${F(90,'0.75')} = 120`)+' ريالًا',`تحقّق: ${m(`25${PC} من 120 = 30`)}، و ${m('120 − 30 = 90')} ✓`,`الخيار ${m('112.5')} ينتج من زيادة ${m(`25${PC}`)} على ${m('90')}، وهذا خطأ لأن الخصم حُسب من السعر الأصلي.`]}
+]}];
+
+const EXIT={hot:'سؤال الهروب',q:`تحدٍّ أخير: ارتفع سعر حذاء بنسبة ${m(`20${PC}`)}، وبعد شهر عُرض بخصم ${m(`20${PC}`)} على سعره الجديد. ما العلاقة بين السعر النهائي والسعر الأصلي؟`,wide:1,
+o:[`السعر النهائي يساوي السعر الأصلي`,`السعر النهائي أقل من الأصلي بنسبة ${m(`4${PC}`)}`,`السعر النهائي أكثر من الأصلي بنسبة ${m(`4${PC}`)}`,`السعر النهائي أقل من الأصلي بنسبة ${m(`20${PC}`)}`],a:1,
+h:`جرّبي سعرًا أصليًّا سهلًا مثل ${m('100')} ريال. هل يُحسب الخصم من ${m('100')} أم من السعر بعد الزيادة؟`,
+s:[`نفرض السعر الأصلي ${m('100')} ريال`,`الزيادة: ${m(`20${PC} من 100 = 20`)}، فيصبح السعر ${m('100 + 20 = 120')} ريالًا`,`الخصم: ${m(`20${PC} من 120 = 24`)} ريالًا`,`السعر النهائي: ${m('120 − 24 = 96')} ريالًا`,`التغيّر: ${m(`${F(4,100)} = 4${PC}`)} نقصان`,`السبب: الزيادة حُسبت من ${m('100')}، والخصم حُسب من ${m('120')} الأكبر، فكان الخصم أكبر من الزيادة.`]};
+
+ROOMS[0].qs.push({q:`احسب ذهنيًّا: ${m(`75${PC} من 84`)}`,
+o:[m('21'),m('63'),m('75'),m('56')],a:1,
+h:`${m(`75${PC} = ${F(3,4)}`)}. أوجدي ربع العدد ${m('84')} أولًا.`,
+s:[m(`75${PC} = ${F(3,4)}`),m(`${F(1,4)} × 84 = 21`),m(`${F(3,4)} × 84 = 3 × 21 = 63`),`الخيار ${m('21')} هو ${m(`25${PC}`)} فقط من العدد.`]});
+ROOMS[1].qs.push({q:`ما قيمة ${m(`12.5${PC} من 320`)}؟`,
+o:[m('4'),m('400'),m('25.6'),m('40')],a:3,
+h:`${m(`12.5${PC} = 0.125 = ${F(1,8)}`)}. الجزء = النسبة × الكل.`,
+s:[m(`12.5${PC} = ${F(1,8)}`),m(`${F(1,8)} × 320 = 40`),`أو: ${m('0.125 × 320 = 40')}`,`تحقّق: ${m(`10${PC}`)} من ${m('320')} = ${m('32')}، والنسبة أكبر قليلًا من ${m(`10${PC}`)}، فالناتج ${m('40')} معقول ✓`]});
+ROOMS[2].qs.push({q:`سعر قميص ${m('80')} ريالًا، وعليه خصم ${m(`15${PC}`)}. ما سعر بيعه بعد الخصم؟`,
+o:[m('12')+' ريالًا',m('92')+' ريالًا',m('68')+' ريالًا',m('65')+' ريالًا'],a:2,
+h:`أوجدي مقدار الخصم أولًا: ${m(`15${PC}`)} من ${m('80')}، ثم اطرحيه من السعر الأصلي.`,
+s:[`مقدار الخصم: ${m('0.15 × 80 = 12')} ريالًا`,`سعر البيع: ${m('80 − 12 = 68')} ريالًا`,`طريقة أخرى: ${m(`100${PC} − 15${PC} = 85${PC}`)}، و ${m('0.85 × 80 = 68')}`,`الخيار ${m('12')} هو الخصم فقط، و ${m('92')} ينتج من الجمع بدل الطرح.`]});
+const SLOTS=[[0],[1],[2],[3],[4]];
+const KEY='escape-g8-ch4-v2';
+const LETTERS=['أ','ب','جـ','د'];
+const DIG='٠١٢٣٤٥٦٧٨٩';
+const AR=s=>String(s).replace(/\d/g,d=>DIG[d]);
+const EN=s=>String(s).replace(/[٠-٩]/g,d=>DIG.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+const arab=el=>{const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){n.nodeValue=n.nodeValue.replace(/(\d)\.(\d)/g,'$1,$2').replace(/\d/g,d=>DIG[d])}};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fresh=()=>({name:'',room:0,q:0,stage:'start',got:[],tried:[],mistakes:0,start:0,end:0});
+let S;try{S=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){S=fresh()}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const app=document.getElementById('app');
+const TOTAL=ROOMS.reduce((n,r)=>n+r.qs.length,0)+1;
+
+const lockSvg=open=>open
+ ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>`
+ :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+function mapHtml(){
+  const names=ROOMS.map(r=>r.name).concat(['باب الخروج']);
+  return `<nav class="map">${names.map((n,i)=>{const done=i<S.room||S.stage==='done';const now=i===S.room&&S.stage!=='done'&&S.stage!=='start';
+    return `<div class="door ${done?'open':''} ${now?'now':''}">${lockSvg(done)}<span>${n}</span>${i<ROOMS.length?`<span class="dsym">${ROOMS[i].sym}</span>`:''}</div>`}).join('')}</nav>`}
+function slotsHtml(){const code=ROOMS[S.room].code;const got=new Set();S.got.forEach((g,j)=>{if(g)SLOTS[j].forEach(x=>got.add(x))});
+  return `<div class="lock" aria-label="أرقام الرمز">${[...code].map((c,i)=>`<div class="slot ${got.has(i)?'got':''}">${got.has(i)?c:'؟'}</div>`).join('')}</div>`}
+const foot=()=>`<div class="foot"><span>${esc(S.name)}</span><span>المحاولات الخاطئة: ${S.mistakes}</span><button class="link" id="rst">ابدئي من جديد</button></div>`;
+
+function render(){
+  let h='';
+  if(S.stage==='start')h=startHtml();
+  else if(S.stage==='done')h=doneHtml();
+  else if(S.stage==='code')h=codeHtml();
+  else if(S.room===ROOMS.length)h=qHtml(EXIT,true);
+  else h=qHtml(ROOMS[S.room].qs[S.q],false);
+  app.innerHTML=h;arab(app);bind();
+}
+
+function startHtml(){
+  return `${mapHtml()}
+  <section class="card">
+    <h2 style="font-size:26px">أهلًا بكِ في سوق النسبة المئوية!</h2>
+    <p class="mute" style="margin:6px 0 0">أنتِ داخل سوق صغير فيه ثلاثة دكاكين مقفلة وباب خروج. في كل دكّان ${'5'} أسئلة متنوعة من الفصل كاملًا، وكل إجابة صحيحة تعطيكِ رقمًا من رمز القفل. اجمعي الرمز واكتبيه لتنتقلي للدكّان التالي، وفي النهاية سؤال الهروب.</p>
+  </section>
+  <form class="card" id="f">
+    <label for="nm">اسمكِ الثلاثي</label>
+    <input class="namein" id="nm" autocomplete="name" value="${esc(S.name)}" required>
+    <p class="err" id="ne" hidden>فضلًا اكتبي اسمكِ كاملًا.</p>
+    <div class="row"><button class="btn" type="submit">ادخلي دكّان الحساب الذهني</button></div>
+  </form>
+  <section class="card"><b>القواعد</b>
+    <p class="mute" style="margin:4px 0 0">إذا أخطأتِ يظهر لكِ تلميح، وتقدرين تحاولين مرة ثانية. وإذا أصبتِ يظهر لكِ الحل بالخطوات. حلّي في دفتركِ قبل أن تختاري. في النهاية تظهر لكِ شهادة الهروب: صوّريها وأرسليها لمعلمتكِ أ. لطفيه الطلحي في تيمز.</p>
+  </section>`}
+
+function qHtml(Q,isExit){
+  const r=isExit?null:ROOMS[S.room];
+  const answered=isExit?S.stage==='exitSolved':!!S.got[S.q];
+  return `${mapHtml()}
+  ${isExit?`<section class="card"><h2 style="font-size:26px">باب الخروج 🗝️</h2><p class="mute" style="margin:4px 0 0">سؤال أخير يجمع أفكار الفصل. أجيبي عنه لتخرجي وتستلمي شهادتكِ.</p></section>`
+   :`<section class="card"><h2 style="font-size:26px">${r.name}</h2>${S.q===0&&!answered?`<p class="mute" style="margin:4px 0 0">${r.intro}</p>`:''}${slotsHtml()}</section>`}
+  <section class="card" id="qc">
+    <div class="tags"><span class="tag">${isExit?'السؤال الأخير':`السؤال ${S.q+1} من ${r.qs.length}`}</span>${Q.hot?`<span class="tag hot">${Q.hot}</span>`:''}</div>
+    <div class="q">${Q.q}</div>
+    <div class="opts${Q.wide?' wide':''}">${Q.o.map((o,i)=>{const wrong=S.tried.includes(i),right=answered&&i===Q.a;
+      return `<button class="opt ${wrong?'wrong':''} ${right?'right':''}" data-i="${i}" ${answered||wrong?'disabled':''}><b>${LETTERS[i]}</b><span>${o}</span></button>`}).join('')}</div>
+    <div id="fb">${fbHtml(Q,answered,isExit)}</div>
+  </section>
+  ${foot()}`}
+
+function fbHtml(Q,answered,isExit){
+  if(answered){
+    const code=isExit?'':ROOMS[S.room].code;const dg=isExit?'':SLOTS[S.q].map(x=>code[x]).join('');
+    const last=!isExit&&S.q===ROOMS[S.room].qs.length-1;
+    return `<div class="box sol"><h4>إجابة صحيحة، أحسنتِ! طريقة الحل:</h4>${Q.s.map(x=>`<div>${x}</div>`).join('')}</div>
+    ${isExit?'':`<div class="digit pop">${dg.length>1?'حصلتِ على رقمين من الرمز:':'حصلتِ على رقم من الرمز:'} <span class="big">${dg}</span></div>`}
+    <div class="row"><button class="btn ${isExit?'coral':''}" id="nx">${isExit?'اخرجي واستلمي شهادتكِ 🎓':last?'اذهبي إلى القفل ←':'السؤال التالي ←'}</button></div>`}
+  if(S.tried.length)return `<div class="box hint"><h4>ليست الإجابة الصحيحة. تلميح:</h4>${Q.h}</div>`;
+  return ''}
+
+function codeHtml(){
+  const r=ROOMS[S.room];
+  return `${mapHtml()}
+  <section class="card"><h2 style="font-size:26px">افتحي قفل ${r.name}</h2><p class="mute" style="margin:4px 0 0">اكتبي أرقام الرمز بالترتيب نفسه الظاهر في الخانات، من اليسار إلى اليمين.</p>${slotsHtml()}</section>
+  <form class="card" id="cf">
+    <div class="codebox">${[...r.code].map((_,i)=>`<input id="c${i}" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="الرقم ${i+1}">`).join('')}</div>
+    <p class="err" id="ce" hidden>الرمز غير صحيح. راجعي الأرقام في الخانات بالأعلى.</p>
+    <div class="row" style="justify-content:center"><button class="btn coral" type="submit">افتحي الباب</button></div>
+  </form>
+  ${foot()}`}
+
+function doneHtml(){
+  const mins=Math.max(1,Math.round((S.end-S.start)/60000));
+  let date='';try{date=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(new Date(S.end))}catch(e){}
+  const first=S.name.trim().split(/\s+/)[0];
+  const pr=S.mistakes===0
+   ?{t:'أداء كامل بدون أي خطأ!',b:'فهمكِ للنسبة المئوية واضح وقوي. حافظي على هذا المستوى، وراجعي بنفس الهمّة، والدرجة الكاملة في الاختبار المركزي بإذن الله قريبة منكِ.'}
+   :S.mistakes<=4
+   ?{t:'إنجاز رائع!',b:'أخطاؤكِ قليلة، وكل خطأ صحّحتِه صار خطوة تعلّمتِها. ارجعي للأسئلة التي توقفتِ عندها مرة ثانية، وستدخلين الاختبار بثقة بإذن الله.'}
+   :{t:'ما استسلمتِ ووصلتِ!',b:'كل محاولة خاطئة كانت درسًا، والمهم أنكِ أكملتِ حتى فتحتِ كل الأبواب. أعيدي الغرفة مرة ثانية وستلاحظين بنفسكِ كم تحسّنتِ. الاستمرار سرّ النجاح.'};
+  return `${mapHtml()}
+  <section class="card cert pop">
+    <span class="tag">شهادة الهروب · الفصل الرابع: النسبة المئوية</span>
+    <h1>خرجتِ من سوق النسبة المئوية!</h1>
+    <div class="nm">${esc(S.name)}</div>
+    <p class="mute" style="margin:0">الصف الثاني المتوسط${date?' · '+date:''}</p>
+    <div class="stats">
+      <div class="stat"><div class="v">${TOTAL}</div><div class="l">سؤالًا محلولًا</div></div>
+      <div class="stat"><div class="v">${S.mistakes}</div><div class="l">محاولة خاطئة</div></div>
+      <div class="stat"><div class="v">${mins}</div><div class="l">دقيقة</div></div>
+    </div>
+    <div class="praise">
+      <p class="pt">${pr.t}</p>
+      <p>${pr.b}</p>
+      <p class="thanks">شكرًا لكِ يا ${esc(first)} على جهدكِ وصبركِ حتى آخر باب. فخورة بكِ، وأنتظر أن أراكِ في الغرفة القادمة.<br><span class="mute">معلمة المادة: لطفيه الطلحي</span></p>
+    </div>
+    <p class="mute" style="margin:0">صوّري هذه الشهادة وأرسليها لمعلمتكِ أ. لطفيه الطلحي في تيمز.</p>
+  </section>
+  <div class="row"><button class="btn ghost" id="again">ابدئي من جديد</button></div>`}
+
+function bind(){
+  const g=id=>document.getElementById(id);
+  if(g('rst'))g('rst').onclick=()=>{if(g('rst').dataset.sure){const n=S.name;S=fresh();S.name=n;save();render();scrollTo(0,0)}else{g('rst').dataset.sure=1;g('rst').textContent='اضغطي مرة أخرى للتأكيد (سيُمسح تقدّمكِ)'}};
+  if(S.stage==='start'){g('f').onsubmit=e=>{e.preventDefault();const n=g('nm').value.trim().replace(/\s+/g,' ');if(n.length<3){g('ne').hidden=false;return}
+    Object.assign(S,{name:n,room:0,q:0,stage:'q',got:[],tried:[],mistakes:0,start:Date.now()});save();render();scrollTo(0,0)};return}
+  if(S.stage==='done'){g('again').onclick=()=>{const n=S.name;S=fresh();S.name=n;save();render();scrollTo(0,0)};return}
+  if(S.stage==='code'){const r=ROOMS[S.room];const ins=[...r.code].map((_,i)=>g('c'+i));
+    ins.forEach((inp,i)=>{inp.oninput=()=>{inp.value=AR(EN(inp.value).replace(/\D/g,'').slice(-1));if(inp.value&&ins[i+1])ins[i+1].focus()};
+      inp.onkeydown=e=>{if(e.key==='Backspace'&&!inp.value&&ins[i-1])ins[i-1].focus()}});
+    ins[0].focus();
+    g('cf').onsubmit=e=>{e.preventDefault();const v=ins.map(x=>EN(x.value)).join('');
+      if(v===r.code){S.room++;S.q=0;S.got=[];S.tried=[];S.stage='q';save();render();scrollTo(0,0)}
+      else{g('ce').hidden=false;const f=g('cf');f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake')}};return}
+  const isExit=S.room===ROOMS.length;const Q=isExit?EXIT:ROOMS[S.room].qs[S.q];
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;
+    if(i===Q.a){if(isExit)S.stage='exitSolved';else S.got[S.q]=true}else{S.tried.push(i);S.mistakes++}
+    save();render();if(i!==Q.a)g('qc').classList.add('shake');g('fb').scrollIntoView({behavior:'smooth',block:'nearest'})});
+  if(g('nx'))g('nx').onclick=()=>{S.tried=[];
+    if(isExit){S.stage='done';S.end=Date.now()}else if(S.q<ROOMS[S.room].qs.length-1)S.q++;else S.stage='code';
+    save();render();scrollTo(0,0)};
+}
+render();
+}
+</script>
+</body>
+</html>

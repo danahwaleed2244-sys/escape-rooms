@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>غرفة الهروب: الأعداد النسبية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: هادئ ومشجّع، رحلة غوص في الخليج
+   IDEA: ثلاث غرف تحت الماء وباب خروج، لكل غرفة قفل من خمس خانات
+   PICTURE: القفل وخريطة الأبواب
+   COLOUR and TYPE: أزرق مخضر بحري، رمل فاتح، مرجاني؛ لاله زار للعناوين، تجوال للنص، نسخ للرياضيات
+   LAYOUT: عمود واحد هادئ */
+:root{color-scheme:light dark;
+--bg:light-dark(#f5f0e6,#0c1f22);--card:light-dark(#fffdf8,#12302f);--ink:light-dark(#173234,#e6efe9);
+--mute:light-dark(#5b7472,#9fb9b4);--sea:light-dark(#1d6b6b,#5cc2b5);--sea2:light-dark(#d6ebe5,#1b4644);
+--deep:light-dark(#0f4c4f,#08393b);--coral:light-dark(#d0603f,#f08a70);--ok:light-dark(#2f7d4f,#6fd39a);
+--okbg:light-dark(#e2f2e6,#173d2a);--bad:light-dark(#b8483a,#f0907f);--badbg:light-dark(#fbeae5,#43221d);
+--line:light-dark(#e3dccd,#24494a);--chip:light-dark(#0f4c4f,#cfe9e3);--on:light-dark(#fff,#062a2a);
+--display:"Lalezar","Tajawal",sans-serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.75 Tajawal,"Noto Naskh Arabic",sans-serif;overflow-x:clip}
+button,input,select{font:inherit;color:inherit}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.3;text-wrap:balance}
+.top{background:var(--deep);color:#f3efe4;position:relative;overflow:hidden}
+.top .in{max-width:680px;margin:auto;padding:20px max(5vw,16px) 54px;position:relative;z-index:1}
+.top h1{font-size:clamp(28px,6vw,40px)}
+.top .tg{display:inline-block;font-size:14px;color:#cfe9e3;background:rgba(255,255,255,.1);border-radius:99px;padding:2px 12px;margin-bottom:6px}
+.waves{position:absolute;inset:auto 0 0 0;height:60px;width:100%}
+.wrap{max-width:680px;margin:-34px auto 40px;padding:0 max(4vw,12px);position:relative;z-index:2;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border-radius:20px;border:1px solid var(--line);padding:clamp(16px,4vw,26px);box-shadow:0 10px 30px -18px rgba(10,50,50,.45)}
+.mute{color:var(--mute)}
+/* خريطة الأبواب */
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.door{background:var(--card);border:1.5px solid var(--line);border-radius:14px 14px 6px 6px;padding:8px 4px;text-align:center;font-size:13px;line-height:1.35;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700}
+.door svg{width:24px;height:24px}
+.door.open{border-color:var(--ok);color:var(--ok)}
+.door.now{border-color:var(--sea);color:var(--ink);box-shadow:0 0 0 3px light-dark(rgba(29,107,107,.18),rgba(92,194,181,.25))}
+/* القفل */
+.lock{display:flex;justify-content:center;gap:clamp(6px,2vw,10px);margin:10px 0 4px;direction:ltr}
+.slot{width:clamp(44px,12vw,56px);height:clamp(54px,14vw,66px);border-radius:12px;background:var(--sea2);display:grid;place-items:center;font:700 clamp(26px,7vw,32px) "Noto Naskh Arabic",serif;color:var(--chip);border:2px dashed var(--sea)}
+.slot.got{background:var(--sea);color:var(--on);border-style:solid}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;align-items:center}
+.tag{font-size:13px;padding:2px 10px;border-radius:99px;background:var(--sea2);color:var(--chip);font-weight:700}
+.tag.hot{background:var(--coral);color:#fff}
+.q{font-size:clamp(18px,3.6vw,20px);line-height:2.1;margin:4px 0 14px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opts.wide{grid-template-columns:minmax(0,1fr)}
+@media(max-width:560px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{min-height:58px;padding:8px 12px;border-radius:14px;border:2px solid var(--line);background:transparent;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:start;line-height:1.9}
+.opt b{flex:none;width:30px;height:30px;border-radius:50%;background:var(--sea2);color:var(--chip);display:grid;place-items:center;font-size:14px}
+.opt:hover:not([disabled]){border-color:var(--sea)}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg);opacity:.7}
+.opt.wrong span{text-decoration:line-through;text-decoration-color:var(--bad)}
+.opt[disabled]{cursor:default}
+.box{margin-top:14px;border-radius:14px;padding:12px 16px;line-height:2.1}
+.box h4{margin:0 0 4px;font-size:16px}
+.hint{background:light-dark(#fdf3dc,#3a321c);border-inline-start:5px solid #e0a93a}
+.sol{background:var(--okbg);border-inline-start:5px solid var(--ok)}
+.sol>div{overflow-x:auto;padding:2px 0}
+.digit{display:flex;align-items:center;gap:10px;margin-top:12px;font-weight:700;color:var(--sea)}
+.digit .big{font:700 30px "Noto Naskh Arabic",serif;background:var(--sea);color:var(--on);border-radius:10px;padding:0 14px;direction:ltr}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn{min-height:48px;padding:6px 20px;border-radius:12px;border:0;background:var(--sea);color:var(--on);font-weight:800;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--sea);border:2px solid var(--sea)}
+.btn.coral{background:var(--coral);color:#fff}
+.btn:focus-visible,.opt:focus-visible,input:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+label{display:block;font-weight:700;margin-bottom:4px}
+.namein{width:100%;min-height:50px;border-radius:12px;border:2px solid var(--line);background:var(--bg);padding:6px 14px;font-size:18px}
+.codebox{display:flex;gap:8px;justify-content:center;direction:ltr;margin:6px 0}
+.codebox input{width:52px;height:62px;text-align:center;font:700 28px "Noto Naskh Arabic",serif;background:var(--bg);color:var(--sea);border:2px solid var(--sea);border-radius:10px}
+.err{color:var(--bad);font-weight:700;text-align:center;margin:6px 0 0}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--mute);font-size:14px}
+.link{background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;font-size:14px;padding:0}
+/* الرياضيات */
+.m{font-family:"Noto Naskh Arabic",serif;white-space:nowrap;unicode-bidi:isolate;direction:rtl;font-size:1.08em}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 2px;font-size:.92em}
+.fr>span{padding:0 3px}.fr>span:first-child{border-bottom:1.6px solid currentColor}
+.mx{display:inline;white-space:nowrap}.mx>.fr{margin-inline-end:3px}
+.pw{unicode-bidi:isolate;direction:rtl}.pw>.pb,.pw>sup{unicode-bidi:isolate}
+.pw sup{font-size:.68em;vertical-align:.95em;line-height:0}
+.fr .pw sup{vertical-align:.6em}
+.ov{text-decoration:overline;text-decoration-thickness:1.5px}
+.tb{border-collapse:collapse;margin:10px auto;font-size:16px;line-height:1.8}.tb th,.tb td{border:1px solid var(--line);padding:4px 14px;text-align:center}.tb th{background:var(--sea2);color:var(--chip)}
+/* الشهادة */
+.cert{border:3px double var(--sea);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;background:light-dark(#fffaf0,#0f2a2a)}
+.cert h1{color:var(--sea);font-size:clamp(30px,7vw,42px)}
+.cert .nm{font-family:var(--display);font-size:clamp(28px,7vw,38px);color:var(--coral);line-height:1.3}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
+.stat{background:var(--sea2);border-radius:12px;padding:10px 4px}
+.stat .v{font:700 26px "Noto Naskh Arabic",serif;color:var(--chip)}
+.stat .l{font-size:13px;color:var(--chip)}
+.praise{background:var(--okbg);border-radius:14px;padding:16px;width:100%;line-height:1.95;text-align:center}
+.praise .pt{font-family:var(--display);font-size:24px;color:var(--ok);margin:0}
+.praise p{margin:6px 0}
+.praise .thanks{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+.shake{animation:shake .35s}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .45s ease-out}@keyframes pop{from{transform:scale(.7);opacity:.3}to{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.shake,.pop{animation:none}}
+@media(max-width:400px){.codebox input{width:46px;height:56px}.door{font-size:12px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+<span class="tg">الصف الثاني المتوسط · الفصل الأول · أ. لطفيه الطلحي</span>
+<h1>غرفة الهروب: الأعداد النسبية</h1>
+</div>
+<svg class="waves" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
+<path d="M0 30 Q150 5 300 30 T600 30 T900 30 T1200 30 V60 H0Z" fill="#2a7d78" opacity=".55"/>
+<path d="M0 40 Q150 18 300 40 T600 40 T900 40 T1200 40 V60 H0Z" fill="var(--bg)"/>
+</svg>
+</header>
+<main class="wrap" id="app" aria-live="polite"></main>
+<script>
+{
+const F=(n,d)=>`<span class="fr"><span>${n}</span><span>${d}</span></span>`;
+const X=(w,n,d)=>`<span class="mx">${F(n,d)}<span>${w}</span></span>`;
+const P=(b,e)=>`<span class="pw"><span class="pb">${b}</span><sup>${e}</sup></span>`;
+const m=s=>`<span class="m">${s}</span>`;
+const L=s=>`<span class="m">${s}</span>`;
+const N='−';
+const T=(head,rows)=>`<table class="tb"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+const HOT='مهارة تفكير عليا';
+const ROOMS=[
+{name:'غرفة المرجان',intro:`الباب مقفل برمز من خمسة أرقام. كل إجابة صحيحة تكشف لكِ رقمًا منه. حلّي في دفتركِ قبل أن تختاري.`,code:'47291',
+qs:[
+{q:`اكتب الكسر العشري الدوري ${m(`0,<span class="ov">36</span>`)} على صورة كسر اعتيادي في أبسط صورة.`,
+o:[m(F(9,25)),m(F(2,5)),m(F(4,11)),m(F(3,8))],a:2,
+h:`افرضي أن ن = ${m('0.3636…')}. يتكرر رقمان، فاضربي الطرفين في ${m('100')} ثم اطرحي المعادلتين.`,
+s:[m(`ن = 0.3636…`),m(`100ن = 36.3636…`),`بالطرح: ${m(`99ن = 36`)}`,m(`ن = ${F(36,99)} = ${F(4,11)}`)+` (بقسمة البسط والمقام على ${m('9')})`,`الخيار ${m(F(9,25))} يساوي ${m('0.36')} المنتهي، وليس الدوري.`]},
+{q:`ما قيمة العبارة ${m(`${P('أ','2')} − ${P('أ','3')}`)} عندما ${m(`أ = ${N}3`)} ؟`,
+o:[m('36'),m(N+'18'),m('18'),m(N+'36')],a:0,
+h:`عوّضي عن أ بالعدد ${m(`(${N}3)`)} داخل قوسين. تذكّري: مربع العدد السالب موجب، ومكعبه سالب، وطرح عدد سالب يساوي جمع معكوسه.`,
+s:[m(`${P('أ','2')} = ${P(`(${N}3)`,'2')} = (${N}3) × (${N}3) = 9`),m(`${P('أ','3')} = ${P(`(${N}3)`,'3')} = (${N}3) × (${N}3) × (${N}3) = ${N}27`),m(`${P('أ','2')} − ${P('أ','3')} = 9 − (${N}27) = 9 + 27 = 36`)]},
+{q:`أيّ الأعداد الآتية يقع بين العددين ${m(N+F(3,4))} و ${m(N+F(2,3))} على خط الأعداد؟`,
+o:[m(N+F(4,5)),m(N+F(3,5)),m(N+'0.76'),m(N+'0.71')],a:3,
+h:`حوّلي جميع الأعداد إلى كسور عشرية، ثم حدّدي أي عدد يكون أكبر من ${m(N+F(3,4))} وأصغر من ${m(N+F(2,3))}.`,
+s:[m(`${N}${F(3,4)} = ${N}0.75`)+' و '+m(`${N}${F(2,3)} = ${N}0.666…`),`المطلوب عدد أكبر من ${m(N+'0.75')} وأصغر من ${m(N+'0.666…')}`,m(`${N}${F(4,5)} = ${N}0.8`)+' أصغر من '+m(N+'0.75')+' ✗',m(`${N}${F(3,5)} = ${N}0.6`)+' أكبر من '+m(N+'0.666…')+' ✗',m(N+'0.76')+' أصغر من '+m(N+'0.75')+' ✗',m(N+'0.71')+' يقع بينهما ✓']},
+{hot:HOT,q:`عند قسمة عدد موجب على كسر اعتيادي موجب <b>أقل من ${m('1')}</b>، فإن الناتج يكون دائمًا:`,wide:1,
+o:['أكبر من العدد المقسوم','أصغر من العدد المقسوم','مساويًا للعدد المقسوم',`أقل من ${m('1')}`],a:0,
+h:`جرّبي مثالًا: ${m(`6 ÷ ${F(1,2)}`)}. وتذكّري أن القسمة على كسر تعني الضرب في نظيره الضربي.`,
+s:[`مثال: ${m(`6 ÷ ${F(1,2)} = 6 × 2 = 12`)}، والناتج أكبر من ${m('6')}`,`السبب: النظير الضربي لكسر موجب أقل من ${m('1')} يكون أكبر من ${m('1')}، مثل ${m(F(1,2))} ← ${m('2')} و ${m(F(3,4))} ← ${m(F(4,3))}`,`وضرب عدد موجب في عدد أكبر من ${m('1')} يعطي ناتجًا أكبر منه.`]}
+]},
+{name:'غرفة اللؤلؤ',intro:`نزلتِ إلى الأعماق! هنا مسائل حياتية وعمليات على الكسور. اقرئي المسألة جيدًا وحدّدي العملية المطلوبة قبل الحل.`,code:'83605',
+qs:[
+{q:`تحتاج سارة إلى ${m(X(3,3,4))} كوب من الحليب لعمل وصفة، ولديها مكيال سعته ${m(F(3,8))} كوب. كم مرة تملأ المكيال لتحصل على ما تحتاج إليه؟`,
+o:[m('8'),m(X(1,13,32)),m('12'),m('10')],a:3,
+h:`المطلوب: كم ${m(F(3,8))} في ${m(X(3,3,4))}؟ هذه مسألة قسمة. حوّلي العدد الكسري إلى كسر غير فعلي أولًا.`,
+s:[m(`${X(3,3,4)} = ${F(15,4)}`),m(`${F(15,4)} ÷ ${F(3,8)} = ${F(15,4)} × ${F(8,3)}`),`نبسّط: ${m('15')} و ${m('3')} على ${m('3')}، و ${m('8')} و ${m('4')} على ${m('4')}:`,m(`= ${F(5,1)} × ${F(2,1)} = 10`),`إذن تملأ المكيال ${m('10')} مرات.`]},
+{q:`تبلغ المسافة بين الشمس وكوكب المشتري نحو ${m('484000000')} ميل. ما العبارة التي تعطي هذه المسافة بالصيغة العلمية؟`,
+o:[m(`48.4 × ${P('10','7')}`),m(`4.84 × ${P('10','8')}`),m(`4.84 × ${P('10','6')}`),m(`484 × ${P('10','6')}`)],a:1,
+h:`في الصيغة العلمية يكون العامل الأول أكبر من أو يساوي ${m('1')} وأقل من ${m('10')}. عُدّي المنازل التي تتحرّكها الفاصلة.`,
+s:[`نضع الفاصلة بعد الرقم الأول: ${m('4.84')}`,`عدد المنازل التي تحرّكتها الفاصلة = ${m('8')}، والعدد أكبر من ${m('1')} فالأس موجب.`,m(`484000000 = 4.84 × ${P('10','8')}`),`الخياران ${m(`48.4 × ${P('10','7')}`)} و ${m(`484 × ${P('10','6')}`)} يساويان العدد نفسه لكنهما ليسا بالصيغة العلمية.`]},
+{hot:'اكتشف الخطأ',q:`أوجدت هند ناتج الجمع الآتي:<br>${m(`${F(2,5)} + ${F(1,3)} = ${F('2 + 1','5 + 3')} = ${F(3,8)}`)}<br>ما رأيكِ في حلّها؟`,wide:1,
+o:[`حلّها صحيح؛ لأنها جمعت البسطين والمقامين`,`أخطأت، والصواب ${m(F(3,15))}`,`أخطأت؛ لأنها جمعت المقامين، والصواب ${m(F(11,15))}`,`أخطأت، والصواب ${m(F(2,15))}`],a:2,
+h:`هل يمكن أن يكون مجموع عددين موجبين (${m(F(3,8))}) أصغر من أحدهما (${m(F(2,5))})؟ لجمع كسرين مختلفي المقام نوحّد المقامات أولًا.`,
+s:[`لا نجمع المقامات أبدًا. المضاعف المشترك الأصغر للعددين ${m('5')} و ${m('3')} هو ${m('15')}:`,m(`${F(2,5)} + ${F(1,3)} = ${F(6,15)} + ${F(5,15)} = ${F(11,15)}`),`تحقّق سريع: ${m(`${F(3,8)} = 0.375`)} أصغر من ${m(`${F(2,5)} = 0.4`)}، وهذا مستحيل عند إضافة عدد موجب.`]},
+{q:`يبيّن الجدول أطوال قفزات أربع طالبات في مسابقة الوثب الطويل بالأمتار. أيّ القوائم الآتية مرتّبة من الأقصر إلى الأطول قفزةً؟${T(['الطالبة','طول القفزة (م)'],[['نورة',m(X(3,3,5))],['ريم',m('3.58')],['هيا',m(X(3,5,8))],['لمى',m('3.55')]])}`,wide:1,
+o:['لمى ، ريم ، نورة ، هيا','ريم ، لمى ، نورة ، هيا','لمى ، ريم ، هيا ، نورة','هيا ، نورة ، ريم ، لمى'],a:0,
+h:`حوّلي الأعداد الكسرية إلى كسور عشرية، ثم قارني الأعداد بدءًا من منزلة الأجزاء من عشرة.`,
+s:[`نورة: ${m(`${X(3,3,5)} = 3.6`)}`,`هيا: ${m(`${X(3,5,8)} = 3.625`)}`,`الأطوال: لمى ${m('3.55')}، ريم ${m('3.58')}، نورة ${m('3.6')}، هيا ${m('3.625')}`,`الترتيب من الأقصر إلى الأطول: لمى ، ريم ، نورة ، هيا`]}
+]},
+{name:'غرفة المنارة',intro:`اقتربتِ من النور! أنماط وقوى وصيغة علمية. انتبهي للإشارات والأسس.`,code:'16958',
+qs:[
+{q:`يبيّن الجدول عدد زوّار معرض للكتاب في أيامه الأربعة الأولى. إذا استمرّ النمط نفسه، فكم يكون عدد الزوّار في اليوم السابع؟${T(['اليوم','١','٢','٣','٤'],[['عدد الزوار',m('420'),m('505'),m('590'),m('675')]])}`,
+o:[m('845'),m('930'),m('1015'),m('760')],a:1,
+h:`استعملي خطة البحث عن نمط: بكم يزداد عدد الزوار من يوم إلى الذي يليه؟`,
+s:[`الزيادة اليومية ثابتة: ${m('505 − 420 = 85')}`,`اليوم الخامس: ${m('675 + 85 = 760')}`,`اليوم السادس: ${m('760 + 85 = 845')}`,`اليوم السابع: ${m('845 + 85 = 930')} زائرًا.`]},
+{q:`حديقة منزلية مستطيلة الشكل، طولها ${m(X(3,1,3))} م وعرضها ${m(X(2,2,5))} م. ما مساحتها؟`,
+o:[m(X(6,2,15))+' م<sup>2</sup>',m(X(5,11,15))+' م<sup>2</sup>',m('8')+' م<sup>2</sup>',m('16')+' م<sup>2</sup>'],a:2,
+h:`مساحة المستطيل = الطول × العرض. حوّلي العددين الكسريين إلى كسرين غير فعليين قبل الضرب، ولا تضربي الأعداد الكلية والكسور كلًّا على حدة.`,
+s:[m(`${X(3,1,3)} = ${F(10,3)}`)+' و '+m(`${X(2,2,5)} = ${F(12,5)}`),m(`${F(10,3)} × ${F(12,5)}`),`نبسّط: ${m('10')} و ${m('5')} على ${m('5')}، و ${m('12')} و ${m('3')} على ${m('3')}:`,m(`= ${F(2,1)} × ${F(4,1)} = 8`),`المساحة ${m('8')} م<sup>2</sup>. (الخيار ${m(X(5,11,15))} هو المجموع، وليس الناتج.)`]},
+{hot:'الحس العددي',q:`أيّ الأعداد الآتية هو <b>الأكبر</b>؟`,
+o:[m(`9.8 × ${P('10',N+'3')}`),m('0.011'),m(`9.9 × ${P('10',N+'3')}`),m(`1.2 × ${P('10',N+'2')}`)],a:3,
+h:`في الصيغة العلمية قارني الأسس أولًا: ${m(P('10',N+'2'))} أكبر من ${m(P('10',N+'3'))}. أو حوّلي كل عدد إلى الصيغة القياسية.`,
+s:[m(`9.8 × ${P('10',N+'3')} = 0.0098`),m(`9.9 × ${P('10',N+'3')} = 0.0099`),m(`1.2 × ${P('10',N+'2')} = 0.012`),`والعدد ${m('0.011')} أصغر من ${m('0.012')}`,`إذن الأكبر هو ${m(`1.2 × ${P('10',N+'2')}`)}`]},
+{q:`مثلث أطوال أضلاعه ${m(X(2,1,2))} سم، ${m(X(3,3,4))} سم، ${m(X(4,5,6))} سم. ما محيطه؟`,
+o:[m(X(11,1,12))+' سم',m(X(9,3,4))+' سم',m(X(10,1,12))+' سم',m(X(11,1,6))+' سم'],a:0,
+h:`المحيط = مجموع أطوال الأضلاع. اجمعي الأعداد الكلية معًا، والكسور معًا بعد توحيد المقامات (المقام المشترك ${m('12')}).`,
+s:[`الأعداد الكلية: ${m('2 + 3 + 4 = 9')}`,`الكسور: ${m(`${F(1,2)} + ${F(3,4)} + ${F(5,6)} = ${F(6,12)} + ${F(9,12)} + ${F(10,12)} = ${F(25,12)} = ${X(2,1,12)}`)}`,`المحيط: ${m(`9 + ${X(2,1,12)} = ${X(11,1,12)}`)} سم`]}
+]}];
+
+const EXIT={hot:'سؤال الهروب',q:`تحدٍّ أخير: إذا كان ${m(`ن = ${N}${F(2,3)}`)} ، فأيّ العبارات الآتية لها <b>أكبر</b> قيمة؟`,
+o:[m('ن'),m(P('ن','2')),m(P('ن','3')),m(P('ن',N+'1'))],a:1,
+h:`احسبي قيمة كل عبارة. الأس الزوجي للعدد السالب يعطي ناتجًا موجبًا، والأس الفردي يبقيه سالبًا، و ${m(P('ن',N+'1'))} هو النظير الضربي للعدد ن.`,
+s:[m(`ن = ${N}${F(2,3)}`)+' (سالب)',m(`${P('ن','2')} = (${N}${F(2,3)}) × (${N}${F(2,3)}) = ${F(4,9)}`)+' (موجب)',m(`${P('ن','3')} = ${F(4,9)} × (${N}${F(2,3)}) = ${N}${F(8,27)}`)+' (سالب)',m(`${P('ن',N+'1')} = ${F(1,'ن')} = ${N}${F(3,2)}`)+' (سالب)',`العبارة الوحيدة الموجبة هي ${m(P('ن','2'))}، فهي الأكبر.`]};
+
+ROOMS[0].qs.push({q:`أوجد ناتج الضرب في أبسط صورة: ${m(`${N}${F(3,4)} × ${F(8,9)}`)}`,
+o:[m(F(2,3)),m(N+F(2,3)),m(N+F(27,32)),m(F(5,13))],a:1,
+h:`اضربي البسط في البسط والمقام في المقام، وبسّطي قبل الضرب إن أمكن. ناتج ضرب عددين مختلفين في الإشارة سالب.`,
+s:[m(`${N}${F(3,4)} × ${F(8,9)} = ${N}${F('3 × 8','4 × 9')}`),`نبسّط: ${m('3')} و ${m('9')} على ${m('3')}، و ${m('8')} و ${m('4')} على ${m('4')}:`,m(`= ${N}${F('1 × 2','1 × 3')} = ${N}${F(2,3)}`),`الخيار ${m(N+F(27,32))} ناتج القسمة وليس الضرب، و ${m(F(5,13))} ينتج من جمع البسطين والمقامين.`]});
+ROOMS[1].qs.push({q:`أوجد ناتج الطرح في أبسط صورة: ${m(`${F(5,9)} − ${F(8,9)}`)}`,
+o:[m(F(1,3)),m(N+F(13,9)),m(N+F(3,18)),m(N+F(1,3))],a:3,
+h:`المقامان متشابهان، فنطرح البسطين ونُبقي المقام كما هو، ثم نبسّط.`,
+s:[m(`${F(5,9)} − ${F(8,9)} = ${F('5 − 8',9)} = ${N}${F(3,9)}`),m(`${N}${F(3,9)} = ${N}${F(1,3)}`)+` (بقسمة البسط والمقام على ${m('3')})`,`لا نطرح المقامين، ولهذا الخيار ${m(N+F(3,18))} خطأ.`]});
+ROOMS[2].qs.push({q:`اكتب العدد ${m(`3.05 × ${P('10','4')}`)} بالصيغة القياسية.`,
+o:[m('3050'),m('305000'),m('30500'),m('0.000305')],a:2,
+h:`الأس موجب ${m('4')}، فنحرّك الفاصلة العشرية ${m('4')} منازل إلى اليمين (نضرب في ${m('10000')}).`,
+s:[m(`${P('10','4')} = 10000`),m('3.05 × 10000 = 30500'),`الخيار ${m('0.000305')} ينتج من تحريك الفاصلة إلى اليسار، وهذا يكون عندما يكون الأس سالبًا.`]});
+const SLOTS=[[0],[1],[2],[3],[4]];
+const KEY='escape-g8-ch1-v5';
+const LETTERS=['أ','ب','جـ','د'];
+const DIG='٠١٢٣٤٥٦٧٨٩';
+const AR=s=>String(s).replace(/\d/g,d=>DIG[d]);
+const EN=s=>String(s).replace(/[٠-٩]/g,d=>DIG.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+const arab=el=>{const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){n.nodeValue=n.nodeValue.replace(/(\d)\.(\d)/g,'$1,$2').replace(/\d/g,d=>DIG[d])}};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fresh=()=>({name:'',room:0,q:0,stage:'start',got:[],tried:[],mistakes:0,start:0,end:0});
+let S;try{S=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){S=fresh()}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const app=document.getElementById('app');
+const TOTAL=ROOMS.reduce((n,r)=>n+r.qs.length,0)+1;
+
+const lockSvg=open=>open
+ ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>`
+ :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+function mapHtml(){
+  const names=ROOMS.map(r=>r.name).concat(['باب الخروج']);
+  return `<nav class="map">${names.map((n,i)=>{const done=i<S.room||S.stage==='done';const now=i===S.room&&S.stage!=='done'&&S.stage!=='start';
+    return `<div class="door ${done?'open':''} ${now?'now':''}">${lockSvg(done)}<span>${n}</span></div>`}).join('')}</nav>`}
+function slotsHtml(){const code=ROOMS[S.room].code;const got=new Set();S.got.forEach((g,j)=>{if(g)SLOTS[j].forEach(x=>got.add(x))});
+  return `<div class="lock" aria-label="أرقام الرمز">${[...code].map((c,i)=>`<div class="slot ${got.has(i)?'got':''}">${got.has(i)?c:'؟'}</div>`).join('')}</div>`}
+const foot=()=>`<div class="foot"><span>${esc(S.name)}</span><span>المحاولات الخاطئة: ${S.mistakes}</span><button class="link" id="rst">ابدئي من جديد</button></div>`;
+
+function render(){
+  let h='';
+  if(S.stage==='start')h=startHtml();
+  else if(S.stage==='done')h=doneHtml();
+  else if(S.stage==='code')h=codeHtml();
+  else if(S.room===ROOMS.length)h=qHtml(EXIT,true);
+  else h=qHtml(ROOMS[S.room].qs[S.q],false);
+  app.innerHTML=h;arab(app);bind();
+}
+
+function startHtml(){
+  return `${mapHtml()}
+  <section class="card">
+    <h2 style="font-size:26px">أهلًا بكِ في رحلة الأعماق!</h2>
+    <p class="mute" style="margin:6px 0 0">أنتِ تحت الماء أمام ثلاث غرف مقفلة وباب خروج. في كل غرفة ${'5'} أسئلة متنوعة من الفصل كاملًا، وكل إجابة صحيحة تعطيكِ رقمًا من رمز القفل. اجمعي الرمز واكتبيه لتنتقلي للغرفة التالية، وفي النهاية سؤال الهروب.</p>
+  </section>
+  <form class="card" id="f">
+    <label for="nm">اسمكِ الثلاثي</label>
+    <input class="namein" id="nm" autocomplete="name" value="${esc(S.name)}" required>
+    <p class="err" id="ne" hidden>فضلًا اكتبي اسمكِ كاملًا.</p>
+    <div class="row"><button class="btn" type="submit">ادخلي غرفة المرجان</button></div>
+  </form>
+  <section class="card"><b>القواعد</b>
+    <p class="mute" style="margin:4px 0 0">إذا أخطأتِ يظهر لكِ تلميح، وتقدرين تحاولين مرة ثانية. وإذا أصبتِ يظهر لكِ الحل بالخطوات. حلّي في دفتركِ قبل أن تختاري. في النهاية تظهر لكِ شهادة الهروب: صوّريها وأرسليها لمعلمتكِ أ. لطفيه الطلحي في تيمز.</p>
+  </section>`}
+
+function qHtml(Q,isExit){
+  const r=isExit?null:ROOMS[S.room];
+  const answered=isExit?S.stage==='exitSolved':!!S.got[S.q];
+  return `${mapHtml()}
+  ${isExit?`<section class="card"><h2 style="font-size:26px">باب الخروج 🗝️</h2><p class="mute" style="margin:4px 0 0">سؤال أخير يجمع أفكار الفصل. أجيبي عنه لتخرجي وتستلمي شهادتكِ.</p></section>`
+   :`<section class="card"><h2 style="font-size:26px">${r.name}</h2>${S.q===0&&!answered?`<p class="mute" style="margin:4px 0 0">${r.intro}</p>`:''}${slotsHtml()}</section>`}
+  <section class="card" id="qc">
+    <div class="tags"><span class="tag">${isExit?'السؤال الأخير':`السؤال ${S.q+1} من ${r.qs.length}`}</span>${Q.hot?`<span class="tag hot">${Q.hot}</span>`:''}</div>
+    <div class="q">${Q.q}</div>
+    <div class="opts${Q.wide?' wide':''}">${Q.o.map((o,i)=>{const wrong=S.tried.includes(i),right=answered&&i===Q.a;
+      return `<button class="opt ${wrong?'wrong':''} ${right?'right':''}" data-i="${i}" ${answered||wrong?'disabled':''}><b>${LETTERS[i]}</b><span>${o}</span></button>`}).join('')}</div>
+    <div id="fb">${fbHtml(Q,answered,isExit)}</div>
+  </section>
+  ${foot()}`}
+
+function fbHtml(Q,answered,isExit){
+  if(answered){
+    const code=isExit?'':ROOMS[S.room].code;const dg=isExit?'':SLOTS[S.q].map(x=>code[x]).join('');
+    const last=!isExit&&S.q===ROOMS[S.room].qs.length-1;
+    return `<div class="box sol"><h4>إجابة صحيحة، أحسنتِ! طريقة الحل:</h4>${Q.s.map(x=>`<div>${x}</div>`).join('')}</div>
+    ${isExit?'':`<div class="digit pop">${dg.length>1?'حصلتِ على رقمين من الرمز:':'حصلتِ على رقم من الرمز:'} <span class="big">${dg}</span></div>`}
+    <div class="row"><button class="btn ${isExit?'coral':''}" id="nx">${isExit?'اخرجي واستلمي شهادتكِ 🎓':last?'اذهبي إلى القفل ←':'السؤال التالي ←'}</button></div>`}
+  if(S.tried.length)return `<div class="box hint"><h4>ليست الإجابة الصحيحة. تلميح:</h4>${Q.h}</div>`;
+  return ''}
+
+function codeHtml(){
+  const r=ROOMS[S.room];
+  return `${mapHtml()}
+  <section class="card"><h2 style="font-size:26px">افتحي قفل ${r.name}</h2><p class="mute" style="margin:4px 0 0">اكتبي أرقام الرمز بالترتيب نفسه الظاهر في الخانات، من اليسار إلى اليمين.</p>${slotsHtml()}</section>
+  <form class="card" id="cf">
+    <div class="codebox">${[...r.code].map((_,i)=>`<input id="c${i}" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="الرقم ${i+1}">`).join('')}</div>
+    <p class="err" id="ce" hidden>الرمز غير صحيح. راجعي الأرقام في الخانات بالأعلى.</p>
+    <div class="row" style="justify-content:center"><button class="btn coral" type="submit">افتحي الباب</button></div>
+  </form>
+  ${foot()}`}
+
+function doneHtml(){
+  const mins=Math.max(1,Math.round((S.end-S.start)/60000));
+  let date='';try{date=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(new Date(S.end))}catch(e){}
+  const first=S.name.trim().split(/\s+/)[0];
+  const pr=S.mistakes===0
+   ?{t:'أداء كامل بدون أي خطأ!',b:'فهمكِ للأعداد النسبية واضح وقوي. حافظي على هذا المستوى، وراجعي بنفس الهمّة، والدرجة الكاملة في الاختبار المركزي بإذن الله قريبة منكِ.'}
+   :S.mistakes<=4
+   ?{t:'إنجاز رائع!',b:'أخطاؤكِ قليلة، وكل خطأ صحّحتِه صار خطوة تعلّمتِها. ارجعي للأسئلة التي توقفتِ عندها مرة ثانية، وستدخلين الاختبار بثقة بإذن الله.'}
+   :{t:'ما استسلمتِ ووصلتِ!',b:'كل محاولة خاطئة كانت درسًا، والمهم أنكِ أكملتِ حتى فتحتِ كل الأبواب. أعيدي الغرفة مرة ثانية وستلاحظين بنفسكِ كم تحسّنتِ. الاستمرار سرّ النجاح.'};
+  return `${mapHtml()}
+  <section class="card cert pop">
+    <span class="tag">شهادة الهروب · الفصل الأول: الأعداد النسبية</span>
+    <h1>هربتِ من الأعماق!</h1>
+    <div class="nm">${esc(S.name)}</div>
+    <p class="mute" style="margin:0">الصف الثاني المتوسط${date?' · '+date:''}</p>
+    <div class="stats">
+      <div class="stat"><div class="v">${TOTAL}</div><div class="l">سؤالًا محلولًا</div></div>
+      <div class="stat"><div class="v">${S.mistakes}</div><div class="l">محاولة خاطئة</div></div>
+      <div class="stat"><div class="v">${mins}</div><div class="l">دقيقة</div></div>
+    </div>
+    <div class="praise">
+      <p class="pt">${pr.t}</p>
+      <p>${pr.b}</p>
+      <p class="thanks">شكرًا لكِ يا ${esc(first)} على جهدكِ وصبركِ حتى آخر باب. فخورة بكِ، وأنتظر أن أراكِ في الغرفة القادمة.<br><span class="mute">معلمة المادة: لطفيه الطلحي</span></p>
+    </div>
+    <p class="mute" style="margin:0">صوّري هذه الشهادة وأرسليها لمعلمتكِ أ. لطفيه الطلحي في تيمز.</p>
+  </section>
+  <div class="row"><button class="btn ghost" id="again">ابدئي من جديد</button></div>`}
+
+function bind(){
+  const g=id=>document.getElementById(id);
+  if(g('rst'))g('rst').onclick=()=>{if(g('rst').dataset.sure){const n=S.name;S=fresh();S.name=n;save();render();scrollTo(0,0)}else{g('rst').dataset.sure=1;g('rst').textContent='اضغطي مرة أخرى للتأكيد (سيُمسح تقدّمكِ)'}};
+  if(S.stage==='start'){g('f').onsubmit=e=>{e.preventDefault();const n=g('nm').value.trim().replace(/\s+/g,' ');if(n.length<3){g('ne').hidden=false;return}
+    Object.assign(S,{name:n,room:0,q:0,stage:'q',got:[],tried:[],mistakes:0,start:Date.now()});save();render();scrollTo(0,0)};return}
+  if(S.stage==='done'){g('again').onclick=()=>{const n=S.name;S=fresh();S.name=n;save();render();scrollTo(0,0)};return}
+  if(S.stage==='code'){const r=ROOMS[S.room];const ins=[...r.code].map((_,i)=>g('c'+i));
+    ins.forEach((inp,i)=>{inp.oninput=()=>{inp.value=AR(EN(inp.value).replace(/\D/g,'').slice(-1));if(inp.value&&ins[i+1])ins[i+1].focus()};
+      inp.onkeydown=e=>{if(e.key==='Backspace'&&!inp.value&&ins[i-1])ins[i-1].focus()}});
+    ins[0].focus();
+    g('cf').onsubmit=e=>{e.preventDefault();const v=ins.map(x=>EN(x.value)).join('');
+      if(v===r.code){S.room++;S.q=0;S.got=[];S.tried=[];S.stage='q';save();render();scrollTo(0,0)}
+      else{g('ce').hidden=false;const f=g('cf');f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake')}};return}
+  const isExit=S.room===ROOMS.length;const Q=isExit?EXIT:ROOMS[S.room].qs[S.q];
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;
+    if(i===Q.a){if(isExit)S.stage='exitSolved';else S.got[S.q]=true}else{S.tried.push(i);S.mistakes++}
+    save();render();if(i!==Q.a)g('qc').classList.add('shake');g('fb').scrollIntoView({behavior:'smooth',block:'nearest'})});
+  if(g('nx'))g('nx').onclick=()=>{S.tried=[];
+    if(isExit){S.stage='done';S.end=Date.now()}else if(S.q<ROOMS[S.room].qs.length-1)S.q++;else S.stage='code';
+    save();render();scrollTo(0,0)};
+}
+render();
+}
+</script>
+</body>
+</html>

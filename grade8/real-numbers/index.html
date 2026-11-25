@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>غرفة الهروب: الأعداد الحقيقية ونظرية فيثاغورس</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Tajawal:wght@400;500;700;800&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: هادئ ومتأمّل، مثل لوح رياضيات قديم في رواق حجري
+   IDEA: متاهة فيثاغورس: ثلاث بوابات وباب خروج، لكل بوابة قفل من خمس خانات
+   PICTURE: شكل فيثاغورس (مثلث قائم ومربعات على أضلاعه) في الترويسة، والقفل
+   COLOUR and TYPE: بنفسجي رمادي هادئ، حجر فاتح، زعفراني للتمييز؛ ريم كوفي للعناوين، تجوال للنص، نسخ للرياضيات
+   LAYOUT: عمود واحد هادئ */
+:root{color-scheme:light dark;
+--bg:light-dark(#f3f0f5,#16121d);--card:light-dark(#fffdfd,#211b2b);--ink:light-dark(#2a2236,#ece6f3);
+--mute:light-dark(#6b6378,#a99fb8);--sea:light-dark(#5b4a86,#b4a3e0);--sea2:light-dark(#e8e2f2,#342b46);
+--deep:light-dark(#3a2f52,#231b33);--acc:light-dark(#c4841a,#f0b44c);--ok:light-dark(#2f7d4f,#6fd39a);
+--okbg:light-dark(#e4f2e8,#173d2a);--bad:light-dark(#b8483a,#f0907f);--badbg:light-dark(#fbeae5,#43221d);
+--line:light-dark(#e2dcea,#3a3150);--chip:light-dark(#3a2f52,#e6dcf7);--on:light-dark(#fff,#1a1426);
+--display:"Cairo","Tajawal",sans-serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 19px/1.8 Tajawal,"Noto Naskh Arabic",sans-serif;overflow-x:clip}
+button,input{font:inherit;color:inherit}
+h1,h2{font-family:var(--display);font-weight:700;margin:0;line-height:1.35;text-wrap:balance}
+.top{background:var(--deep);color:#f1ecf7;position:relative;overflow:hidden;border-bottom:4px solid var(--acc)}
+.top .in{max-width:680px;margin:auto;padding:20px max(5vw,16px) 50px;position:relative;z-index:1;padding-inline-end:150px}
+.top h1{font-size:clamp(26px,6vw,36px);font-weight:800}
+.top .tg{display:inline-block;font-size:15px;color:#ddd3ee;background:rgba(255,255,255,.1);border-radius:99px;padding:2px 12px;margin-bottom:6px}
+.pyth{position:absolute;left:max(2vw,8px);top:10px;width:140px;height:130px;opacity:.9}
+@media(max-width:480px){.top .in{padding-inline-end:16px}.pyth{opacity:.22;width:120px}}
+.wrap{max-width:680px;margin:-28px auto 40px;padding:0 max(4vw,12px);position:relative;z-index:2;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border-radius:18px;border:1px solid var(--line);padding:clamp(16px,4vw,26px);box-shadow:0 10px 30px -18px rgba(40,25,70,.45)}
+.mute{color:var(--mute)}
+.card h2{font-size:28px!important}
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.door{background:var(--card);border:1.5px solid var(--line);border-radius:6px;padding:8px 4px;text-align:center;font-size:15px;line-height:1.35;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700;clip-path:polygon(0 12%,50% 0,100% 12%,100% 100%,0 100%);padding-top:14px}
+.door svg{width:24px;height:24px}
+.door.open{border-color:var(--ok);color:var(--ok)}
+.door.now{border-color:var(--sea);color:var(--ink);background:var(--sea2)}
+.lock{display:flex;justify-content:center;gap:clamp(6px,2vw,10px);margin:10px 0 4px;direction:ltr}
+.slot{width:clamp(44px,12vw,56px);height:clamp(54px,14vw,66px);border-radius:6px;background:var(--sea2);display:grid;place-items:center;font:700 clamp(26px,7vw,32px) "Noto Naskh Arabic",serif;color:var(--chip);border:2px dashed var(--sea)}
+.slot.got{background:var(--sea);color:var(--on);border-style:solid}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;align-items:center}
+.tag{font-size:15px;padding:2px 10px;border-radius:99px;background:var(--sea2);color:var(--chip);font-weight:700}
+.tag.hot{background:var(--acc);color:#1d1406}
+.q{font-size:clamp(20px,4.6vw,23px);font-weight:500;line-height:2.15;margin:4px 0 14px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opts.wide{grid-template-columns:minmax(0,1fr)}
+@media(max-width:560px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{min-height:60px;font-size:20px;font-weight:500;padding:8px 12px;border-radius:12px;border:2px solid var(--line);background:transparent;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:start;line-height:2}
+.opt b{flex:none;width:30px;height:30px;border-radius:8px;background:var(--sea2);color:var(--chip);display:grid;place-items:center;font-size:14px}
+.opt:hover:not([disabled]){border-color:var(--sea)}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg);opacity:.7}
+.opt.wrong span{text-decoration:line-through;text-decoration-color:var(--bad)}
+.opt[disabled]{cursor:default}
+.box{margin-top:14px;border-radius:12px;padding:12px 16px;line-height:2.15;font-size:19px}
+.box h4{margin:0 0 4px;font-size:18px}
+.hint{background:light-dark(#fdf3dc,#3a321c);border-inline-start:5px solid var(--acc)}
+.sol{background:var(--okbg);border-inline-start:5px solid var(--ok)}
+.sol>div{overflow-x:auto;padding:2px 0}
+.digit{display:flex;align-items:center;gap:10px;margin-top:12px;font-weight:700;color:var(--sea);font-size:18px}
+.digit .big{font:700 30px "Noto Naskh Arabic",serif;background:var(--sea);color:var(--on);border-radius:8px;padding:0 14px;direction:ltr}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn{min-height:48px;padding:6px 20px;border-radius:10px;border:0;background:var(--sea);color:var(--on);font-weight:800;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--sea);border:2px solid var(--sea)}
+.btn.coral{background:var(--acc);color:#1d1406}
+.btn:focus-visible,.opt:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+label{display:block;font-weight:700;margin-bottom:4px}
+.namein{width:100%;min-height:50px;border-radius:10px;border:2px solid var(--line);background:var(--bg);padding:6px 14px;font-size:18px}
+.codebox{display:flex;gap:8px;justify-content:center;direction:ltr;margin:6px 0}
+.codebox input{width:52px;height:62px;text-align:center;font:700 28px "Noto Naskh Arabic",serif;background:var(--bg);color:var(--sea);border:2px solid var(--sea);border-radius:8px}
+.err{color:var(--bad);font-weight:700;text-align:center;margin:6px 0 0}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--mute);font-size:16px}
+.link{background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;font-size:14px;padding:0}
+/* الرياضيات */
+.m{font-family:"Noto Naskh Arabic",serif;font-weight:600;white-space:nowrap;unicode-bidi:isolate;direction:rtl;font-size:1.1em}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 2px;font-size:.92em}
+.fr>span{padding:0 3px}.fr>span:first-child{border-bottom:1.6px solid currentColor}
+.mx{display:inline;white-space:nowrap}.mx>.fr{margin-inline-end:3px}
+.pw{unicode-bidi:isolate;direction:rtl}.pw>.pb,.pw>sup{unicode-bidi:isolate}
+.pw sup{font-size:.68em;vertical-align:.95em;line-height:0}
+.fr .pw sup{vertical-align:.6em}
+.ov{text-decoration:overline;text-decoration-thickness:1.5px}
+/* إشارة الجذر بالاتجاه العربي: الإشارة يمين والخط فوق العدد */
+.rt{display:inline-flex;align-items:stretch;margin:0 1px;padding-top:2px}
+.rs{width:.6em;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round;overflow:visible}
+.rr{align-self:baseline;border-top:1.7px solid currentColor;padding:1px 3px 0;line-height:1.35}
+.rr .fr{vertical-align:middle;margin:2px 1px}
+.tb{border-collapse:collapse;margin:10px auto;font-size:16px;line-height:1.8}.tb th,.tb td{border:1px solid var(--line);padding:4px 14px;text-align:center}.tb th{background:var(--sea2);color:var(--chip)}
+/* الرسومات */
+.fig{display:block;margin:10px auto;width:100%;max-width:340px;height:auto}
+.fig.tri{max-width:300px}
+.ax{stroke:var(--ink);stroke-width:2}.axf{fill:var(--ink)}
+.tx{fill:var(--ink);font-size:17px;font-weight:600}.tx.b{font-weight:700}.tx.big{font-size:21px;font-weight:700}.tx.s{font-size:12px}
+.pt{fill:var(--acc)}.sh{fill:var(--sea2);stroke:var(--sea);stroke-width:2.5;stroke-linejoin:round}
+.frame{fill:none;stroke:var(--mute);stroke-width:1.5}
+.c1{fill:light-dark(rgba(91,74,134,.16),rgba(180,163,224,.18));stroke:var(--sea);stroke-width:2}
+.c2{fill:light-dark(rgba(196,132,26,.14),rgba(240,180,76,.16));stroke:var(--acc);stroke-width:2}
+.gr{stroke:var(--line);stroke-width:1}.sg{stroke:var(--acc);stroke-width:3}
+/* الشهادة */
+.cert{border:3px double var(--sea);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;background:light-dark(#fdfbff,#1e1829)}
+.cert h1{color:var(--sea);font-size:clamp(26px,6vw,36px)}
+.cert .nm{font-family:var(--display);font-size:clamp(26px,7vw,36px);color:var(--acc);line-height:1.4}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
+.stat{background:var(--sea2);border-radius:10px;padding:10px 4px}
+.stat .v{font:700 26px "Noto Naskh Arabic",serif;color:var(--chip)}
+.stat .l{font-size:15px;color:var(--chip)}
+.praise{background:var(--okbg);border-radius:12px;padding:16px;width:100%;line-height:1.95;text-align:center}
+.praise .pt{font-family:var(--display);font-size:22px;color:var(--ok);margin:0;fill:none}
+.praise p{margin:6px 0}
+.praise .thanks{border-top:1px solid var(--line);padding-top:10px;font-weight:700}
+.shake{animation:shake .35s}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .45s ease-out}@keyframes pop{from{transform:scale(.7);opacity:.3}to{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.shake,.pop{animation:none}}
+@media(max-width:400px){.codebox input{width:46px;height:56px}.door{font-size:13px}}
+</style>
+</head>
+<body>
+<header class="top">
+<svg class="pyth" viewBox="0 0 140 130" aria-hidden="true">
+<polygon points="45,80 85,80 85,50" fill="#f0b44c" opacity=".9"/>
+<rect x="45" y="80" width="40" height="40" fill="none" stroke="#ddd3ee" stroke-width="2"/>
+<rect x="85" y="50" width="30" height="30" fill="none" stroke="#ddd3ee" stroke-width="2"/>
+<polygon points="45,80 85,50 55,10 15,40" fill="none" stroke="#f0b44c" stroke-width="2"/>
+<polyline points="79,80 79,74 85,74" fill="none" stroke="#3a2f52" stroke-width="1.5"/>
+</svg>
+<div class="in">
+<span class="tg">الصف الثاني المتوسط · الفصل الثاني · أ. لطفيه الطلحي</span>
+<h1>غرفة الهروب: الأعداد الحقيقية ونظرية فيثاغورس</h1>
+</div>
+</header>
+<main class="wrap" id="app" aria-live="polite"></main>
+<script>
+{
+const F=(n,d)=>`<span class="fr"><span>${n}</span><span>${d}</span></span>`;
+const X=(w,n,d)=>`<span class="mx">${F(n,d)}<span>${w}</span></span>`;
+const P=(b,e)=>`<span class="pw"><span class="pb">${b}</span><sup>${e}</sup></span>`;
+const RT=x=>`<span class="rt"><svg class="rs" viewBox="0 0 10 20" preserveAspectRatio="none" aria-hidden="true"><path d="M10 12 L8.2 11 L6.2 19 L1.2 1 L0 1" vector-effect="non-scaling-stroke"/></svg><span class="rr">${x}</span></span>`;
+const m=s=>`<span class="m">${s}</span>`;
+const N='−';
+const PM='±';
+const T=(head,rows)=>`<table class="tb"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+const HOT='مهارة تفكير عليا';
+const SV='font-family="Tajawal,sans-serif"';
+/* خط أعداد من lo إلى hi، يزداد نحو اليمين */
+const NL=(lo,hi,pt,lab)=>{const W=340,x=v=>20+(v-lo)*(W-40)/(hi-lo);let s=`<svg class="fig" viewBox="0 0 ${W} 70" direction="ltr" role="img" aria-label="خط أعداد"><line x1="6" y1="28" x2="${W-6}" y2="28" class="ax"/><path d="M6 28 l9 -5 v10z M${W-6} 28 l-9 -5 v10z" class="axf"/>`;
+for(let v=lo;v<=hi;v+=.5){const big=v%1===0;s+=`<line x1="${x(v)}" y1="${big?20:24}" x2="${x(v)}" y2="${big?36:32}" class="ax"/>`;if(big)s+=`<text x="${x(v)}" y="56" text-anchor="middle" class="tx" ${SV}>${v}</text>`}
+return s+`<circle cx="${x(pt)}" cy="28" r="6" class="pt"/><text x="${x(pt)}" y="13" text-anchor="middle" class="tx b" ${SV}>${lab}</text></svg>`};
+/* مثلث قائم: ساقان أفقية ورأسية، والزاوية القائمة يمين الأسفل */
+const TRI=(base,h,lb,lh,lc)=>`<svg class="fig tri" viewBox="0 0 300 170" direction="ltr" role="img" aria-label="مثلث قائم الزاوية"><polygon points="30,140 220,140 220,30" class="sh"/><polyline points="206,140 206,126 220,126" class="ax" fill="none"/><text x="125" y="162" text-anchor="middle" class="tx" ${SV}>${lb}</text><text x="232" y="90" text-anchor="start" class="tx" ${SV}>${lh}</text><text x="112" y="74" text-anchor="middle" class="tx" ${SV}>${lc}</text></svg>`;
+/* شكل فن */
+const VENN=(a,b,ab,out,la,lb)=>`<svg class="fig" viewBox="0 0 300 170" direction="ltr" role="img" aria-label="شكل فن"><rect x="4" y="4" width="292" height="162" rx="10" class="frame"/><circle cx="118" cy="92" r="58" class="c1"/><circle cx="182" cy="92" r="58" class="c2"/><text x="96" y="26" text-anchor="middle" class="tx b" ${SV}>${la}</text><text x="204" y="26" text-anchor="middle" class="tx b" ${SV}>${lb}</text><text x="92" y="98" text-anchor="middle" class="tx big" ${SV}>${a}</text><text x="150" y="98" text-anchor="middle" class="tx big" ${SV}>${ab}</text><text x="208" y="98" text-anchor="middle" class="tx big" ${SV}>${b}</text><text x="270" y="154" text-anchor="middle" class="tx big" ${SV}>${out}</text></svg>`;
+/* مستوى إحداثي */
+const PL=(x0,x1,y0,y1,pts,seg)=>{const u=22,W=(x1-x0)*u+30,H=(y1-y0)*u+30,X=x=>15+(x-x0)*u,Y=y=>15+(y1-y)*u;let s=`<svg class="fig pl" viewBox="0 0 ${W} ${H}" style="max-width:${W}px" direction="ltr" role="img" aria-label="مستوى إحداثي">`;
+for(let i=x0;i<=x1;i++)s+=`<line x1="${X(i)}" y1="${Y(y0)}" x2="${X(i)}" y2="${Y(y1)}" class="gr"/>`;for(let j=y0;j<=y1;j++)s+=`<line x1="${X(x0)}" y1="${Y(j)}" x2="${X(x1)}" y2="${Y(j)}" class="gr"/>`;
+s+=`<line x1="${X(x0)}" y1="${Y(0)}" x2="${X(x1)}" y2="${Y(0)}" class="ax"/><line x1="${X(0)}" y1="${Y(y0)}" x2="${X(0)}" y2="${Y(y1)}" class="ax"/><text x="${X(x1)-4}" y="${Y(0)-5}" text-anchor="end" class="tx s" ${SV}>س</text><text x="${X(0)+5}" y="${Y(y1)+12}" class="tx s" ${SV}>ص</text>`;
+if(seg)s+=`<line x1="${X(seg[0])}" y1="${Y(seg[1])}" x2="${X(seg[2])}" y2="${Y(seg[3])}" class="sg"/>`;
+pts.forEach(([x,y,l,dx,dy])=>s+=`<circle cx="${X(x)}" cy="${Y(y)}" r="5" class="pt"/><text x="${X(x)+(dx||8)}" y="${Y(y)+(dy||-6)}" class="tx b" ${SV}>${l}</text>`);
+return s+`</svg>`};
+
+const ROOMS=[
+{name:'بوابة المربع',intro:`البوابة مقفلة برمز من خمسة أرقام. كل إجابة صحيحة تكشف لكِ رقمًا منه. حلّي في دفتركِ قبل أن تختاري.`,code:'52813',
+qs:[
+{q:`أوجد: ${m(`${PM}${RT('0.64')}`)}`,
+o:[m('0.8'),m(PM+'0.8'),m(PM+'0.08'),m(PM+'0.32')],a:1,
+h:`إشارة ${m(PM)} تعني أن المطلوب الجذران التربيعيان: الموجب والسالب. ابحثي عن عدد مربّعه ${m('0.64')}.`,
+s:[`بما أن ${m(`${P('0.8','2')} = 0.64`)} و ${m(`${P(`(${N}0.8)`,'2')} = 0.64`)}`,`فإن ${m(`${PM}${RT('0.64')} = ${PM}0.8`)}، أي ${m('0.8')} أو ${m(N+'0.8')}`,`تنبيه: ${m('0.32')} نصف العدد وليس جذره، و ${m(P('0.08','2'))} = ${m('0.0064')}.`]},
+{q:`أيّ الجذور التربيعية الآتية يبيّن أفضل تمثيل للنقطة ف على خط الأعداد؟${NL(7,11,9.22,'ف')}`,
+o:[m(RT('85')),m(RT('81')),m(RT('98')),m(RT('79'))],a:0,
+h:`النقطة ف تقع بين ${m('9')} و ${m('9.5')}، وأقرب إلى ${m('9')}. ابحثي عن مربعي ${m('9')} و ${m('10')}، ثم قدّري كل جذر.`,
+s:[`${m(`${P('9','2')} = 81`)} و ${m(`${P('10','2')} = 100`)}`,`${m(`${RT('81')} = 9`)} بالضبط، لكن ف بعد ${m('9')} قليلًا ✗`,`${m(RT('79'))} أقل من ${m('9')} ✗، و ${m(RT('98'))} قريب جدًّا من ${m('10')} ✗`,`${m(RT('85'))}: العدد ${m('85')} أكبر قليلًا من ${m('81')}، إذن ${m(`${RT('85')} ≈ 9.2`)} ✓`]},
+{q:`حديقة مربعة الشكل مساحتها ${m('361')} م<sup>2</sup>. كم مترًا من السياج يلزم لإحاطتها بالكامل؟`,
+o:[m('19')+' م',m('38')+' م',m('76')+' م',m('90.25')+' م'],a:2,
+h:`طول ضلع المربع هو الجذر التربيعي الموجب لمساحته. والسياج حول الحديقة يساوي محيطها: ${m('4')} × طول الضلع.`,
+s:[`طول الضلع = ${m(`${RT('361')} = 19`)} م، لأن ${m(`${P('19','2')} = 361`)}`,`المحيط = ${m('4 × 19 = 76')} م`,`انتبهي: ${m('19')} هو طول الضلع فقط، و ${m('90.25')} ناتج قسمة المساحة على ${m('4')}.`]},
+{hot:HOT,q:`إذا كان س عددًا كليًّا، و ${m(RT('س'))} يقع بين ${m('7')} و ${m('8')}، فما أكبر قيمة ممكنة للعدد س؟`,
+o:[m('49'),m('56'),m('64'),m('63')],a:3,
+h:`إذا كان ${m(RT('س'))} بين ${m('7')} و ${m('8')}، فإن س يقع بين ${m(P('7','2'))} و ${m(P('8','2'))}. هل يمكن أن يساوي س العدد ${m(P('8','2'))} نفسه؟`,
+s:[`${m(`${P('7','2')} = 49`)} و ${m(`${P('8','2')} = 64`)}، إذن س بين ${m('49')} و ${m('64')}`,`لو كان ${m('س = 64')} لكان ${m(`${RT('64')} = 8`)}، أي لا يقع <b>بين</b> ${m('7')} و ${m('8')} ✗`,`أكبر عدد كلي أقل من ${m('64')} هو ${m('63')}، و ${m(`${RT('63')} ≈ 7.9`)} ✓`]}
+]},
+{name:'بوابة المثلث',intro:`عبرتِ البوابة الأولى! هنا أعداد حقيقية وأشكال فن ونظرية فيثاغورس. ارسمي الشكل في دفتركِ إذا احتجتِ.`,code:'90476',
+qs:[
+{q:`أيّ الأعداد الآتية عدد <b>غير نسبي</b>؟`,
+o:[m(N+RT('49')),m(`0,<span class="ov">3</span>`),m(RT(F(4,25))),m(RT('12'))],a:3,
+h:`بسّطي كل عدد أولًا. العدد النسبي يمكن كتابته على صورة كسر، وكسره العشري منتهٍ أو دوري. أما الجذر التربيعي لعدد ليس مربعًا كاملًا فكسره العشري غير منتهٍ وغير دوري.`,
+s:[`${m(`${N}${RT('49')} = ${N}7`)}: عدد صحيح، إذن نسبي`,`${m(`0,<span class="ov">3</span> = ${F(1,3)}`)}: كسر عشري دوري، إذن نسبي`,`${m(`${RT(F(4,25))} = ${F(2,5)}`)}: نسبي`,`${m(`${RT('12')} = 3.4641016…`)}: لا ينتهي ولا يتكرر، لأن ${m('12')} ليس مربعًا كاملًا ← <b>غير نسبي</b>`]},
+{q:`أيّ القوائم الآتية مرتّبة من الأصغر إلى الأكبر؟`,wide:1,
+o:[m(`${RT('8')} ، ${X(2,4,5)} ، ${RT('7')} ، 2,<span class="ov">8</span>`),m(`${RT('7')} ، ${X(2,4,5)} ، ${RT('8')} ، 2,<span class="ov">8</span>`),m(`${X(2,4,5)} ، ${RT('7')} ، 2,<span class="ov">8</span> ، ${RT('8')}`),m(`${RT('7')} ، ${RT('8')} ، ${X(2,4,5)} ، 2,<span class="ov">8</span>`)],a:1,
+h:`اكتبي كل عدد على صورة كسر عشري (قرّبي الجذور إلى جزء من ألف)، ثم قارني.`,
+s:[m(`${RT('7')} ≈ 2.646`),m(`${X(2,4,5)} = 2.8`),m(`${RT('8')} ≈ 2.828`),m(`2,<span class="ov">8</span> = 2.888…`),`الترتيب: ${m(`${RT('7')} ، ${X(2,4,5)} ، ${RT('8')} ، 2,<span class="ov">8</span>`)}`]},
+{q:`سُئلت ${m('40')} طالبة عن هواياتهن: ${m('22')} يفضّلن الرسم، و ${m('18')} يفضّلن القراءة، و ${m('7')} منهن يفضّلن الهوايتين معًا. كم طالبة لا تفضّل أيًّا من الهوايتين؟`,
+o:[m('7'),m('0'),m('14'),m('3')],a:0,
+h:`استعملي شكل فن: ابدئي بالجزء المشترك (${m('7')})، ثم اطرحيه من عدد كل هواية.`,
+s:[`الرسم فقط: ${m('22 − 7 = 15')}`,`القراءة فقط: ${m('18 − 7 = 11')}`,`من يفضّلن هواية واحدة على الأقل: ${m('15 + 7 + 11 = 33')}`,`لا تفضّل أيًّا منهما: ${m('40 − 33 = 7')} طالبات`,VENN(15,11,7,7,'الرسم','القراءة'),`خطأ شائع: ${m('22 + 18 = 40')} يعطي ${m('0')}، لأن المشتركات حُسبن مرتين.`]},
+{q:`ما محيط المثلث القائم الزاوية المبيّن أدناه؟${TRI(12,9,'١٢ سم','٩ سم','؟')}`,
+o:[m('21')+' سم',m('15')+' سم',m('36')+' سم',m('54')+' سم'],a:2,
+h:`أوجدي طول الوتر أولًا باستعمال نظرية فيثاغورس: ${m(`${P('جـ','2')} = ${P('أ','2')} + ${P('ب','2')}`)}، ثم اجمعي أطوال الأضلاع الثلاثة.`,
+s:[m(`${P('جـ','2')} = ${P('9','2')} + ${P('12','2')}`),m(`${P('جـ','2')} = 81 + 144 = 225`),m(`جـ = ${RT('225')} = 15`)+' سم (الطول موجب)',`المحيط = ${m('9 + 12 + 15 = 36')} سم`,`الخيار ${m('15')} هو الوتر فقط، و ${m('54')} مساحة المثلث.`]}
+]},
+{name:'بوابة الوتر',intro:`البوابة الأخيرة قبل الخروج! تطبيقات فيثاغورس والمستوى الإحداثي. ارسمي مثلثًا قائمًا في كل مسألة.`,code:'31742',
+qs:[
+{q:`سلّم طوله ${m('13')} م يستند إلى حائط رأسي، ويبعد أسفله عن قاعدة الحائط ${m('5')} م. ما ارتفاع النقطة التي يصل إليها أعلى السلّم على الحائط؟`,
+o:[m('8')+' م',m('12')+' م',m('18')+' م',m('13.9')+' م'],a:1,
+h:`السلّم هو الوتر لأنه يقابل الزاوية القائمة بين الحائط والأرض. اكتبي: ${m(`${P('5','2')} + ${P('ب','2')} = ${P('13','2')}`)}.`,
+s:[m(`${P('5','2')} + ${P('ب','2')} = ${P('13','2')}`),m(`25 + ${P('ب','2')} = 169`),m(`${P('ب','2')} = 169 − 25 = 144`),m(`ب = ${RT('144')} = 12`)+' م',`الخيار ${m('13.9')} ناتج جمع المربعين بدل طرحهما، وهذا خطأ لأن السلّم هو الوتر.`]},
+{hot:'اكتشف المختلف',q:`أيّ مجموعات الأعداد الآتية <b>لا</b> تمثّل أطوال أضلاع مثلث قائم الزاوية؟`,
+o:[m('6 ، 8 ، 10'),m('5 ، 12 ، 13'),m('7 ، 24 ، 25'),m('8 ، 15 ، 16')],a:3,
+h:`استعملي عكس نظرية فيثاغورس: هل مربع العدد الأكبر يساوي مجموع مربعي العددين الآخرين؟`,
+s:[m(`${P('6','2')} + ${P('8','2')} = 36 + 64 = 100 = ${P('10','2')}`)+' ✓',m(`${P('5','2')} + ${P('12','2')} = 25 + 144 = 169 = ${P('13','2')}`)+' ✓',m(`${P('7','2')} + ${P('24','2')} = 49 + 576 = 625 = ${P('25','2')}`)+' ✓',m(`${P('8','2')} + ${P('15','2')} = 64 + 225 = 289`)+' لكن '+m(`${P('16','2')} = 256`)+' ✗',`(المثلث القائم ذو الساقين ${m('8')} و ${m('15')} وتره ${m('17')}.)`]},
+{q:`ما المسافة بين النقطتين ${m('أ(−2، 1)')} و ${m('ب(4، −7)')}؟${PL(-3,5,-8,2,[[-2,1,'أ',-16,-6],[4,-7,'ب',8,4]],[-2,1,4,-7])}`,
+o:[m('10')+' وحدات',m('14')+' وحدة',m('2')+' وحدة',m(RT('28'))+' وحدة'],a:0,
+h:`كوّني مثلثًا قائمًا: الفرق الأفقي بين س١ و س٢، والفرق الرأسي بين ص١ و ص٢، ثم استعملي نظرية فيثاغورس.`,
+s:[`الفرق الأفقي: ${m('4 − (−2) = 6')}`,`الفرق الرأسي: ${m('1 − (−7) = 8')}`,m(`${P('جـ','2')} = ${P('6','2')} + ${P('8','2')} = 36 + 64 = 100`),m(`جـ = ${RT('100')} = 10`)+' وحدات',`الخيار ${m('14')} = ${m('6 + 8')}: جمع الفرقين دون استعمال فيثاغورس.`]},
+{hot:'تحدٍّ',q:`النقطة ${m('م(3، −1)')} هي نقطة منتصف القطعة المستقيمة أ ب. إذا كانت ${m('أ(7، 2)')}، فما إحداثيا النقطة ب؟`,
+o:[m('(5، 0.5)'),m('(11، 5)'),m('(−1، −4)'),m('(4، −3)')],a:2,
+h:`استعملي قانون نقطة المنتصف: ${m(`${F('س١ + س٢','2')} = 3`)} و ${m(`${F('ص١ + ص٢','2')} = −1`)}، ثم حلّي كل معادلة.`,
+s:[m(`${F('7 + س','2')} = 3`)+' ← '+m('7 + س = 6')+' ← '+m('س = −1'),m(`${F('2 + ص','2')} = −1`)+' ← '+m('2 + ص = −2')+' ← '+m('ص = −4'),`إذن ${m('ب(−1، −4)')}`,`تحقق: ${m(`(${F('7 + (−1)','2')} ، ${F('2 + (−4)','2')}) = (3، −1)`)} ✓`,`الخيار ${m('(5، 0.5)')} هو منتصف أ و م، وليس النقطة ب.`]}
+]}];
+
+const EXIT={hot:'سؤال الهروب',q:`تحدٍّ أخير: مثلث قائم الزاوية متطابق الساقين، طول وتره ${m(RT('72'))} سم. ما طول كل ساق من ساقيه؟`,
+o:[m('36')+' سم',m('18')+' سم',m('6')+' سم',m('8.5')+' سم'],a:2,
+h:`الساقان متطابقان، فسمّي طول كل منهما س. ونظرية فيثاغورس تعطي: ${m(`${P('س','2')} + ${P('س','2')} = ${P(`(${RT('72')})`,'2')}`)}. وتذكّري أن ${m(`${P(`(${RT('أ')})`,'2')} = أ`)}.`,
+s:[m(`${P('س','2')} + ${P('س','2')} = ${P(`(${RT('72')})`,'2')}`),m(`2${P('س','2')} = 72`),m(`${P('س','2')} = 36`),m(`س = ${RT('36')} = 6`)+' سم (الطول موجب)',`تحقق: ${m(`${P('6','2')} + ${P('6','2')} = 72`)} ✓`,`الخيار ${m('36')} هو ${m(P('س','2'))} وليس س، و ${m('8.5')} تقريب للوتر نفسه.`]};
+
+ROOMS[0].qs.push({q:`حلّ المعادلة: ${m(`${P('س','2')} = ${F(49,81)}`)}`,
+o:[m(F(7,9)),m(`${PM}${F(7,9)}`),m(`${PM}${F(49,81)}`),m(`${PM}${F(9,7)}`)],a:1,
+h:`إذا كان ${m(`${P('س','2')} = أ`)} فإن ${m(`س = ${PM}${RT('أ')}`)}. للمعادلة حلّان: موجب وسالب.`,
+s:[m(`س = ${PM}${RT(F(49,81))}`),m(`${RT(F(49,81))} = ${F(7,9)}`)+`، لأن ${m(`${P(`(${F(7,9)})`,'2')} = ${F(49,81)}`)}`,m(`س = ${PM}${F(7,9)}`),`الخيار ${m(F(7,9))} ناقص، لأنه أهمل الحلّ السالب ${m(N+F(7,9))}.`]});
+ROOMS[1].qs.push({q:`قدّر ${m(RT('30'))} إلى أقرب عدد كلي.`,
+o:[m('6'),m('15'),m('5'),m('7')],a:2,
+h:`ابحثي عن مربعين كاملين يقع ${m('30')} بينهما، ثم حدّدي أيّهما أقرب إلى ${m('30')}.`,
+s:[`${m(`${P('5','2')} = 25`)} و ${m(`${P('6','2')} = 36`)}، إذن ${m(RT('30'))} بين ${m('5')} و ${m('6')}`,`${m('30 − 25 = 5')} و ${m('36 − 30 = 6')}، فالعدد ${m('30')} أقرب إلى ${m('25')}`,`إذن ${m(`${RT('30')} ≈ 5`)} (وقيمته ${m('5.48')} تقريبًا)`,`الخيار ${m('15')} نصف العدد وليس جذره.`]});
+ROOMS[2].qs.push({q:`شاشة تلفاز مستطيلة طولها ${m('48')} بوصة وعرضها ${m('36')} بوصة. ما طول قطرها؟`,
+o:[m('84')+' بوصة',m('60')+' بوصة',m('42')+' بوصة',m('72')+' بوصة'],a:1,
+h:`القطر يقسم المستطيل إلى مثلثين قائمين، والقطر هو الوتر: ${m(`${P('جـ','2')} = ${P('48','2')} + ${P('36','2')}`)}.`,
+s:[m(`${P('جـ','2')} = ${P('48','2')} + ${P('36','2')} = 2304 + 1296 = 3600`),m(`جـ = ${RT('3600')} = 60`)+' بوصة',`الخيار ${m('84')} هو مجموع البعدين، وهذا خطأ.`]});
+const SLOTS=[[0],[1],[2],[3],[4]];
+const KEY='escape-g8-ch2-v2';
+const LETTERS=['أ','ب','جـ','د'];
+const DIG='٠١٢٣٤٥٦٧٨٩';
+const AR=s=>String(s).replace(/\d/g,d=>DIG[d]);
+const EN=s=>String(s).replace(/[٠-٩]/g,d=>DIG.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+const arab=el=>{const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){n.nodeValue=n.nodeValue.replace(/(\d)\.(\d)/g,'$1,$2').replace(/\d/g,d=>DIG[d])}};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fresh=()=>({name:'',room:0,q:0,stage:'start',got:[],tried:[],mistakes:0,start:0,end:0});
+let S;try{S=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){S=fresh()}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const app=document.getElementById('app');
+const TOTAL=ROOMS.reduce((n,r)=>n+r.qs.length,0)+1;
+
+const lockSvg=open=>open
+ ?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>`
+ :`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>`;
+function mapHtml(){
+  const names=ROOMS.map(r=>r.name).concat(['باب الخروج']);
+  return `<nav class="map">${names.map((n,i)=>{const done=i<S.room||S.stage==='done';const now=i===S.room&&S.stage!=='done'&&S.stage!=='start';
+    return `<div class="door ${done?'open':''} ${now?'now':''}">${lockSvg(done)}<span>${n}</span></div>`}).join('')}</nav>`}
+function slotsHtml(){const code=ROOMS[S.room].code;const got=new Set();S.got.forEach((g,j)=>{if(g)SLOTS[j].forEach(x=>got.add(x))});
+  return `<div class="lock" aria-label="أرقام الرمز">${[...code].map((c,i)=>`<div class="slot ${got.has(i)?'got':''}">${got.has(i)?c:'؟'}</div>`).join('')}</div>`}
+const foot=()=>`<div class="foot"><span>${esc(S.name)}</span><span>المحاولات الخاطئة: ${S.mistakes}</span><button class="link" id="rst">ابدئي من جديد</button></div>`;
+
+function render(){
+  let h='';
+  if(S.stage==='start')h=startHtml();
+  else if(S.stage==='done')h=doneHtml();
+  else if(S.stage==='code')h=codeHtml();
+  else if(S.room===ROOMS.length)h=qHtml(EXIT,true);
+  else h=qHtml(ROOMS[S.room].qs[S.q],false);
+  app.innerHTML=h;arab(app);bind();
+}
+
+function startHtml(){
+  return `${mapHtml()}
+  <section class="card">
+    <h2 style="font-size:26px">أهلًا بكِ في متاهة فيثاغورس!</h2>
+    <p class="mute" style="margin:6px 0 0">أنتِ داخل متاهة فيثاغورس أمام ثلاث بوابات مقفلة وباب خروج. في كل بوابة ${'5'} أسئلة متنوعة من الفصل كاملًا، وكل إجابة صحيحة تعطيكِ رقمًا من رمز القفل. اجمعي الرمز واكتبيه لتنتقلي للبوابة التالية، وفي النهاية سؤال الهروب.</p>
+  </section>
+  <form class="card" id="f">
+    <label for="nm">اسمكِ الثلاثي</label>
+    <input class="namein" id="nm" autocomplete="name" value="${esc(S.name)}" required>
+    <p class="err" id="ne" hidden>فضلًا اكتبي اسمكِ كاملًا.</p>
+    <div class="row"><button class="btn" type="submit">ادخلي بوابة المربع</button></div>
+  </form>
+  <section class="card"><b>القواعد</b>
+    <p class="mute" style="margin:4px 0 0">إذا أخطأتِ يظهر لكِ تلميح، وتقدرين تحاولين مرة ثانية. وإذا أصبتِ يظهر لكِ الحل بالخطوات. حلّي في دفتركِ قبل أن تختاري. في النهاية تظهر لكِ شهادة الهروب: صوّريها وأرسليها لمعلمتكِ أ. لطفيه الطلحي في تيمز.</p>
+  </section>`}
+
+function qHtml(Q,isExit){
+  const r=isExit?null:ROOMS[S.room];
+  const answered=isExit?S.stage==='exitSolved':!!S.got[S.q];
+  return `${mapHtml()}
+  ${isExit?`<section class="card"><h2 style="font-size:26px">باب الخروج 🗝️</h2><p class="mute" style="margin:4px 0 0">سؤال أخير يجمع أفكار الفصل. أجيبي عنه لتخرجي وتستلمي شهادتكِ.</p></section>`
+   :`<section class="card"><h2 style="font-size:26px">${r.name}</h2>${S.q===0&&!answered?`<p class="mute" style="margin:4px 0 0">${r.intro}</p>`:''}${slotsHtml()}</section>`}
+  <section class="card" id="qc">
+    <div class="tags"><span class="tag">${isExit?'السؤال الأخير':`السؤال ${S.q+1} من ${r.qs.length}`}</span>${Q.hot?`<span class="tag hot">${Q.hot}</span>`:''}</div>
+    <div class="q">${Q.q}</div>
+    <div class="opts${Q.wide?' wide':''}">${Q.o.map((o,i)=>{const wrong=S.tried.includes(i),right=answered&&i===Q.a;
+      return `<button class="opt ${wrong?'wrong':''} ${right?'right':''}" data-i="${i}" ${answered||wrong?'disabled':''}><b>${LETTERS[i]}</b><span>${o}</span></button>`}).join('')}</div>
+    <div id="fb">${fbHtml(Q,answered,isExit)}</div>
+  </section>
+  ${foot()}`}
+
+function fbHtml(Q,answered,isExit){
+  if(answered){
+    const code=isExit?'':ROOMS[S.room].code;const dg=isExit?'':SLOTS[S.q].map(x=>code[x]).join('');
+    const last=!isExit&&S.q===ROOMS[S.room].qs.length-1;
+    return `<div class="box sol"><h4>إجابة صحيحة، أحسنتِ! طريقة الحل:</h4>${Q.s.map(x=>`<div>${x}</div>`).join('')}</div>
+    ${isExit?'':`<div class="digit pop">${dg.length>1?'حصلتِ على رقمين من الرمز:':'حصلتِ على رقم من الرمز:'} <span class="big">${dg}</span></div>`}
+    <div class="row"><button class="btn ${isExit?'coral':''}" id="nx">${isExit?'اخرجي واستلمي شهادتكِ 🎓':last?'اذهبي إلى القفل ←':'السؤال التالي ←'}</button></div>`}
+  if(S.tried.length)return `<div class="box hint"><h4>ليست الإجابة الصحيحة. تلميح:</h4>${Q.h}</div>`;
+  return ''}
+
+function codeHtml(){
+  const r=ROOMS[S.room];
+  return `${mapHtml()}
+  <section class="card"><h2 style="font-size:26px">افتحي قفل ${r.name}</h2><p class="mute" style="margin:4px 0 0">اكتبي أرقام الرمز بالترتيب نفسه الظاهر في الخانات، من اليسار إلى اليمين.</p>${slotsHtml()}</section>
+  <form class="card" id="cf">
+    <div class="codebox">${[...r.code].map((_,i)=>`<input id="c${i}" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="الرقم ${i+1}">`).join('')}</div>
+    <p class="err" id="ce" hidden>الرمز غير صحيح. راجعي الأرقام في الخانات بالأعلى.</p>
+    <div class="row" style="justify-content:center"><button class="btn coral" type="submit">افتحي الباب</button></div>
+  </form>
+  ${foot()}`}
+
+function doneHtml(){
+  const mins=Math.max(1,Math.round((S.end-S.start)/60000));
+  let date='';try{date=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(new Date(S.end))}catch(e){}
+  const first=S.name.trim().split(/\s+/)[0];
+  const pr=S.mistakes===0
+   ?{t:'أداء كامل بدون أي خطأ!',b:'فهمكِ للأعداد الحقيقية ونظرية فيثاغورس واضح وقوي. حافظي على هذا المستوى، وراجعي بنفس الهمّة، والدرجة الكاملة في الاختبار المركزي بإذن الله قريبة منكِ.'}
+   :S.mistakes<=4
+   ?{t:'إنجاز رائع!',b:'أخطاؤكِ قليلة، وكل خطأ صحّحتِه صار خطوة تعلّمتِها. ارجعي للأسئلة التي توقفتِ عندها مرة ثانية، وستدخلين الاختبار بثقة بإذن الله.'}
+   :{t:'ما استسلمتِ ووصلتِ!',b:'كل محاولة خاطئة كانت درسًا، والمهم أنكِ أكملتِ حتى فتحتِ كل الأبواب. أعيدي الغرفة مرة ثانية وستلاحظين بنفسكِ كم تحسّنتِ. الاستمرار سرّ النجاح.'};
+  return `${mapHtml()}
+  <section class="card cert pop">
+    <span class="tag">شهادة الهروب · الفصل الثاني: الأعداد الحقيقية ونظرية فيثاغورس</span>
+    <h1>خرجتِ من متاهة فيثاغورس!</h1>
+    <div class="nm">${esc(S.name)}</div>
+    <p class="mute" style="margin:0">الصف الثاني المتوسط${date?' · '+date:''}</p>
+    <div class="stats">
+      <div class="stat"><div class="v">${TOTAL}</div><div class="l">سؤالًا محلولًا</div></div>
+      <div class="stat"><div class="v">${S.mistakes}</div><div class="l">محاولة خاطئة</div></div>
+      <div class="stat"><div class="v">${mins}</div><div class="l">دقيقة</div></div>
+    </div>
+    <div class="praise">
+      <p class="pt">${pr.t}</p>
+      <p>${pr.b}</p>
+      <p class="thanks">شكرًا لكِ يا ${esc(first)} على جهدكِ وصبركِ حتى آخر باب. فخورة بكِ، وأنتظر أن أراكِ في الغرفة القادمة.<br><span class="mute">معلمة المادة: لطفيه الطلحي</span></p>
+    </div>
+    <p class="mute" style="margin:0">صوّري هذه الشهادة وأرسليها لمعلمتكِ أ. لطفيه الطلحي في تيمز.</p>
+  </section>
+  <div class="row"><button class="btn ghost" id="again">ابدئي من جديد</button></div>`}
+
+function bind(){
+  const g=id=>document.getElementById(id);
+  if(g('rst'))g('rst').onclick=()=>{if(g('rst').dataset.sure){const n=S.name;S=fresh();S.name=n;save();render();scrollTo(0,0)}else{g('rst').dataset.sure=1;g('rst').textContent='اضغطي مرة أخرى للتأكيد (سيُمسح تقدّمكِ)'}};
+  if(S.stage==='start'){g('f').onsubmit=e=>{e.preventDefault();const n=g('nm').value.trim().replace(/\s+/g,' ');if(n.length<3){g('ne').hidden=false;return}
+    Object.assign(S,{name:n,room:0,q:0,stage:'q',got:[],tried:[],mistakes:0,start:Date.now()});save();render();scrollTo(0,0)};return}
+  if(S.stage==='done'){g('again').onclick=()=>{const n=S.name;S=fresh();S.name=n;save();render();scrollTo(0,0)};return}
+  if(S.stage==='code'){const r=ROOMS[S.room];const ins=[...r.code].map((_,i)=>g('c'+i));
+    ins.forEach((inp,i)=>{inp.oninput=()=>{inp.value=AR(EN(inp.value).replace(/\D/g,'').slice(-1));if(inp.value&&ins[i+1])ins[i+1].focus()};
+      inp.onkeydown=e=>{if(e.key==='Backspace'&&!inp.value&&ins[i-1])ins[i-1].focus()}});
+    ins[0].focus();
+    g('cf').onsubmit=e=>{e.preventDefault();const v=ins.map(x=>EN(x.value)).join('');
+      if(v===r.code){S.room++;S.q=0;S.got=[];S.tried=[];S.stage='q';save();render();scrollTo(0,0)}
+      else{g('ce').hidden=false;const f=g('cf');f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake')}};return}
+  const isExit=S.room===ROOMS.length;const Q=isExit?EXIT:ROOMS[S.room].qs[S.q];
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;
+    if(i===Q.a){if(isExit)S.stage='exitSolved';else S.got[S.q]=true}else{S.tried.push(i);S.mistakes++}
+    save();render();if(i!==Q.a)g('qc').classList.add('shake');g('fb').scrollIntoView({behavior:'smooth',block:'nearest'})});
+  if(g('nx'))g('nx').onclick=()=>{S.tried=[];
+    if(isExit){S.stage='done';S.end=Date.now()}else if(S.q<ROOMS[S.room].qs.length-1)S.q++;else S.stage='code';
+    save();render();scrollTo(0,0)};
+}
+render();
+}
+</script>
+</body>
+</html>
